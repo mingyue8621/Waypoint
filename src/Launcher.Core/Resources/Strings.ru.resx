@@ -15,6 +15,9 @@
   <data name="Text_000b821603b6" xml:space="preserve">
     <value>Ремесло</value>
   </data>
+  <data name="Text_00249de5ba18" xml:space="preserve">
+    <value>разраб.: переместить и повернуть гильдейский склад этой области до выхода</value>
+  </data>
   <data name="Text_00316f35c7ee" xml:space="preserve">
     <value>Метка задания</value>
   </data>
@@ -24,8 +27,14 @@
   <data xml:space="preserve" name="Text_005cb5071483">
     <value>Серверы готовы</value>
   </data>
+  <data name="Text_0082210d0bde" xml:space="preserve">
+    <value>показать или выбрать доступное восхождение</value>
+  </data>
   <data name="Text_00d1a1e34df7" xml:space="preserve">
     <value>Создать копию и переключить</value>
+  </data>
+  <data name="Text_00db0e746309" xml:space="preserve">
+    <value>Инструменты Waypoint</value>
   </data>
   <data name="Text_00e2d1f0bf57" xml:space="preserve">
     <value>Скрыть при создании персонажей</value>
@@ -42,11 +51,17 @@
   <data xml:space="preserve" name="Text_01134b9287ff">
     <value>Не удалось прочитать резервные копии: </value>
   </data>
+  <data name="Text_011cc4bbe97f" xml:space="preserve">
+    <value>LocalExile перешёл на клиент Path of Exile {0}, и он есть у вас в {1}. В этой папке всё ещё LocalExile для {2}: обновите его, чтобы играть на {0}. Сохранения, аккаунты и ключи входа останутся.</value>
+  </data>
   <data name="Text_0126dc853a0e" xml:space="preserve">
     <value>клиент: {0}</value>
   </data>
   <data name="Text_0135b37a077c" xml:space="preserve">
     <value>Нет модов, подходящих под поиск.</value>
+  </data>
+  <data name="Text_014c2dd9e2c6" xml:space="preserve">
+    <value>быстрая кампания: её настройки и команды для пропуска</value>
   </data>
   <data name="Text_01846401bd51" xml:space="preserve">
     <value>Скрипты</value>
@@ -66,11 +81,20 @@
   <data name="Text_01c618fd5db4" xml:space="preserve">
     <value>Выбранный модуль отсутствует.</value>
   </data>
+  <data name="Text_01d0aece657c" xml:space="preserve">
+    <value>Аннулированные персонажи.</value>
+  </data>
+  <data name="Text_01d43e181229" xml:space="preserve">
+    <value>Они в сохранности там, где находятся: в {0}.</value>
+  </data>
   <data name="Text_01deac2c6a06" xml:space="preserve">
     <value>Лабиринт дня каждой сложности в виде карты: комнаты, кратчайший путь к Изаро, ловушки, головоломки, тёмные святыни, ключи и двери.</value>
   </data>
   <data name="Text_01deefe59ede" xml:space="preserve">
     <value>Чтение {0} …</value>
+  </data>
+  <data name="Text_01f67d5891fe" xml:space="preserve">
+    <value>разраб.: получить Blind в обход обычного иммунитета</value>
   </data>
   <data name="Text_01f6aefc4008" xml:space="preserve">
     <value>Закрытие окна полностью завершает работу Waypoint.</value>
@@ -86,6 +110,9 @@
   </data>
   <data xml:space="preserve" name="Text_02262050828b">
     <value>Заменяются только сохранения этой установки; исходники, клиент и ключи не меняются.</value>
+  </data>
+  <data name="Text_0237fda382e0" xml:space="preserve">
+    <value>Наследие восхождений Phrecia. Идолы не реализованы.</value>
   </data>
   <data name="Text_024dc204d7ba" xml:space="preserve">
     <value>Область</value>
@@ -119,6 +146,9 @@
   </data>
   <data xml:space="preserve" name="Text_030d3f415374">
     <value>Что входит в копии</value>
+  </data>
+  <data name="Text_0323abc7112d" xml:space="preserve">
+    <value>разраб., live.ps1 -Walkmaps: посетить каждую пару "&lt;id области&gt; &lt;сид&gt;" файла в новом инстансе и записать; levelgen tourlist создаёт такой файл</value>
   </data>
   <data name="Text_03341d673f63" xml:space="preserve">
     <value>{0}: для этого семейства лиг вариант не определён; параметр недоступен.</value>
@@ -159,17 +189,29 @@
   <data name="Text_045923f3710f" xml:space="preserve">
     <value>Сортировка областей</value>
   </data>
+  <data name="Text_04641c39f9de" xml:space="preserve">
+    <value>моды в Mods/Binaries/: сначала загруженные, с версией, видом и хуками, затем почему остальные нет</value>
+  </data>
   <data name="Text_0470943bd6a4" xml:space="preserve">
     <value>Модулей: {0} из {1}</value>
   </data>
   <data xml:space="preserve" name="Text_0480c77bde68">
     <value>Адаптер запуска</value>
   </data>
+  <data name="Text_048fe1d24504" xml:space="preserve">
+    <value>Это не сборка 3.29.3c, нужная LocalExile, поэтому подготовка, скорее всего, не удастся. Можно попробовать, но сначала проверьте версию: копия большая.</value>
+  </data>
+  <data name="Text_04fc6ba06c6e" xml:space="preserve">
+    <value>Не удалось прочитать официальные моды: {0}</value>
+  </data>
   <data xml:space="preserve" name="Text_0516ac3163b5">
     <value>Какие цвета изменять</value>
   </data>
   <data name="Text_051d9dc39fc1" xml:space="preserve">
     <value>Безжалостный Лабиринт</value>
+  </data>
+  <data name="Text_051e0471ec60" xml:space="preserve">
+    <value>Этот мод несовместим с вашей версией клиента: {0}. Всё равно установить его?</value>
   </data>
   <data name="Text_0543defbc095" xml:space="preserve">
     <value>этой сборки из исходников</value>
@@ -186,11 +228,20 @@
   <data name="Text_058d82af4063" xml:space="preserve">
     <value>Сохранить выбор мода</value>
   </data>
+  <data name="Text_059f1bfcd1b8" xml:space="preserve">
+    <value>Windows · отдельный клиент PoE 3.29.3c · .NET 10 · сборки Debug · стандартные порты localhost. Игра всегда запускается через live.ps1. Службы останавливаются через Ctrl+C; Waypoint не завершает сервер или игру принудительно.</value>
+  </data>
   <data xml:space="preserve" name="Text_05d3ec58206c">
     <value>Фокус клавиатуры</value>
   </data>
+  <data name="Text_05f72f759953" xml:space="preserve">
+    <value>Вдвое больше опыта за убийства.</value>
+  </data>
   <data name="Text_0601b77efc9d" xml:space="preserve">
     <value>Не удалось связаться с запущенным Waypoint. Закройте его обычным способом и попробуйте снова. Обе копии должны запускаться с одинаковым уровнем прав Windows.</value>
+  </data>
+  <data name="Text_0618ad02b1e1" xml:space="preserve">
+    <value>Грабьте затонувшие сокровища и используйте силу Всепламени. Ruthless: крайняя нехватка предметов. Погибший персонаж переходит в Ruthless Allflame.</value>
   </data>
   <data xml:space="preserve" name="Text_06291e8ea32e">
     <value>Найден и выбран: </value>
@@ -215,6 +266,12 @@
   </data>
   <data name="Text_06afb73ab20b" xml:space="preserve">
     <value>Шаг 1 из 2 · Лига и режим</value>
+  </data>
+  <data name="Text_06c07d364810" xml:space="preserve">
+    <value>Персонажей пока нельзя перенести</value>
+  </data>
+  <data name="Text_06f8025705e4" xml:space="preserve">
+    <value>Без {0} эта лига будет работать без правил или содержимого, в честь которых она названа. Её персонажи останутся как есть, и модуль можно включить снова.</value>
   </data>
   <data name="Text_06fd5b0dcece" xml:space="preserve">
     <value>{0}: не целое число</value>
@@ -291,6 +348,9 @@
   <data name="Text_09b5f4350f6d" xml:space="preserve">
     <value>Применяется в следующей области.</value>
   </data>
+  <data name="Text_09cdf9d2503f" xml:space="preserve">
+    <value>Используйте подготовленный репозиторий или подготовьте отдельную копию клиента в выбранной папке. Поддерживается отдельный клиент PoE 3.29.3c.</value>
+  </data>
   <data name="Text_09df5fb37bf0" xml:space="preserve">
     <value>Аккаунты загружены. Обновите список, чтобы проверить изменения.</value>
   </data>
@@ -302,6 +362,9 @@
   </data>
   <data name="Text_0a2cabf16dae" xml:space="preserve">
     <value>Ваш текущий LocalExile</value>
+  </data>
+  <data name="Text_0a2d04499ab8" xml:space="preserve">
+    <value>переключает или on/off: +1000% скорости атаки и чтения, 100% жизни и 10 000 маны в секунду, +200% области, +10 000 жизни, +1000 характеристик; immune: ещё и без урона; сохраняется при смене области</value>
   </data>
   <data name="Text_0a63ffdd26c0" xml:space="preserve">
     <value>ТРЕБОВАНИЕ</value>
@@ -323,6 +386,9 @@
   </data>
   <data name="Text_0ad5bf6f475d" xml:space="preserve">
     <value>Не удалось установить Frida. Проверьте подключение и повторите попытку.</value>
+  </data>
+  <data name="Text_0ada19fb92ef" xml:space="preserve">
+    <value>разраб.: вкладки с гнёздами добавляют до count, максимум 1000; Gem, Flask и Unique добавляют по одному недостающему варианту</value>
   </data>
   <data name="Text_0b046bdcbbe3" xml:space="preserve">
     <value>Готова новая версия Waypoint</value>
@@ -402,6 +468,9 @@
   <data name="Text_0cad8e682400" xml:space="preserve">
     <value>Флаги для игроков, игровые режимы и выбор модулей для каждой лиги.</value>
   </data>
+  <data name="Text_0cbb46ecfee3" xml:space="preserve">
+    <value>SSF Ruthless</value>
+  </data>
   <data xml:space="preserve" name="Text_0cdc983551de">
     <value> · история модов не записана</value>
   </data>
@@ -417,8 +486,14 @@
   <data name="Text_0d0d25a58963" xml:space="preserve">
     <value>Заново получает запрос на слияние #{0}: его новейшие коммиты, в том числе после force-push</value>
   </data>
+  <data name="Text_0d21277e3dc4" xml:space="preserve">
+    <value>Задано локальным профилем запуска этой копии, config/runtime.local.ps1. Уберите это оттуда, чтобы пользоваться переключателем.</value>
+  </data>
   <data name="Text_0d2924eb2590" xml:space="preserve">
     <value>{0}: эту настройку меняйте в файле</value>
+  </data>
+  <data name="Text_0d2d61a07d4e" xml:space="preserve">
+    <value>S→C 0x7b открыть интерфейс</value>
   </data>
   <data name="Text_0d422d261e8b" xml:space="preserve">
     <value>Резервное копирование сохранений</value>
@@ -435,14 +510,23 @@
   <data name="Text_0d8c3b10eadc" xml:space="preserve">
     <value>{0}: не число</value>
   </data>
+  <data name="Text_0d8e8ef54280" xml:space="preserve">
+    <value>0x1b2 вид 0: проиграть анимацию на ближайшем монстре</value>
+  </data>
   <data name="Text_0d9fe2fa20b9" xml:space="preserve">
     <value>Это можно изменить в разделе «Настройки → Поведение окна».</value>
   </data>
   <data name="Text_0da96708cb8a" xml:space="preserve">
     <value>Останавливать службы этой рабочей копии при выходе из Waypoint</value>
   </data>
+  <data name="Text_0dada2c495ef" xml:space="preserve">
+    <value>канала консоли серверов нет: запустите Gateway, собранный с ним.</value>
+  </data>
   <data name="Text_0dc3484d5ab2" xml:space="preserve">
     <value>Аккаунтов пока нет: зарегистрируйте первый ниже.</value>
+  </data>
+  <data name="Text_0dcb80676a91" xml:space="preserve">
+    <value>Использовать версию для {0}</value>
   </data>
   <data name="Text_0dcc8c70ea9d" xml:space="preserve">
     <value>Качество {0}</value>
@@ -482,6 +566,9 @@
   </data>
   <data name="Text_0e47f09a748f" xml:space="preserve">
     <value>Приблизить</value>
+  </data>
+  <data name="Text_0e570ca6fabe" xml:space="preserve">
+    <value>Исходный код</value>
   </data>
   <data name="Text_0e70993a9229" xml:space="preserve">
     <value>Точка события не гарантирует его появления.</value>
@@ -531,6 +618,9 @@
   <data name="Text_0fe48573aa2b" xml:space="preserve">
     <value>Настроить новую копию…</value>
   </data>
+  <data name="Text_0ff81662b90f" xml:space="preserve">
+    <value>Положить предмет в инвентарь персонажа в игре (через мод Waypoint Tools)</value>
+  </data>
   <data name="Text_10103cd43afc" xml:space="preserve">
     <value>LocalExile установлен. Когда у вас будет клиент игры, запустите этот мастер снова: «Играть» → «Завершить настройку».</value>
   </data>
@@ -561,6 +651,9 @@
   <data name="Text_10adc7d75e67" xml:space="preserve">
     <value>Не менее 4 символов. Waypoint не сохраняет учётные данные.</value>
   </data>
+  <data name="Text_10b451daffda" xml:space="preserve">
+    <value>Не удалось сохранить отчёт</value>
+  </data>
   <data name="Text_10b654bcd6eb" xml:space="preserve">
     <value>Состояние пакета</value>
   </data>
@@ -584,6 +677,9 @@
   </data>
   <data name="Text_1181d704686c" xml:space="preserve">
     <value>Журнал сеанса записи ещё не создан.</value>
+  </data>
+  <data name="Text_1188e39cdad2" xml:space="preserve">
+    <value>последние n сообщений соединения в обе стороны в лог шлюза; по умолчанию 64</value>
   </data>
   <data name="Text_118ae3c5a8a6" xml:space="preserve">
     <value>Игра будет использовать его со следующего запуска</value>
@@ -612,8 +708,14 @@
   <data xml:space="preserve" name="Text_122b49fe8f4e">
     <value>Оформление сохранено.</value>
   </data>
+  <data name="Text_123b0b96dfe9" xml:space="preserve">
+    <value>ваша клетка</value>
+  </data>
   <data name="Text_126b8d3e1100" xml:space="preserve">
     <value>Обновить аккаунты</value>
+  </data>
+  <data name="Text_12bb0cca2ddd" xml:space="preserve">
+    <value>разраб.: попадание заклинанием через сопротивление и подавление заклинаний</value>
   </data>
   <data name="Text_12c439264448" xml:space="preserve">
     <value>Изаро, бой {0}</value>
@@ -648,6 +750,9 @@
   <data name="Text_13d6ff07b8a5" xml:space="preserve">
     <value>Репозиторий</value>
   </data>
+  <data name="Text_13da3c149ab9" xml:space="preserve">
+    <value>Найти…</value>
+  </data>
   <data name="Text_13e5b221168b" xml:space="preserve">
     <value>отстаёт от LocalExile на {0} коммит(ов)</value>
   </data>
@@ -659,6 +764,9 @@
   </data>
   <data xml:space="preserve" name="Text_140bedbf9c3f">
     <value>нет</value>
+  </data>
+  <data name="Text_14126be5e433" xml:space="preserve">
+    <value>Быстрая кампания: опыт за убийства ×5, скорость передвижения +50%, /fast перечисляет команды для пропуска.</value>
   </data>
   <data name="Text_14189860e58d" xml:space="preserve">
     <value>Client — это ссылка на {0}. Эту папку могут использовать другие копии LocalExile, поэтому Waypoint не будет её менять. Подготовьте клиент там или запустите мастер настройки, чтобы разместить клиент здесь.</value>
@@ -741,6 +849,9 @@
   <data name="Text_1640b0da3e69" xml:space="preserve">
     <value>Проверить сведения</value>
   </data>
+  <data name="Text_165113b6b409" xml:space="preserve">
+    <value>разраб.: уникальный камень The Adorned в инвентарь, осквернённый, для теста пассивных камней; обычный диапазон 0-100</value>
+  </data>
   <data name="Text_16cd278f7e3d" xml:space="preserve">
     <value>Всё готово к созданию. Существующие лиги и сохранения будут сохранены.</value>
   </data>
@@ -765,6 +876,9 @@
   <data name="Text_1709305c9fa9" xml:space="preserve">
     <value>Уровень</value>
   </data>
+  <data name="Text_174085a82ad4" xml:space="preserve">
+    <value>список NPC здесь</value>
+  </data>
   <data name="Text_1744b96470b5" xml:space="preserve">
     <value>Сеть</value>
   </data>
@@ -774,11 +888,17 @@
   <data name="Text_17705384c701" xml:space="preserve">
     <value>Запуск просмотра карты …</value>
   </data>
+  <data name="Text_1795d263daac" xml:space="preserve">
+    <value>Диалоги NPC</value>
+  </data>
   <data name="Text_17a007daa2f8" xml:space="preserve">
     <value>Отключение инструмента без закрытия игры и удаления записанных файлов.</value>
   </data>
   <data name="Text_17b78022cd38" xml:space="preserve">
     <value>Описание настроек успешно загружено и не содержит редактируемых параметров.</value>
+  </data>
+  <data name="Text_17bdebfa7973" xml:space="preserve">
+    <value>Текущий клиент {0} (ссылка: заменяется только ссылка):</value>
   </data>
   <data name="Text_17cebc83e8bd" xml:space="preserve">
     <value>Серверы не остановились</value>
@@ -804,8 +924,14 @@
   <data xml:space="preserve" name="Text_1842c8d229bc">
     <value>Gateway снова принимает подключения после перезагрузки. Войдите повторно, если игра вернулась на экран входа.</value>
   </data>
+  <data name="Text_185f8db32271" xml:space="preserve">
+    <value>Приветствие</value>
+  </data>
   <data name="Text_18c9175ef71b" xml:space="preserve">
     <value>Обезличенный отчёт об ошибке: сначала предпросмотр, копируется только по вашему запросу</value>
+  </data>
+  <data name="Text_18d4f61b4f45" xml:space="preserve">
+    <value>косметика портала: эффект из магазина заменяет базовый вид портала</value>
   </data>
   <data xml:space="preserve" name="Text_18dd785c42a8">
     <value>{0} · {1} · текст {2}%</value>
@@ -849,11 +975,20 @@
   <data xml:space="preserve" name="Text_1a4f630ac1b6">
     <value>Остановлен</value>
   </data>
+  <data name="Text_1a505b9f71ee" xml:space="preserve">
+    <value>«Не сейчас»: ничего не меняется, но эта папка пока не запустится.</value>
+  </data>
   <data name="Text_1a56ffc0af65" xml:space="preserve">
     <value>Серверы работают</value>
   </data>
   <data xml:space="preserve" name="Text_1a5ac0bd0b6b">
     <value>Исходный проект: </value>
+  </data>
+  <data name="Text_1a6192ed0ec5" xml:space="preserve">
+    <value>Начать с последних изменений. Копию вы обновляете сами в разделе «Версии».</value>
+  </data>
+  <data name="Text_1a6e5743a0b2" xml:space="preserve">
+    <value>Здесь можно включить или выключить любой установленный модуль, если включено всё, что ему требуется. Перед отключением собственного набора этой лиги Waypoint спросит подтверждение, модуль, созданный для изолированной лиги, остаётся в изолированных лигах, а правила режима игры относятся к лигам этого режима и к лигам, созданным в Waypoint.</value>
   </data>
   <data name="Text_1a6ff8f22cbb" xml:space="preserve">
     <value>Начните, когда будете готовы. Остановиться можно в любой момент, а игру всё это время можно не запускать.</value>
@@ -867,6 +1002,9 @@
   <data name="Text_1aee4597ab3b" xml:space="preserve">
     <value>Создать аккаунт…</value>
   </data>
+  <data name="Text_1b071ef8f91d" xml:space="preserve">
+    <value>Waypoint не скачивает игру. Нужна ваша собственная автономная копия Path of Exile 3.29.3c.</value>
+  </data>
   <data name="Text_1b12c338d9d5" xml:space="preserve">
     <value>Метки предметов</value>
   </data>
@@ -878,6 +1016,10 @@
   </data>
   <data name="Text_1b28bb60c464" xml:space="preserve">
     <value>Удаляет локальные ветки pr/&lt;n&gt; закрытых запросов на слияние (кроме текущей)</value>
+  </data>
+  <data name="Text_1b388120b03f" xml:space="preserve">
+    <value>Не удалось удалить старый клиент: {0}
+Закройте игру и всё, что использует эту папку, затем повторите.</value>
   </data>
   <data name="Text_1b39c7a894cf" xml:space="preserve">
     <value>Вы сможете вернуться к текущей в любой момент. У каждой свои персонажи и прогресс.</value>
@@ -936,6 +1078,9 @@
   <data name="Text_1cb3a13595dc" xml:space="preserve">
     <value>настройки игры отдельные ({0})</value>
   </data>
+  <data name="Text_1cbd771e134f" xml:space="preserve">
+    <value>Эта папка — «Новейшая»: новейшие изменения LocalExile из исходного кода. Перейдите на релиз, чтобы остаться в простом режиме, или включите расширенный режим, чтобы играть в этой копии и выбирать ветки и запросы на слияние.</value>
+  </data>
   <data name="Text_1cceb5ebd12e" xml:space="preserve">
     <value>Кратчайший путь</value>
   </data>
@@ -966,6 +1111,9 @@
   <data xml:space="preserve" name="Text_1ddc54772630">
     <value> · подготовленный клиент найден</value>
   </data>
+  <data name="Text_1ddc894c4c46" xml:space="preserve">
+    <value>Обмен валюты у Фаустуса как живой рынок: цены официальных лиг Path of Exile, спред, глубина и заказы, исполняющиеся со временем.</value>
+  </data>
   <data name="Text_1e0a5a4fd5bf" xml:space="preserve">
     <value>Перезапустить Gateway для записи</value>
   </data>
@@ -986,6 +1134,9 @@
   </data>
   <data name="Text_1f08634207ab" xml:space="preserve">
     <value>Показать журнал операций</value>
+  </data>
+  <data name="Text_1f14def65c07" xml:space="preserve">
+    <value>{0}, {1}, используется</value>
   </data>
   <data name="Text_1f27728ea921" xml:space="preserve">
     <value>Неизвестная связь режима</value>
@@ -1098,6 +1249,9 @@
   <data name="Text_21f1037412e4" xml:space="preserve">
     <value>Что происходит</value>
   </data>
+  <data name="Text_2200fbfe3efb" xml:space="preserve">
+    <value>по умолчанию: последний созданный</value>
+  </data>
   <data xml:space="preserve" name="Text_223e64b8fc5b">
     <value>При первом запуске выполняется автоматический поиск. Здесь можно запустить его повторно.</value>
   </data>
@@ -1115,6 +1269,9 @@
   </data>
   <data name="Text_22695d9b9731" xml:space="preserve">
     <value>Ещё не прочитано.</value>
+  </data>
+  <data name="Text_226cc5e45c9b" xml:space="preserve">
+    <value>Чтобы получить режим целиком, вернитесь назад и выберите «{0}» в поле «Режим игры».</value>
   </data>
   <data name="Text_2288c47a9839" xml:space="preserve">
     <value>Только ошибки и предупреждения</value>
@@ -1167,6 +1324,9 @@
   <data name="Text_241b991ef5b7" xml:space="preserve">
     <value>Предпросмотр карточки лиги</value>
   </data>
+  <data name="Text_241cc97b1195" xml:space="preserve">
+    <value>Проверяет копию клиента и восстанавливает устаревшие исполняемые файлы из проверенного оригинала; сохраняет ключи входа и резервные копии заменяемых файлов</value>
+  </data>
   <data name="Text_24532939f9d0" xml:space="preserve">
     <value>Выберите другое имя</value>
   </data>
@@ -1179,8 +1339,17 @@
   <data name="Text_2494bdb5bc46" xml:space="preserve">
     <value>Загрузка аккаунтов…</value>
   </data>
+  <data name="Text_24bb04339805" xml:space="preserve">
+    <value>Пароль учётной записи: им входит хостовый сервер разработки</value>
+  </data>
+  <data name="Text_24d8d6631c8e" xml:space="preserve">
+    <value>Найдите команды сервера и используйте нужную в игре.</value>
+  </data>
   <data name="Text_24ee657570ef" xml:space="preserve">
     <value>Обновить мод</value>
+  </data>
+  <data name="Text_2507bcb012ff" xml:space="preserve">
+    <value>разраб.: через сколько после срабатывания шиповые ловушки Испытаний наносят удар, до 3000 мс</value>
   </data>
   <data name="Text_2509a2687740" xml:space="preserve">
     <value>Головоломка</value>
@@ -1196,6 +1365,9 @@
   </data>
   <data name="Text_253a6e5a66fa" xml:space="preserve">
     <value>загрузка {0} …</value>
+  </data>
+  <data name="Text_2543097e3584" xml:space="preserve">
+    <value>/ перечисляет команды, затем значения каждого аргумента (области, монстры, предметы, камни …): ↑↓ выбрать, Tab или Enter взять. Без списка ↑↓ идут по истории. Текст без / — строка чата.</value>
   </data>
   <data name="Text_2550b8b2b454" xml:space="preserve">
     <value>У этого мода нет выпуска, поэтому Waypoint собирает его из исходников, а для этого нужен .NET 10 SDK. Установите его (раздел «Настройка» перечисляет, что нужно рабочей копии) и попробуйте снова.</value>
@@ -1230,8 +1402,14 @@
   <data name="Text_25d99e3dbef3" xml:space="preserve">
     <value>live.ps1 выполняется; смените сервер, когда он завершится.</value>
   </data>
+  <data name="Text_25e19b1298a9" xml:space="preserve">
+    <value>Отправка /reload через встроенный помощник выбранного репозитория; ожидание подтверждения Gateway.</value>
+  </data>
   <data name="Text_25e7df197704" xml:space="preserve">
     <value>мосту нужен Python с frida, который не установлен: его настроит кнопка «Выдать предмет» в конструкторе предметов</value>
+  </data>
+  <data name="Text_25eaa4ef8e3c" xml:space="preserve">
+    <value>Версия клиента</value>
   </data>
   <data name="Text_25ec5c9141d3" xml:space="preserve">
     <value>live.ps1 -NoClient: пересобирает и перезапускает Patch, Auth и Gateway (после pull или изменений вне Gateway); правки кода самого Gateway применяются сами через горячую перезагрузку. Запущенный клиент остаётся.</value>
@@ -1339,6 +1517,9 @@
   <data xml:space="preserve" name="Text_282b08d0523c">
     <value>Скачать Node.js</value>
   </data>
+  <data name="Text_282e649055dc" xml:space="preserve">
+    <value>{0} содержит правила режима игры. Новая лига получит их без собственных умений, торговцев и наград за задания этого режима, и игра не будет показывать её как лигу этого режима.</value>
+  </data>
   <data name="Text_284c52af98f1" xml:space="preserve">
     <value>игра запущена</value>
   </data>
@@ -1353,6 +1534,9 @@
   </data>
   <data name="Text_28c09aa06d80" xml:space="preserve">
     <value>на аккаунте уже максимальное число персонажей</value>
+  </data>
+  <data name="Text_28c922df380e" xml:space="preserve">
+    <value>Использовать локальный профиль запуска из копии, если он есть</value>
   </data>
   <data name="Text_28fd171b0b6b" xml:space="preserve">
     <value>Спросить снова в следующий раз</value>
@@ -1383,6 +1567,9 @@
   </data>
   <data name="Text_293d8864e78d" xml:space="preserve">
     <value>Инструменты для самой игры. Каждый открывается в своём окне и работает с персонажем в игре через мост управления клиентом (Python с Frida).</value>
+  </data>
+  <data name="Text_294f085ed9d0" xml:space="preserve">
+    <value>Эта копия остаётся на LocalExile для {0}: новейшему нужен клиент {1}.</value>
   </data>
   <data name="Text_2951c4e2bb30" xml:space="preserve">
     <value>Остановка: шаг, записывающий клиент или ключи, сначала завершится.</value>
@@ -1420,6 +1607,9 @@
   <data name="Text_29f2cb4814a9" xml:space="preserve">
     <value>Подготовить клиент</value>
   </data>
+  <data name="Text_2a0063587f69" xml:space="preserve">
+    <value>Этой папки нет на месте</value>
+  </data>
   <data name="Text_2a0a15cf528f" xml:space="preserve">
     <value>не удалось закрыть клиент: {0}</value>
   </data>
@@ -1432,6 +1622,9 @@
   <data xml:space="preserve" name="Text_2a36428839a3">
     <value>Фиолетовая</value>
   </data>
+  <data name="Text_2a41c9467723" xml:space="preserve">
+    <value>GameServer.Gateway commands: список команд собранного шлюза</value>
+  </data>
   <data xml:space="preserve" name="Text_2a43880cee01">
     <value>Сохраняет существующие сохранения и параметры из config/runtime.local.ps1. Адаптер v1 поддерживает буквальные присваивания Game_* и стандартные локальные порты. Неподдерживаемые профили отклоняются с пояснением.</value>
   </data>
@@ -1440,6 +1633,9 @@
   </data>
   <data xml:space="preserve" name="Text_2a954f0067b1">
     <value>История резервных копий</value>
+  </data>
+  <data name="Text_2a984528e00e" xml:space="preserve">
+    <value>открывает обмен валюты</value>
   </data>
   <data xml:space="preserve" name="Text_2ad562319767">
     <value>Функциональный мод</value>
@@ -1477,6 +1673,9 @@
   <data name="Text_2b79cd4ec41b" xml:space="preserve">
     <value>Сохранить настройки мода</value>
   </data>
+  <data name="Text_2bc430e7e225" xml:space="preserve">
+    <value>Старый клиент {0} удалён. Сохранения, аккаунты и ключи входа остались.</value>
+  </data>
   <data name="Text_2bcd48474ec9" xml:space="preserve">
     <value>Извлечь игровые данные</value>
   </data>
@@ -1504,6 +1703,9 @@
   <data name="Text_2c5c517cb9a3" xml:space="preserve">
     <value>До тех пор Waypoint работает со значениями по умолчанию. Измените или очистите их в разделе «Настройки» → «Папки и программы».</value>
   </data>
+  <data name="Text_2c88d72ca61c" xml:space="preserve">
+    <value>разраб.: применить пилотную татуировку к выделенному пассиву</value>
+  </data>
   <data xml:space="preserve" name="Text_2cb93bc2b809">
     <value>Введите положительный номер PR LocalExile, включая закрытые PR</value>
   </data>
@@ -1522,6 +1724,9 @@
   <data name="Text_2d0b83afa9d2" xml:space="preserve">
     <value>Моды отключены для этой копии</value>
   </data>
+  <data name="Text_2d7f55755f07" xml:space="preserve">
+    <value>нет персонажа в игре: войдите и зайдите в область, затем отправьте снова.</value>
+  </data>
   <data name="Text_2d895f09eb26" xml:space="preserve">
     <value>Нет выпуска: устанавливается исходный код</value>
   </data>
@@ -1537,6 +1742,9 @@
   <data name="Text_2de6febbfacf" xml:space="preserve">
     <value>Устанавливает Frida — инструмент, который взаимодействует с запущенной игрой. Она занимает около 180 МБ, а некоторые антивирусы на неё реагируют. Чат игры слишком короткий для большинства предметов, поэтому без неё выдача не работает.</value>
   </data>
+  <data name="Text_2deddd866f78" xml:space="preserve">
+    <value>Waypoint предложит установить её при отправке команд из консоли, управлении модами в игре или записи карт проходимости.</value>
+  </data>
   <data xml:space="preserve" name="Text_2deea4664d23">
     <value>Вспомогательный текст</value>
   </data>
@@ -1545,6 +1753,9 @@
   </data>
   <data name="Text_2e19a6844469" xml:space="preserve">
     <value>Waypoint не скачивает игру. Нужна ваша собственная автономная копия Path of Exile 3.29.3b.</value>
+  </data>
+  <data name="Text_2e22ad395b03" xml:space="preserve">
+    <value>Перейти на релиз…</value>
   </data>
   <data name="Text_2e24eb8ac337" xml:space="preserve">
     <value>Ближний бой</value>
@@ -1555,6 +1766,9 @@
   <data name="Text_2e3e57537a8b" xml:space="preserve">
     <value>Установка Frida в отдельное окружение. Глобальные пакеты не изменяются.</value>
   </data>
+  <data name="Text_2e6a2e3bbeeb" xml:space="preserve">
+    <value>Allflame</value>
+  </data>
   <data name="Text_2e985979a4b9" xml:space="preserve">
     <value>В этой папке LocalExile нет сохранений.</value>
   </data>
@@ -1563,6 +1777,9 @@
   </data>
   <data name="Text_2eaf1f9c10ef" xml:space="preserve">
     <value>Поиск…</value>
+  </data>
+  <data name="Text_2eb515aacf07" xml:space="preserve">
+    <value>показать экран смерти; по умолчанию этой лиги; 2 скрывает</value>
   </data>
   <data name="Text_2eb5f87b62ec" xml:space="preserve">
     <value>Выберите метку ({0})</value>
@@ -1579,8 +1796,14 @@
   <data name="Text_2eed71190382" xml:space="preserve">
     <value>Полная копия</value>
   </data>
+  <data name="Text_2efd6c79d96d" xml:space="preserve">
+    <value>Установить Waypoint Tools?</value>
+  </data>
   <data name="Text_2f0bd5f62bba" xml:space="preserve">
     <value>База: {0}</value>
+  </data>
+  <data name="Text_2f0c74977b99" xml:space="preserve">
+    <value>Серверы не отвечают на эту команду: у их Gateway нет канала консоли (запустите его один раз сборкой этого лаунчера).</value>
   </data>
   <data name="Text_2f0da30ad195" xml:space="preserve">
     <value>{0} (UTC), сид {1}</value>
@@ -1593,6 +1816,9 @@
   </data>
   <data xml:space="preserve" name="Text_2f444c96f7fb">
     <value>Более заметная рамка фокуса</value>
+  </data>
+  <data name="Text_2f55db28c725" xml:space="preserve">
+    <value>Что-то всё ещё работает: оно запущено не из этой папки или не остановилось. «Всё равно переключить» оставит это работать, и в другой папке оно будет показано как её собственное. Если оно запущено из папки, которую вы открываете, его можно остановить там.</value>
   </data>
   <data name="Text_2f5ca4b733a1" xml:space="preserve">
     <value>Выйти из Waypoint</value>
@@ -1612,6 +1838,9 @@
   <data xml:space="preserve" name="Text_2fad023a9cbb">
     <value>Подготовить клиент</value>
   </data>
+  <data name="Text_2faff9fbc32c" xml:space="preserve">
+    <value>разраб.: снять татуировку с пассива</value>
+  </data>
   <data name="Text_2fb09efc5c44" xml:space="preserve">
     <value>Череп</value>
   </data>
@@ -1623,6 +1852,9 @@
   </data>
   <data name="Text_2fd09340d317" xml:space="preserve">
     <value>Переключить для всех копий?</value>
+  </data>
+  <data name="Text_2fe123735877" xml:space="preserve">
+    <value>Исполняемый файл отдельного клиента 3.29.3c: Client/Game.exe</value>
   </data>
   <data name="Text_2fe83d132e3d" xml:space="preserve">
     <value>Мод</value>
@@ -1642,6 +1874,9 @@
   <data name="Text_3016539813b7" xml:space="preserve">
     <value>Лагерь</value>
   </data>
+  <data name="Text_301fc5574d06" xml:space="preserve">
+    <value>Переводим вас на ваш клиент Path of Exile {0} в {1}.</value>
+  </data>
   <data name="Text_302110ba3e90" xml:space="preserve">
     <value>Искать новый выпуск Waypoint на GitHub</value>
   </data>
@@ -1651,11 +1886,29 @@
   <data name="Text_3064d79a295c" xml:space="preserve">
     <value>Переименовать</value>
   </data>
+  <data name="Text_3066eeb97ef9" xml:space="preserve">
+    <value>камень в инвентарь с этим уровнем и качеством, например /gem Fireball 20 20</value>
+  </data>
+  <data name="Text_307136636b95" xml:space="preserve">
+    <value>Обновите эту копию до новейшего LocalExile в разделе «Версии».</value>
+  </data>
+  <data name="Text_307fdf4938d6" xml:space="preserve">
+    <value>разраб.: глобальный уникальный камень с максимальными значениями, в инвентарь</value>
+  </data>
   <data name="Text_30b596760dc1" xml:space="preserve">
     <value>Frida установлена, но не загружается. Проверьте вывод установки и попробуйте снова.</value>
   </data>
   <data xml:space="preserve" name="Text_30cc92d87a1e">
     <value>Монохромная</value>
+  </data>
+  <data name="Text_30dcdc997a5f" xml:space="preserve">
+    <value>разраб.: задать или снять квестовые флаги Испытаний восхождения одного уровня Лабиринта или всех, затем открыть окно таблички с пройденными</value>
+  </data>
+  <data name="Text_3115dbe40be2" xml:space="preserve">
+    <value>разраб.: сернистая кислота персонажа, сохраняется и отправляется как данные Исследования 0x228</value>
+  </data>
+  <data name="Text_312c1c3547ea" xml:space="preserve">
+    <value>HC SSF Allflame</value>
   </data>
   <data xml:space="preserve" name="Text_3131e368b220">
     <value>Проверено в {0:T} · принадлежность процессов и необходимые порты проверены локально</value>
@@ -1739,11 +1992,17 @@
   <data name="Text_3374c9e93f22" xml:space="preserve">
     <value>Остановиться можно в любой момент: готовое останется готовым.</value>
   </data>
+  <data name="Text_337fc4c61628" xml:space="preserve">
+    <value>Сохранения, аккаунты и ключи входа сохранятся. Чтобы сначала сделать резервную копию, откройте папку ниже.</value>
+  </data>
   <data name="Text_338c29e24170" xml:space="preserve">
     <value>В релизе нет исходного кода для сборки, поэтому здесь его использовать нельзя. Скачайте LocalExile в новую или пустую папку. Ваш релиз останется без изменений.</value>
   </data>
   <data name="Text_338e02304930" xml:space="preserve">
     <value>Сид {0} заменён на {1}.</value>
+  </data>
+  <data name="Text_33a4a7386c6d" xml:space="preserve">
+    <value>Открыть клиент {0}</value>
   </data>
   <data name="Text_33a58116eb34" xml:space="preserve">
     <value>Только в этом репозитории: на origin её нет (не отправлена)</value>
@@ -1753,6 +2012,9 @@
   </data>
   <data xml:space="preserve" name="Text_33b938b93ca9">
     <value>Открыть PR по номеру</value>
+  </data>
+  <data name="Text_34227ed910c5" xml:space="preserve">
+    <value>разраб.: предмет из кузнеца предметов лаунчера, с модами, в инвентарь; массив JSON выдаёт каждый предмет</value>
   </data>
   <data name="Text_343d7ede578c" xml:space="preserve">
     <value>Нет значков, соответствующих запросу.</value>
@@ -1802,6 +2064,9 @@
   <data xml:space="preserve" name="Text_3506d661965b">
     <value>Перезапустить Gateway</value>
   </data>
+  <data name="Text_35141d3417f1" xml:space="preserve">
+    <value>канал консоли закрылся без ответа</value>
+  </data>
   <data name="Text_354dc95ba6ca" xml:space="preserve">
     <value>В PATH есть Python {0}; нужен 3.9 или новее.</value>
   </data>
@@ -1813,6 +2078,9 @@
   </data>
   <data name="Text_35a86201334e" xml:space="preserve">
     <value>Проверка Python 3.9+ и Frida без установки пакетов.</value>
+  </data>
+  <data name="Text_35b31d20f9a2" xml:space="preserve">
+    <value>«Синхронизация» изменится при следующем запуске Gateway: «Играть» перезапустит серверы.</value>
   </data>
   <data name="Text_35dd8b832082" xml:space="preserve">
     <value>Показать Waypoint</value>
@@ -1849,6 +2117,9 @@
   </data>
   <data xml:space="preserve" name="Text_375e15d846ce">
     <value>Мятная Waypoint</value>
+  </data>
+  <data name="Text_378a5666fe38" xml:space="preserve">
+    <value>Правила режима игры</value>
   </data>
   <data name="Text_37a8eec1ce19" xml:space="preserve">
     <value>основная</value>
@@ -1904,6 +2175,15 @@
   <data name="Text_390dc6e41d4f" xml:space="preserve">
     <value>Мастер настройки скачает новейшую версию LocalExile, соберёт её и может перенести ваших персонажей.</value>
   </data>
+  <data name="Text_391b7011e22f" xml:space="preserve">
+    <value>Waypoint не удалось сравнить копию в {0} с этим релизом.</value>
+  </data>
+  <data name="Text_3935303e78cb" xml:space="preserve">
+    <value>разраб.: убить монстров обычным путём смерти: опыт, дроп, прогресс заданий, стадии боссов пропускаются</value>
+  </data>
+  <data name="Text_3936b1e2fe97" xml:space="preserve">
+    <value>дополнительная скорость передвижения, %</value>
+  </data>
   <data name="Text_393d8d4eecb9" xml:space="preserve">
     <value>У этого флага нет связанных вариантов режима.</value>
   </data>
@@ -1918,6 +2198,9 @@
   </data>
   <data xml:space="preserve" name="Text_39921a740bf2">
     <value>Перейти</value>
+  </data>
+  <data name="Text_39a30e6ba869" xml:space="preserve">
+    <value>Подготовить существующую копию клиента средствами Auth и Patch из LocalExile. Текущие ключи входа сохраняются. Проверенный поддерживаемый PathOfExile.exe может обновить устаревшие Game.exe и его исправленную копию; сначала создаются резервные копии прежних исполняемых файлов. Клиенты, подключённые ссылкой, не изменяются.</value>
   </data>
   <data name="Text_39d2600b7211" xml:space="preserve">
     <value>Использовать как есть</value>
@@ -1960,6 +2243,9 @@
   </data>
   <data name="Text_3ac1a9ec4fa7" xml:space="preserve">
     <value>Валюта</value>
+  </data>
+  <data name="Text_3ad1ce6fedba" xml:space="preserve">
+    <value>Waypoint не может найти вашу папку LocalExile</value>
   </data>
   <data xml:space="preserve" name="Text_3ad8589795b3">
     <value>Проверить в игре</value>
@@ -2020,7 +2306,7 @@
     <value>Пароль (не менее 4 символов; Waypoint его не сохраняет)</value>
   </data>
   <data name="Text_3c25c5fd139b" xml:space="preserve">
-    <value>/ показывает команды, затем значения каждого аргумента (области, монстры, предметы, камни …): ↑↓ — выбор, Tab или Enter — подставить значение. Без списка ↑↓ листают историю. Текст без / — это строка чата.</value>
+    <value>/ перечисляет команды, затем значения каждого аргумента (области, монстры, предметы, камни …): ↑↓ выбрать, Tab или Enter взять. Без списка ↑↓ идут по истории. Текст без / — строка чата.</value>
   </data>
   <data name="Text_3c285116701e" xml:space="preserve">
     <value>Нет редактируемых настроек</value>
@@ -2034,6 +2320,9 @@
   <data xml:space="preserve" name="Text_3c58451ae577">
     <value>Без привязки к ветке</value>
   </data>
+  <data name="Text_3c88e7cfb8fd" xml:space="preserve">
+    <value>Hardcore Ruthless</value>
+  </data>
   <data name="Text_3c8dedc73d20" xml:space="preserve">
     <value>Встречи и испытания</value>
   </data>
@@ -2045,6 +2334,9 @@
   </data>
   <data name="Text_3cdb8050a820" xml:space="preserve">
     <value>Возможные монстры: {0}</value>
+  </data>
+  <data name="Text_3cf1146ab196" xml:space="preserve">
+    <value>разраб.: предмет-валюта татуировки в инвентарь</value>
   </data>
   <data name="Text_3cf994886885" xml:space="preserve">
     <value>Скопировать аккаунты и персонажей.</value>
@@ -2065,7 +2357,13 @@
     <value> · файлы не изменены</value>
   </data>
   <data name="Text_3d502d9e88cc" xml:space="preserve">
-    <value>В лиге «Стандарт»; другие лиги доступны на экране создания персонажа в игре</value>
+    <value>В лиге Standard; другие лиги предлагает собственный экран создания персонажа</value>
+  </data>
+  <data name="Text_3d68073c4805" xml:space="preserve">
+    <value>выгрузить мод и зависимые от него, сейчас и при каждом старте</value>
+  </data>
+  <data name="Text_3da865c1058e" xml:space="preserve">
+    <value>Настраивает второй LocalExile из исходного кода, который можно менять и собирать самому. Вы можете перенести своих персонажей.</value>
   </data>
   <data name="Text_3db20e7a2c35" xml:space="preserve">
     <value>Текущие сохранения копируются и убираются в сторону, но не удаляются; действует на одно переключение</value>
@@ -2097,14 +2395,23 @@
   <data name="Text_3e55c7d756db" xml:space="preserve">
     <value>в моде больше {0} файлов или больше 64 МБ; ничего не установлено</value>
   </data>
+  <data name="Text_3e8cf9c948a6" xml:space="preserve">
+    <value>Ничего не изменилось. Нажмите «Играть», чтобы попробовать снова.</value>
+  </data>
   <data xml:space="preserve" name="Text_3e9648b06bc7">
     <value>Используется только эта установка. Waypoint не сохраняет данные для входа.</value>
   </data>
   <data xml:space="preserve" name="Text_3ea221ce95ba">
     <value>Текст основных кнопок</value>
   </data>
+  <data name="Text_3ebb4c126fd8" xml:space="preserve">
+    <value>рейтинг точности и шанс попадания атакой; по умолчанию ваш уровень</value>
+  </data>
   <data name="Text_3ee0b304b03f" xml:space="preserve">
     <value>Остановить и переключить</value>
+  </data>
+  <data name="Text_3ef49830a24a" xml:space="preserve">
+    <value>Уникальные пояса</value>
   </data>
   <data name="Text_3f8635c36da3" xml:space="preserve">
     <value>Вернуть отложенные изменения</value>
@@ -2139,6 +2446,9 @@
   <data name="Text_400d65cb7299" xml:space="preserve">
     <value>Остановить и обновить</value>
   </data>
+  <data name="Text_4011b69007cd" xml:space="preserve">
+    <value>Не удаётся найти {0}: возможно, папку переместили или переименовали, либо её диск не подключён. Укажите, где она теперь, чтобы вернуть её в список, или уберите её из списка. В самой папке в любом случае ничего не изменится.</value>
+  </data>
   <data name="Text_4033ce159a87" xml:space="preserve">
     <value>Случайная добыча</value>
   </data>
@@ -2150,6 +2460,12 @@
   </data>
   <data xml:space="preserve" name="Text_40ef19a35d79">
     <value>Службы остановлены.</value>
+  </data>
+  <data name="Text_4109f096d29b" xml:space="preserve">
+    <value>{0} (не установлен)</value>
+  </data>
+  <data name="Text_4115d7cc67e2" xml:space="preserve">
+    <value>Сохранения, сделанные до разделения баз данных, помещаются в data/saves.db, но этот LocalExile его не использует: его база данных персонажей указана в другом месте.</value>
   </data>
   <data name="Text_411aa8a7f208" xml:space="preserve">
     <value>Эти порты нужны LocalExile, но один из них занят самой Windows, поэтому Waypoint не будет его завершать. Посмотрите, что его использует, освободите порт и повторите попытку.</value>
@@ -2193,6 +2509,12 @@
   <data name="Text_42610696b9f9" xml:space="preserve">
     <value>Эти данные можно просматривать, но изменение аккаунтов отключено: схема хранения или состояние импорта не распознаны.</value>
   </data>
+  <data name="Text_426c141b68cd" xml:space="preserve">
+    <value>разраб.: пересоздать вейпоинт с StateMachine "active" n или другой моделью, или отправить 0x4c с all, no, этой области или одним битом</value>
+  </data>
+  <data name="Text_427a5eccc110" xml:space="preserve">
+    <value>разраб.: показать или изменить первый переход области; он пересоздаётся</value>
+  </data>
   <data name="Text_42e1d2be26fc" xml:space="preserve">
     <value>Сервер сохраняет прогресс персонажа по ходу игры.</value>
   </data>
@@ -2226,6 +2548,12 @@
   <data xml:space="preserve" name="Text_437d2a208b63">
     <value>Локальный профиль использует {0}</value>
   </data>
+  <data name="Text_438ecc9a4cce" xml:space="preserve">
+    <value>сохраняется в аккаунте; опыт и характеристики уровня отправляются сразу</value>
+  </data>
+  <data name="Text_43b74e5aab5d" xml:space="preserve">
+    <value>{0}, {1}, не найдена</value>
+  </data>
   <data name="Text_43e894b938d6" xml:space="preserve">
     <value>{0} — не индекс модов версии 1</value>
   </data>
@@ -2256,8 +2584,17 @@
   <data name="Text_44bc3799892c" xml:space="preserve">
     <value>Исцеление</value>
   </data>
+  <data name="Text_44c4f73e5ae3" xml:space="preserve">
+    <value>предмет в руке</value>
+  </data>
+  <data name="Text_44f981f8e19d" xml:space="preserve">
+    <value>Двойной опыт</value>
+  </data>
   <data name="Text_4556e8f76b8d" xml:space="preserve">
     <value>Загрузка не удалась (код git {0}). Проверьте подключение и повторите попытку.</value>
+  </data>
+  <data name="Text_4574641897c7" xml:space="preserve">
+    <value>0x1ab движение к вам</value>
   </data>
   <data xml:space="preserve" name="Text_45989de49fb7">
     <value>Сведения</value>
@@ -2265,11 +2602,17 @@
   <data name="Text_45afac004fa5" xml:space="preserve">
     <value>Общие моды</value>
   </data>
+  <data name="Text_45d4372cc098" xml:space="preserve">
+    <value>Ruthless: крайняя нехватка предметов. Solo Self-Found.</value>
+  </data>
   <data name="Text_45d498d7208d" xml:space="preserve">
     <value>Остановка серверов и игры …</value>
   </data>
   <data name="Text_45e596bb002f" xml:space="preserve">
     <value>· по умолчанию</value>
+  </data>
+  <data name="Text_45e9ce7ac34a" xml:space="preserve">
+    <value>ваши несглаженные и сглаженные сопротивления огню/холоду/молнии/хаосу</value>
   </data>
   <data name="Text_45eb89ba5c93" xml:space="preserve">
     <value>Точка обычной группы</value>
@@ -2279,6 +2622,9 @@
   </data>
   <data name="Text_45fd5081ff0d" xml:space="preserve">
     <value>Не удалось проверить обновления</value>
+  </data>
+  <data name="Text_460b3a7da007" xml:space="preserve">
+    <value>Чат</value>
   </data>
   <data name="Text_460c49f91144" xml:space="preserve">
     <value>Репозиторий модов</value>
@@ -2358,6 +2704,9 @@
   <data xml:space="preserve" name="Text_47cc14147fa7">
     <value>Сборка завершена.</value>
   </data>
+  <data name="Text_47d5d119de65" xml:space="preserve">
+    <value>Погибший персонаж переходит в SSF Standard. Solo Self-Found: без торговли и групп.</value>
+  </data>
   <data name="Text_47d8440d8c62" xml:space="preserve">
     <value>Сначала закройте игру. Gateway корректно перезапустится с включённой записью.</value>
   </data>
@@ -2373,14 +2722,23 @@
   <data name="Text_4850b174b713" xml:space="preserve">
     <value>Обязательный</value>
   </data>
+  <data name="Text_4850fd99e28f" xml:space="preserve">
+    <value>Waypoint остаётся в этой папке. Папка мастера настройки: {0}. Открыть её можно кнопкой «Сменить папку…» на странице «Играть» или «Изменить…» в разделе «Управление».</value>
+  </data>
   <data name="Text_4854bd9995ea" xml:space="preserve">
     <value>Ревизия рабочей копии: {0}</value>
   </data>
   <data xml:space="preserve" name="Text_4859a908b868">
     <value>Горячая перезагрузка</value>
   </data>
+  <data name="Text_4862da00cc97" xml:space="preserve">
+    <value>Открыть папку журналов</value>
+  </data>
   <data name="Text_48713a5c63fb" xml:space="preserve">
     <value>Закончить игру</value>
+  </data>
+  <data name="Text_48b405c7169c" xml:space="preserve">
+    <value>Waypoint может переключить эту копию на последний LocalExile для {0}. Ваш клиент останется как есть.</value>
   </data>
   <data name="Text_48bdb0aef4f8" xml:space="preserve">
     <value>Это собственные сохранения этого LocalExile.</value>
@@ -2388,11 +2746,20 @@
   <data name="Text_48ce04a2b2bc" xml:space="preserve">
     <value>Полная копия включает персонажей, прогресс и все секции личных и гильдейских тайников. Пустой аккаунт содержит только новые данные входа.</value>
   </data>
+  <data name="Text_48db6ba05959" xml:space="preserve">
+    <value>Показывает эту копию в расширенном режиме: все разделы, ветки и запросы на слияние в разделе «Версии». Релиз сохраняет режим, выбранный для него.</value>
+  </data>
+  <data name="Text_48e4b55531a4" xml:space="preserve">
+    <value>разраб.: уникальный радиусный камень с максимальными значениями, в инвентарь</value>
+  </data>
   <data name="Text_48fe4f837791" xml:space="preserve">
     <value>Лига создана. Она станет доступна после следующего запуска сервера.</value>
   </data>
   <data xml:space="preserve" name="Text_49089f5749b2">
     <value>Копировать проверенный отчёт</value>
+  </data>
+  <data name="Text_490faa5530c2" xml:space="preserve">
+    <value>разраб.: создать гусеницу Исследования в лагере шахты или переместить и повернуть имеющуюся; клик по ней открывает подземную карту</value>
   </data>
   <data name="Text_491051de7e93" xml:space="preserve">
     <value>Игра читает свои настройки при запуске.</value>
@@ -2400,17 +2767,29 @@
   <data xml:space="preserve" name="Text_491291cca723">
     <value>Перезагрузить выбранный</value>
   </data>
+  <data name="Text_491726921aad" xml:space="preserve">
+    <value>Это клиент {0}, а этому LocalExile нужен {1}. Выберите клиент {1}: обновите копию этого клиента официальным лаунчером Path of Exile или скачайте его.</value>
+  </data>
   <data name="Text_4938abfad1ef" xml:space="preserve">
     <value>Оставить персонажей «Новейшей»</value>
   </data>
   <data name="Text_493d9da88d61" xml:space="preserve">
     <value>Сид {0}, задан сервером (Game_LAB_SEED)</value>
   </data>
+  <data name="Text_494bdcc8aa41" xml:space="preserve">
+    <value>вернуть все узлы восхождения; пять очков отмены за узел/эффект, оболочки выбора бесплатны</value>
+  </data>
   <data xml:space="preserve" name="Text_494ca78f7374">
     <value>Своя схема</value>
   </data>
   <data name="Text_494d2555d158" xml:space="preserve">
     <value>Waypoint не удалось вернуться к этой версии.</value>
+  </data>
+  <data name="Text_496366e7506f" xml:space="preserve">
+    <value>разраб.: отметить карты Атласа пройденными, сохраняется</value>
+  </data>
+  <data name="Text_4985a64efe69" xml:space="preserve">
+    <value>Обновить LocalExile</value>
   </data>
   <data name="Text_4987ea348964" xml:space="preserve">
     <value>Выполняется {0}; в списках то, что репозиторий уже знал.</value>
@@ -2420,6 +2799,9 @@
   </data>
   <data xml:space="preserve" name="Text_49c266baaaa7">
     <value>Поиск</value>
+  </data>
+  <data name="Text_49c8d0c58043" xml:space="preserve">
+    <value>разраб.: повернуть порталы карт вокруг вертикальной оси; пересоздаёт стоящие</value>
   </data>
   <data xml:space="preserve" name="Text_49dad9577c46">
     <value>Не удалось проверить моды: </value>
@@ -2478,6 +2860,9 @@
   <data name="Text_4b3207d58add" xml:space="preserve">
     <value>Waypoint скачает {0:0} МБ, проверит их и установит поверх текущей версии. Персонажи, ключи и клиент игры сохранятся, а если включено автоматическое резервное копирование, сначала будет сделана копия сохранений. При следующем запуске данные игры могут извлекаться заново.</value>
   </data>
+  <data name="Text_4b5006fccd28" xml:space="preserve">
+    <value>Обычный режим игры.</value>
+  </data>
   <data name="Text_4b72b1793476" xml:space="preserve">
     <value>В {0} уже есть файлы, поэтому Waypoint не будет заменять эту папку ссылкой.</value>
   </data>
@@ -2489,6 +2874,9 @@
   </data>
   <data name="Text_4bcfdfe3c64c" xml:space="preserve">
     <value>Скрыть…</value>
+  </data>
+  <data name="Text_4bd005e89ae9" xml:space="preserve">
+    <value>разраб.: текущее значение характеристики персонажа</value>
   </data>
   <data xml:space="preserve" name="Text_4bdd511d381b">
     <value>Инструкция</value>
@@ -2507,6 +2895,12 @@
   </data>
   <data name="Text_4c764cb6248e" xml:space="preserve">
     <value>Бандит</value>
+  </data>
+  <data name="Text_4c7bade6c428" xml:space="preserve">
+    <value>Открыть папку данных Waypoint</value>
+  </data>
+  <data name="Text_4c84136545ca" xml:space="preserve">
+    <value>npm ci в Tools/ooz копии</value>
   </data>
   <data name="Text_4c95462ff653" xml:space="preserve">
     <value>Настройка общих игровых систем; выбор лиг для них — в разделе «Лиги».</value>
@@ -2529,6 +2923,9 @@
   <data name="Text_4cefcb025be3" xml:space="preserve">
     <value>LocalExile обновлён. Нажмите «Играть», чтобы запустить его.</value>
   </data>
+  <data name="Text_4cf1bf896411" xml:space="preserve">
+    <value>После выхода 3.30 версии для {0} больше не будут предлагаться.</value>
+  </data>
   <data name="Text_4d0e0d0e73a3" xml:space="preserve">
     <value>Зависимости: {0}</value>
   </data>
@@ -2549,6 +2946,9 @@
   </data>
   <data name="Text_4d8b9e63701a" xml:space="preserve">
     <value>Дальше к Изаро</value>
+  </data>
+  <data name="Text_4d939f063dfe" xml:space="preserve">
+    <value>множитель опыта за убийства</value>
   </data>
   <data name="Text_4d95f1b334f2" xml:space="preserve">
     <value>Отложенные изменения возвращены.</value>
@@ -2571,6 +2971,9 @@
   <data name="Text_4df36313ae04" xml:space="preserve">
     <value>2.  Находит клиент игры или позволяет указать его</value>
   </data>
+  <data name="Text_4df4a74256c7" xml:space="preserve">
+    <value>режим работы сети {0}: сервер его обслуживает</value>
+  </data>
   <data xml:space="preserve" name="Text_4df57ea533cf">
     <value>Проверка восстановления</value>
   </data>
@@ -2588,6 +2991,9 @@
   </data>
   <data name="Text_4e69a56cf7df" xml:space="preserve">
     <value>В {0} нет списка модов</value>
+  </data>
+  <data name="Text_4e7ba40328ee" xml:space="preserve">
+    <value>Void</value>
   </data>
   <data xml:space="preserve" name="Text_4e80063a06ed">
     <value> · отслеживание активно</value>
@@ -2619,8 +3025,17 @@
   <data name="Text_4f3a9bd00397" xml:space="preserve">
     <value>Класс</value>
   </data>
+  <data name="Text_4f3fb57f471f" xml:space="preserve">
+    <value>Обновление LocalExile</value>
+  </data>
   <data xml:space="preserve" name="Text_4f4bcbb48773">
     <value>ТЕКУЩИЕ ИСХОДНИКИ</value>
+  </data>
+  <data name="Text_4f79cd94340a" xml:space="preserve">
+    <value>Умения Survivors</value>
+  </data>
+  <data name="Text_4fe4cab8566d" xml:space="preserve">
+    <value>разраб.: задать опыт всем камням в инвентаре и гнёздах; near = на единицу ниже порога следующего уровня</value>
   </data>
   <data name="Text_4feda881a8e2" xml:space="preserve">
     <value>мост остановился: {0}</value>
@@ -2639,6 +3054,9 @@
   </data>
   <data name="Text_5045659cf175" xml:space="preserve">
     <value>{0}  (ошибок: {1})</value>
+  </data>
+  <data name="Text_5056fbc21cff" xml:space="preserve">
+    <value>GM-команды</value>
   </data>
   <data name="Text_506dc5a78bd1" xml:space="preserve">
     <value>Всё перенесено в {0}, но эти файлы не удалось удалить из {1}; их можно удалить вручную:</value>
@@ -2667,17 +3085,26 @@
   <data name="Text_515509f0e334" xml:space="preserve">
     <value>{0:0} МБ</value>
   </data>
+  <data name="Text_515ed25002b7" xml:space="preserve">
+    <value>Перейти на Path of Exile {0}?</value>
+  </data>
   <data name="Text_5174093cf95b" xml:space="preserve">
     <value>Оставить старую версию: она не будет обновляться.</value>
   </data>
   <data name="Text_5199860e98ea" xml:space="preserve">
     <value>Новое имя для {0}</value>
   </data>
+  <data name="Text_51a9418e522d" xml:space="preserve">
+    <value>Выживите в орде. Умения применяются сами; на каждом уровне выбирайте улучшение.</value>
+  </data>
   <data xml:space="preserve" name="Text_51b0451ee87b">
     <value>Закрыть игру</value>
   </data>
   <data xml:space="preserve" name="Text_51e7c752f8e6">
     <value>Проверка выбранной резервной копии SQLite.</value>
+  </data>
+  <data name="Text_51ea320938f5" xml:space="preserve">
+    <value>В 10 раз выше шанс магического, редкого и уникального снаряжения.</value>
   </data>
   <data xml:space="preserve" name="Text_521339c7dbbf">
     <value>Перед закрытием дождитесь завершения текущей сборки или операции.</value>
@@ -2721,6 +3148,9 @@
   <data name="Text_52e029304e0f" xml:space="preserve">
     <value>Обновить репозиторий</value>
   </data>
+  <data name="Text_52e6983d432f" xml:space="preserve">
+    <value>опыт как за убийство: повышает уровень, сохраняется</value>
+  </data>
   <data name="Text_52e85e515897" xml:space="preserve">
     <value>Установка и настройка дополнений для этой копии.</value>
   </data>
@@ -2759,6 +3189,9 @@
   </data>
   <data name="Text_5411795d179d" xml:space="preserve">
     <value>Закройте игру и перезапустите Gateway, чтобы включить запись.</value>
+  </data>
+  <data name="Text_54280d4470d9" xml:space="preserve">
+    <value>список активированных вейпоинтов; разраб.: активировать все и посетить каждую область или оставить только города</value>
   </data>
   <data xml:space="preserve" name="Text_54377045445b">
     <value>Сборка инструментов подготовки</value>
@@ -2799,6 +3232,9 @@
   <data name="Text_553decbc612d" xml:space="preserve">
     <value>Обновить LocalExile до {0}?</value>
   </data>
+  <data name="Text_554fa3461f27" xml:space="preserve">
+    <value>загрузить мод, сейчас и при каждом старте</value>
+  </data>
   <data name="Text_5559b6621735" xml:space="preserve">
     <value>В {0} нет Content.ggpk и PathOfExile.exe, поэтому это не автономный клиент.</value>
   </data>
@@ -2817,8 +3253,14 @@
   <data name="Text_5594a1f9def3" xml:space="preserve">
     <value>Остановить серверы и игру перед выходом</value>
   </data>
+  <data name="Text_559c488cfe8b" xml:space="preserve">
+    <value>Сделан для LocalExile {0}; эта копия работает на {1}.</value>
+  </data>
   <data name="Text_55b612083b47" xml:space="preserve">
     <value>Даёт LocalExile собственные настройки и сохранённый вход, а у вашей обычной игры остаются свои</value>
+  </data>
+  <data name="Text_55cd62661ffd" xml:space="preserve">
+    <value>Waypoint Tools не ответил. Игра запущена, а персонаж находится в локации?</value>
   </data>
   <data name="Text_55f68b111c40" xml:space="preserve">
     <value>Дать LocalExile собственные настройки игры, а у вашей обычной игры останутся свои.</value>
@@ -2850,11 +3292,23 @@
   <data name="Text_5726606d5e2a" xml:space="preserve">
     <value>в выпуске {0} нет {1} с файлом .sha256</value>
   </data>
+  <data name="Text_572a2c0f42aa" xml:space="preserve">
+    <value>Перейти без остановки</value>
+  </data>
   <data name="Text_573bf7ff7f9e" xml:space="preserve">
     <value>Ничего не меняется. Если этот клиент использует настройки вашей обычной игры, выберите в игре «Режим работы сети» → «Рассинхронизация» (Networking Mode → Predictive) сами.</value>
   </data>
+  <data name="Text_575a3c66a53a" xml:space="preserve">
+    <value>язык /fast</value>
+  </data>
   <data name="Text_5774139d115b" xml:space="preserve">
     <value>Лейтенанты</value>
+  </data>
+  <data name="Text_578119f923b0" xml:space="preserve">
+    <value>off убирает подмену разработчика</value>
+  </data>
+  <data name="Text_578b9f4d5223" xml:space="preserve">
+    <value>0x1b7 рядом с вами; по умолчанию последний монстр</value>
   </data>
   <data name="Text_57b7b5924c6b" xml:space="preserve">
     <value>Всё на месте. Нажмите «Играть» в Waypoint, чтобы запустить серверы и игру. В первый раз в самой игре выберите Настройки → Игра → Режим работы сети → Рассинхронизация (Options → Game → Networking Mode → Predictive).</value>
@@ -2867,6 +3321,12 @@
   </data>
   <data name="Text_581dec3ed74b" xml:space="preserve">
     <value>ПОСЛЕДНИЙ КОММИТ</value>
+  </data>
+  <data name="Text_5821caa2408b" xml:space="preserve">
+    <value>Укажите, где папка находится сейчас</value>
+  </data>
+  <data name="Text_58303af9ea09" xml:space="preserve">
+    <value>показать резервы или отключить один, включая стойки</value>
   </data>
   <data xml:space="preserve" name="Text_5841335d26d5">
     <value>Автоматические копии выключены. Перед изменениями, которые может понадобиться отменить, создайте копию вручную на странице резервных копий.</value>
@@ -2884,6 +3344,9 @@
   </data>
   <data name="Text_5899382b7399" xml:space="preserve">
     <value>Его файл config.json не удалось прочитать. Он останется рядом с новым как config.json.old.</value>
+  </data>
+  <data name="Text_58aa42f8b7e4" xml:space="preserve">
+    <value>разраб.: список богов Пантеона или выбор как C→S 0x1ee: Id, имя или строка панели</value>
   </data>
   <data xml:space="preserve" name="Text_58b1306d2f1d">
     <value>Резервные копии сохранений</value>
@@ -2903,6 +3366,9 @@
   <data name="Text_59546c79643c" xml:space="preserve">
     <value>Закрыть: {0}</value>
   </data>
+  <data name="Text_595d778513d6" xml:space="preserve">
+    <value>Waypoint остаётся в этой папке. Папка мастера настройки, {0}, добавлена в список папок вверху боковой панели: выберите её там, чтобы открыть.</value>
+  </data>
   <data xml:space="preserve" name="Text_59976865a56d">
     <value>Установите .NET 10 SDK; проверка: dotnet --list-sdks</value>
   </data>
@@ -2911,6 +3377,9 @@
   </data>
   <data name="Text_59afe47d9d37" xml:space="preserve">
     <value>Награды</value>
+  </data>
+  <data name="Text_59d037203207" xml:space="preserve">
+    <value>разраб.: поставить каменную статую этого монстра у игрока</value>
   </data>
   <data name="Text_59de121db1b8" xml:space="preserve">
     <value>Пакет</value>
@@ -2927,6 +3396,9 @@
   <data xml:space="preserve" name="Text_59fc6e9d24f1">
     <value>Игра запущена. Закройте её перед остановкой или перезапуском служб.</value>
   </data>
+  <data name="Text_59fe7b558596" xml:space="preserve">
+    <value>100 = обычная</value>
+  </data>
   <data name="Text_5a086f134592" xml:space="preserve">
     <value>Мир и исследование</value>
   </data>
@@ -2935,6 +3407,9 @@
   </data>
   <data name="Text_5a2a9ccda1eb" xml:space="preserve">
     <value>Не удалось выбрать старую версию (git завершился с кодом {0}).</value>
+  </data>
+  <data name="Text_5a2ee8307574" xml:space="preserve">
+    <value>нет персонажа в игре</value>
   </data>
   <data name="Text_5a3f8a56fafe" xml:space="preserve">
     <value>В установках Steam и Epic нет Content.ggpk, они не подходят. Выберите автономную установку.</value>
@@ -2951,11 +3426,17 @@
   <data name="Text_5a7b893e6881" xml:space="preserve">
     <value>Связи карточек лиг образуют цикл.</value>
   </data>
+  <data name="Text_5ae573789edf" xml:space="preserve">
+    <value>Настроить заново…</value>
+  </data>
   <data name="Text_5aeae0f3a80d" xml:space="preserve">
     <value>Счётчики .NET:</value>
   </data>
   <data name="Text_5b18a6940649" xml:space="preserve">
     <value>Пароль ещё раз</value>
+  </data>
+  <data name="Text_5b1a8c5b3e21" xml:space="preserve">
+    <value>Грабьте затонувшие сокровища и используйте силу Всепламени. Погибший в Hardcore Allflame персонаж переходит в лигу Allflame.</value>
   </data>
   <data name="Text_5b546022750c" xml:space="preserve">
     <value>Подробности ошибки</value>
@@ -2971,6 +3452,9 @@
   </data>
   <data name="Text_5bb7de320b88" xml:space="preserve">
     <value>В {0} есть собственные коммиты, которых нет в запросе на слияние ({1}); сначала отправьте или перенесите их</value>
+  </data>
+  <data name="Text_5c0ded9bef04" xml:space="preserve">
+    <value>в инвентарь, напр. /item Small Life Flask 2, /item Iron Ring rare</value>
   </data>
   <data name="Text_5c1a1026eda3" xml:space="preserve">
     <value>Всё на месте. Нажмите «Играть» в Waypoint, чтобы запустить серверы и игру. У LocalExile собственные настройки игры, поэтому у вашей обычной Path of Exile остаются свои.</value>
@@ -2998,6 +3482,9 @@
   </data>
   <data xml:space="preserve" name="Text_5c6b0c0b0420">
     <value>Локальная учётная запись создана. Войдите в игру и создайте персонажа там.</value>
+  </data>
+  <data name="Text_5c7a4bcd55bc" xml:space="preserve">
+    <value>разраб.: добавить флаги пресета и предыдущих актов</value>
   </data>
   <data name="Text_5cb474767eeb" xml:space="preserve">
     <value>Скачать LocalExile с GitHub в эту папку</value>
@@ -3051,6 +3538,9 @@
     <value>
 Достигнут лимит поиска; другие репозитории могут остаться ненайденными. Вы можете выбрать любую папку вручную.</value>
   </data>
+  <data name="Text_5f3f9390f047" xml:space="preserve">
+    <value>Оставить эту версию</value>
+  </data>
   <data name="Text_5f42784698ae" xml:space="preserve">
     <value>LocalExile от 1 ноября, с которым точно работает конструктор предметов. Последние изменения можно получить позже в разделе «Играть».</value>
   </data>
@@ -3059,6 +3549,12 @@
   </data>
   <data xml:space="preserve" name="Text_5f6d5cac3804">
     <value>Копирование сохранений</value>
+  </data>
+  <data name="Text_5f755162e884" xml:space="preserve">
+    <value>Waypoint не удалось получить новейший код LocalExile, чтобы сравнить копию в {0} с этим релизом. Проверьте подключение и повторите попытку.</value>
+  </data>
+  <data name="Text_5f7d44dba864" xml:space="preserve">
+    <value>Ваши персонажи всё ещё в {0}. Waypoint может перенести их сюда, если этот релиз такой же, как та копия, или новее.</value>
   </data>
   <data xml:space="preserve" name="Text_5f9f3af82191">
     <value>Текст выделения</value>
@@ -3104,6 +3600,9 @@
   </data>
   <data name="Text_60941b3ce6ff" xml:space="preserve">
     <value>Старый LocalExile удалён, а клиент игры перемещён сюда. Старые сохранения остались в {0}.</value>
+  </data>
+  <data name="Text_60ac7167f87b" xml:space="preserve">
+    <value>Этот LocalExile работает только с клиентом Path of Exile {0}, а клиент в этой папке — {1}. LocalExile нужно обновить до версии с поддержкой {1}. Сохранения, аккаунты и ключи входа останутся.</value>
   </data>
   <data xml:space="preserve" name="Text_60acc53f13a5">
     <value>Тёмная</value>
@@ -3201,6 +3700,12 @@
   <data name="Text_6300ef800bb8" xml:space="preserve">
     <value>Никогда</value>
   </data>
+  <data name="Text_632f3e81f230" xml:space="preserve">
+    <value>очки пассивов и выделенные пассивы</value>
+  </data>
+  <data name="Text_633ea86aba82" xml:space="preserve">
+    <value>Грабьте затонувшие сокровища и используйте силу Всепламени. Solo Self-Found. Погибший персонаж переходит в SSF Allflame.</value>
+  </data>
   <data xml:space="preserve" name="Text_635484c1543e">
     <value>Обновить игровые данные</value>
   </data>
@@ -3246,6 +3751,15 @@
   <data name="Text_64a9b80f4b33" xml:space="preserve">
     <value>Не удалось убедиться, что службы остановлены. Waypoint останется открытым.</value>
   </data>
+  <data name="Text_64b765aec7d6" xml:space="preserve">
+    <value>LocalExile не удалось прочитать ожидаемые константы клиента из файла:
+{0}
+
+При настройке может определяться версия PathOfExile.exe, а при извлечении используется Game.exe в этой папке LocalExile. Снова запустите мастер настройки, чтобы проверить и подготовить эту копию. Если ошибка повторится, отправьте сведения ниже и этот журнал:
+{1}
+
+{2}</value>
+  </data>
   <data name="Text_64cff1319d2f" xml:space="preserve">
     <value>Действие</value>
   </data>
@@ -3287,6 +3801,9 @@
   <data name="Text_65cbeb090b74" xml:space="preserve">
     <value>Исходная лига</value>
   </data>
+  <data name="Text_661ced1ed9f6" xml:space="preserve">
+    <value>Ссылка на ваш старый клиент {0} удалена; сама папка осталась как есть.</value>
+  </data>
   <data name="Text_663d6ece3e67" xml:space="preserve">
     <value>Установленных модов: {0} из {1}</value>
   </data>
@@ -3295,6 +3812,9 @@
   </data>
   <data name="Text_6662850b5518" xml:space="preserve">
     <value>Выбранная база сохранений изменилась. Обновите аккаунты и проверьте действие заново.</value>
+  </data>
+  <data name="Text_66795086efa2" xml:space="preserve">
+    <value>разраб.: добавить n дополнительных очков пассивов, сохраняется</value>
   </data>
   <data name="Text_667d957ad516" xml:space="preserve">
     <value>Аккаунты игроков</value>
@@ -3323,6 +3843,9 @@
   <data name="Text_6707ce0b6be2" xml:space="preserve">
     <value>это имя персонажа уже занято</value>
   </data>
+  <data name="Text_67156e25d5e6" xml:space="preserve">
+    <value>список созданных монстров</value>
+  </data>
   <data name="Text_67181a386da0" xml:space="preserve">
     <value>Эта папка — релиз LocalExile</value>
   </data>
@@ -3340,6 +3863,9 @@
   </data>
   <data name="Text_676796f86246" xml:space="preserve">
     <value>Недостаточно места: клиенту нужно ещё {0:0.#} ГБ на этом диске, а свободно {1:0.#} ГБ.</value>
+  </data>
+  <data name="Text_6795da662608" xml:space="preserve">
+    <value>Вернуть ваши настройки игры</value>
   </data>
   <data name="Text_67b6858a9f80" xml:space="preserve">
     <value>Python {0} есть в PATH ({1}).</value>
@@ -3387,7 +3913,7 @@
     <value>Для любой схемы доступны светлая, тёмная и системная темы.</value>
   </data>
   <data name="Text_68e7e2420b8e" xml:space="preserve">
-    <value>Пароль аккаунта: с ним dev host выполняет вход</value>
+    <value>Пароль учётной записи: им входит хостовый сервер разработки</value>
   </data>
   <data xml:space="preserve" name="Text_68fce9b8e435">
     <value>Светлая, тёмная или системная тема; цветовые схемы, свои цвета и параметры чтения.</value>
@@ -3422,6 +3948,9 @@
   <data name="Text_6a01b4f4e1a2" xml:space="preserve">
     <value>Управление в разделе «Лиги»</value>
   </data>
+  <data name="Text_6a1d20a9e448" xml:space="preserve">
+    <value>99-й процентиль худшей секунды в окне</value>
+  </data>
   <data name="Text_6a1ec725867a" xml:space="preserve">
     <value>Добавить на предмет</value>
   </data>
@@ -3449,11 +3978,17 @@
   <data xml:space="preserve" name="Text_6ae2ae6a2f07">
     <value>Распаковщик</value>
   </data>
+  <data name="Text_6af6c28493a1" xml:space="preserve">
+    <value>разраб.: добавить золото или отнять отрицательным числом; на аккаунт, сохраняется</value>
+  </data>
   <data name="Text_6afb5f4184ac" xml:space="preserve">
     <value>Только папки, созданные здесь кнопкой «Создать», и никогда не используемую. Они перемещаются в корзину.</value>
   </data>
   <data name="Text_6b43463e9003" xml:space="preserve">
     <value>Удалить локальные ветки закрытых запросов на слияние?</value>
+  </data>
+  <data name="Text_6b66c287b2d1" xml:space="preserve">
+    <value>В LocalExile {0} есть ошибка, из-за которой большинство скачанных модов не загружается. Обновите LocalExile до {1} или новее, чтобы исправить это. Устанавливать, изменять и удалять моды здесь по-прежнему можно.</value>
   </data>
   <data name="Text_6b8471643e7d" xml:space="preserve">
     <value>Отложенные изменения</value>
@@ -3473,11 +4008,17 @@
   <data name="Text_6c26340a1b96" xml:space="preserve">
     <value>База сохранений</value>
   </data>
+  <data name="Text_6c52f182b830" xml:space="preserve">
+    <value>разраб.: очистить пройденные карты Атласа, его очки и дерево</value>
+  </data>
   <data name="Text_6c6d375befb8" xml:space="preserve">
     <value>Некоторые ваши папки или программы недоступны</value>
   </data>
   <data name="Text_6caadd32b7a9" xml:space="preserve">
     <value>структура отдельного клиента (Content.ggpk)</value>
+  </data>
+  <data name="Text_6cc01aa057db" xml:space="preserve">
+    <value>Больше не предлагать этих персонажей?</value>
   </data>
   <data name="Text_6cc4fac6c312" xml:space="preserve">
     <value>Точек групп монстров: {0}</value>
@@ -3496,6 +4037,12 @@
   </data>
   <data name="Text_6d7beeefb57a" xml:space="preserve">
     <value>Создать профиль</value>
+  </data>
+  <data name="Text_6d896b67ee96" xml:space="preserve">
+    <value>При подготовке клиента не был создан полный исполняемый файл. Прежние файлы клиента сохранены.</value>
+  </data>
+  <data name="Text_6da4f4d72938" xml:space="preserve">
+    <value>Не запущено: игровой клиент не подходит к этому LocalExile.</value>
   </data>
   <data name="Text_6dafb2da0b4c" xml:space="preserve">
     <value>★ Закрепить</value>
@@ -3563,6 +4110,12 @@
   <data name="Text_6f0d66ca5326" xml:space="preserve">
     <value>Жуткие собственные свойства</value>
   </data>
+  <data name="Text_6f120102a235" xml:space="preserve">
+    <value>перечитать world.db: настройки, каталоги, таблицы дропа, веса уникальных, переопределения; без перезапуска</value>
+  </data>
+  <data name="Text_6f1f1b23d3fd" xml:space="preserve">
+    <value>Здесь он даёт только правила режима игры, без собственных умений, торговцев и наград за задания этого режима.</value>
+  </data>
   <data name="Text_6f20e73b9302" xml:space="preserve">
     <value>Префиксы</value>
   </data>
@@ -3614,11 +4167,17 @@
   <data name="Text_709e77536bf1" xml:space="preserve">
     <value>Некорректная настройка: {0}</value>
   </data>
+  <data name="Text_70a3eff5efdf" xml:space="preserve">
+    <value>Сообщить о проблеме: скопируйте или сохраните журналы для того, кто вам помогает</value>
+  </data>
   <data name="Text_70b4554c1108" xml:space="preserve">
     <value>Старые персонажи останутся в {0}, пока вы не удалите эту папку.</value>
   </data>
   <data name="Text_70dbcfcec0c8" xml:space="preserve">
     <value>Удалить {0}</value>
+  </data>
+  <data name="Text_70ea5e752876" xml:space="preserve">
+    <value>разраб.: увеличение области действия персонажа, base_skill_area_of_effect_+%, вместо пассивов, предметов и /god</value>
   </data>
   <data name="Text_71147e58a343" xml:space="preserve">
     <value>Проверка модов в игре</value>
@@ -3637,6 +4196,9 @@
   </data>
   <data name="Text_718c45696575" xml:space="preserve">
     <value>Новее</value>
+  </data>
+  <data name="Text_719cb39bdb67" xml:space="preserve">
+    <value>Персонажи, на которых выполняются команды, и их области (канал консоли серверов)</value>
   </data>
   <data name="Text_71c4cf22a93b" xml:space="preserve">
     <value>Без проверки данных</value>
@@ -3675,7 +4237,10 @@
     <value>Вывод git</value>
   </data>
   <data name="Text_726c2b850161" xml:space="preserve">
-    <value>Меняется интерфейс Waypoint. Названия репозиториев, пути, хеши коммитов, игровые команды и необработанные журналы остаются без перевода.</value>
+    <value>Меняется только интерфейс Waypoint. Имена репозиториев, пути, хеши коммитов, игровые команды и сырые логи остаются как есть.</value>
+  </data>
+  <data name="Text_727ca368d4a0" xml:space="preserve">
+    <value>SSF Ruthless Allflame</value>
   </data>
   <data name="Text_72ac0d580f8c" xml:space="preserve">
     <value>Копировать ID</value>
@@ -3710,6 +4275,9 @@
   <data name="Text_7396f3b0b843" xml:space="preserve">
     <value>Заменяет «Играть» разделом управления и добавляет версии, производительность и время работы сервера.</value>
   </data>
+  <data name="Text_739b47557bf5" xml:space="preserve">
+    <value>гнёзда предмета в руке: R G B W, связанные внутри слова, напр. /sockets RRGBBB — 6 связей; без цветов показывает их; Game_SOCKET_CAPACITY=1..6 задаёт максимум для любого базового предмета</value>
+  </data>
   <data name="Text_73b6e48a1b55" xml:space="preserve">
     <value>Позже</value>
   </data>
@@ -3721,6 +4289,9 @@
   </data>
   <data xml:space="preserve" name="Text_74160bd42b82">
     <value>Папка репозитория LocalExile</value>
+  </data>
+  <data name="Text_7432384d695e" xml:space="preserve">
+    <value>Копия в {0} новее этого релиза или находится на ветке, которой в нём нет. Её персонажей можно будет перенести, когда выйдет более новый релиз: обновите тогда LocalExile и попробуйте ещё раз.</value>
   </data>
   <data name="Text_7449e55272e4" xml:space="preserve">
     <value>Ремесло и торговля</value>
@@ -3745,6 +4316,9 @@
   </data>
   <data xml:space="preserve" name="Text_75081b593d15">
     <value>Отключён</value>
+  </data>
+  <data name="Text_750af77aa42e" xml:space="preserve">
+    <value>Используется</value>
   </data>
   <data name="Text_75304cf77db0" xml:space="preserve">
     <value>Всё</value>
@@ -3794,8 +4368,14 @@
   <data name="Text_76e684d8787d" xml:space="preserve">
     <value>Начать настройку</value>
   </data>
+  <data name="Text_76eb7f69d808" xml:space="preserve">
+    <value>На этом ПК найден Path of Exile {0}. Waypoint обновит LocalExile, а затем скопирует его поверх вашего текущего клиента.</value>
+  </data>
   <data name="Text_76f82c7438fc" xml:space="preserve">
     <value>Команды проходят через игровой клиент (scripts/dev/client_control.py): сначала запустите игру и войдите в область.</value>
+  </data>
+  <data name="Text_77010bfe9db5" xml:space="preserve">
+    <value>разраб.: тестовое попадание врага через сопротивления или броню</value>
   </data>
   <data name="Text_770cd9979c26" xml:space="preserve">
     <value>Игровые данные</value>
@@ -3806,11 +4386,20 @@
   <data name="Text_7743ce348d92" xml:space="preserve">
     <value>черновик</value>
   </data>
+  <data name="Text_775530099b57" xml:space="preserve">
+    <value>LocalExile теперь работает с Path of Exile {0}. Когда сможете, переходите на него: версии для {1} перестанут предлагаться после выхода 3.30.</value>
+  </data>
   <data name="Text_777a88e600e2" xml:space="preserve">
     <value>Запрошенная сборка</value>
   </data>
+  <data name="Text_77969e017152" xml:space="preserve">
+    <value>SSF Allflame</value>
+  </data>
   <data name="Text_779a193c6fad" xml:space="preserve">
     <value>Waypoint не может записывать в {0}: {1}</value>
+  </data>
+  <data name="Text_77a53d9641e6" xml:space="preserve">
+    <value>Убрать из списка</value>
   </data>
   <data name="Text_77dc2a655f8e" xml:space="preserve">
     <value>Цветок</value>
@@ -3876,7 +4465,7 @@
     <value>Клонирует LocalExile через git в выбранную папку и настраивает его для работы с ветками и запросами на слияние</value>
   </data>
   <data name="Text_7989d0faa17f" xml:space="preserve">
-    <value>GameServer.Gateway commands: список собранного Gateway</value>
+    <value>GameServer.Gateway commands: список команд собранного шлюза</value>
   </data>
   <data xml:space="preserve" name="Text_798ca2ce18bf">
     <value>Создать аккаунт</value>
@@ -3917,6 +4506,9 @@
   <data name="Text_7ac5b6d5456b" xml:space="preserve">
     <value>Показать сведения о службе</value>
   </data>
+  <data name="Text_7ad35008821d" xml:space="preserve">
+    <value>Добавить имеющуюся папку…</value>
+  </data>
   <data xml:space="preserve" name="Text_7af959bccf93">
     <value>Скачать SDK</value>
   </data>
@@ -3932,6 +4524,9 @@
   <data name="Text_7b1b95097ad5" xml:space="preserve">
     <value>extract-data.ps1 -List: какие извлечённые файлы отсутствуют или устарели</value>
   </data>
+  <data name="Text_7b1d477c3d5b" xml:space="preserve">
+    <value>Использовать версию для вашего клиента?</value>
+  </data>
   <data name="Text_7b33ac5a1812" xml:space="preserve">
     <value>у выпуска {0} нет SHA-256 для {1}; ничего не установлено</value>
   </data>
@@ -3941,11 +4536,26 @@
   <data name="Text_7b3f91c46dd2" xml:space="preserve">
     <value>{0} · {1:g}</value>
   </data>
+  <data name="Text_7b46684662b8" xml:space="preserve">
+    <value>LocalExile в разработке: самые новые изменения, из исходного кода, в расширенном режиме.</value>
+  </data>
   <data name="Text_7b472544bbda" xml:space="preserve">
     <value>Жрец</value>
   </data>
   <data name="Text_7b47361aad19" xml:space="preserve">
     <value>База</value>
+  </data>
+  <data name="Text_7b7914b171ea" xml:space="preserve">
+    <value>SSF Hardcore</value>
+  </data>
+  <data name="Text_7b9f02f25d2e" xml:space="preserve">
+    <value>новые аффиксы и имя для предмета в руке</value>
+  </data>
+  <data name="Text_7bacc99e13ee" xml:space="preserve">
+    <value>Найден только клиент {0}, поэтому эта копия перейдёт на последний LocalExile для него.</value>
+  </data>
+  <data name="Text_7bc17e5802cf" xml:space="preserve">
+    <value>Этой папки нет на месте: возможно, её переместили или переименовали, либо её диск не подключён. Ничего не изменено.</value>
   </data>
   <data name="Text_7bf6ecedbcdb" xml:space="preserve">
     <value>Карта лабиринта</value>
@@ -3974,6 +4584,9 @@
   <data xml:space="preserve" name="Text_7cd52f8db23c">
     <value>Синий–жёлтый</value>
   </data>
+  <data name="Text_7cd58899d449" xml:space="preserve">
+    <value>разраб.: пометить предмет осквернённым, например чтобы получить осквернённый магический камень</value>
+  </data>
   <data xml:space="preserve" name="Text_7cd7cde68dbf">
     <value>Моды не найдены. Соберите моды из исходников или добавьте мод в их папку.</value>
   </data>
@@ -3992,6 +4605,12 @@
   <data name="Text_7d0a4fb5a543" xml:space="preserve">
     <value>Связан с {0}</value>
   </data>
+  <data name="Text_7d2f06d53231" xml:space="preserve">
+    <value>Проверить требования и обновить настройку, включая подготовку клиента. Сначала закройте игру и остановите серверы.</value>
+  </data>
+  <data name="Text_7d457621ab87" xml:space="preserve">
+    <value>Лигу, входящую в этот релиз, здесь нельзя скрыть или показать: обновление LocalExile отменит это изменение.</value>
+  </data>
   <data xml:space="preserve" name="Text_7d9eb7acb13e">
     <value>Закрыть</value>
   </data>
@@ -4003,6 +4622,9 @@
   </data>
   <data name="Text_7ddb44d8a533" xml:space="preserve">
     <value>только что</value>
+  </data>
+  <data name="Text_7de403089763" xml:space="preserve">
+    <value>переключает их на предмете; без состояния показывает</value>
   </data>
   <data name="Text_7def4e5a805e" xml:space="preserve">
     <value>Кнопка «Играть» получает новейший LocalExile не чаще раза в день, сначала создав резервную копию сохранений. Копия с вашими изменениями остаётся нетронутой.</value>
@@ -4043,6 +4665,9 @@
   <data name="Text_7f06ea4f0831" xml:space="preserve">
     <value>Лига</value>
   </data>
+  <data name="Text_7f13a76b5a48" xml:space="preserve">
+    <value>полное здоровье; также оживляет: 0x1b1 из 0 запускает оживление клиента</value>
+  </data>
   <data name="Text_7f1aa82e323e" xml:space="preserve">
     <value>dotnet build GameServer.slnx при остановленных серверах</value>
   </data>
@@ -4064,6 +4689,9 @@
   <data name="Text_7f8ba52ba5d8" xml:space="preserve">
     <value>Готовый к игре выпуск (рекомендуется)</value>
   </data>
+  <data name="Text_7fc4c8da49d4" xml:space="preserve">
+    <value>Вкладки разработки Nessa</value>
+  </data>
   <data xml:space="preserve" name="Text_7fd994d683da">
     <value>Поиск по веткам, заголовкам PR, авторам или хешам коммитов</value>
   </data>
@@ -4072,6 +4700,9 @@
   </data>
   <data name="Text_801545905b87" xml:space="preserve">
     <value>Снять отметки</value>
+  </data>
+  <data name="Text_8021569a2884" xml:space="preserve">
+    <value>возвращает все пассивы, сохраняется</value>
   </data>
   <data name="Text_8042721ff5f2" xml:space="preserve">
     <value>Этот выпуск не заявляет совместимость с загружаемыми модами. Для установки и обновления модов используйте актуальную копию исходного кода.</value>
@@ -4082,14 +4713,23 @@
   <data xml:space="preserve" name="Text_808fc010f815">
     <value>{0}: {1} при копировании</value>
   </data>
+  <data name="Text_80ae725eed00" xml:space="preserve">
+    <value>обновить открытый магазин Кирака за его цену в золоте по прогрессу</value>
+  </data>
   <data xml:space="preserve" name="Text_80d16534322e">
     <value>Мод собран.</value>
+  </data>
+  <data name="Text_80e410a9736a" xml:space="preserve">
+    <value>отправить одно сообщение S→C</value>
   </data>
   <data name="Text_80fc40213320" xml:space="preserve">
     <value>Открытие</value>
   </data>
   <data xml:space="preserve" name="Text_80fd4dce7fd0">
     <value>Вместо анимированного индикатора используются название этапа и прошедшее время. Параметры анимации Windows учитываются автоматически.</value>
+  </data>
+  <data name="Text_812e643346cc" xml:space="preserve">
+    <value>монстры преследуют вас при приближении; выходящие из земли появляются в любом случае</value>
   </data>
   <data name="Text_81319fb532ca" xml:space="preserve">
     <value>Ваша локальная учётная запись</value>
@@ -4127,11 +4767,23 @@
   <data name="Text_82b8c45a6503" xml:space="preserve">
     <value>dev host остановлен</value>
   </data>
+  <data name="Text_82bf8676d099" xml:space="preserve">
+    <value>То, что записали Waypoint, серверы и игра: сюда стоит заглянуть, если что-то пошло не так.</value>
+  </data>
+  <data name="Text_82c368b8eebd" xml:space="preserve">
+    <value>перезагрузить мод и зависимые из его папки, или все; состояние начинается заново</value>
+  </data>
   <data name="Text_82d5739fc5a5" xml:space="preserve">
     <value>Скопировать чат-команду, которая выдаёт этот предмет</value>
   </data>
+  <data name="Text_82dab4842651" xml:space="preserve">
+    <value>LocalExile v0.4.2-beta, с которым точно работает этот Waypoint. Перейти на последние изменения можно позже в разделе «Версии».</value>
+  </data>
   <data name="Text_8300d2d40c93" xml:space="preserve">
     <value>Готово: {0} ({1:0} с).</value>
+  </data>
+  <data name="Text_8308a244f732" xml:space="preserve">
+    <value>разраб.: телепорт к клетке, монстру, NPC, переходу, вейпоинту или объекту, напр. /tp RhoaChest 2</value>
   </data>
   <data xml:space="preserve" name="Text_8328dc8f6f33">
     <value>Проверка требований, принадлежности процессов и выбранной установки.</value>
@@ -4150,6 +4802,9 @@
   </data>
   <data name="Text_8386a4dafcc0" xml:space="preserve">
     <value>Назад к имени и режиму</value>
+  </data>
+  <data name="Text_839c11f3a600" xml:space="preserve">
+    <value>разраб.: перейти в область как через переход, напр. /goto 1_1_3; с сидом — новый инстанс с этим сидом</value>
   </data>
   <data xml:space="preserve" name="Text_83b12c2216ef">
     <value>Очистить</value>
@@ -4226,8 +4881,17 @@
   <data name="Text_8550dd056667" xml:space="preserve">
     <value>Выпуска для Linux пока нет, поэтому LocalExile будет установлен из исходного кода.</value>
   </data>
+  <data name="Text_8590a0fa1259" xml:space="preserve">
+    <value>Найден клиент {0} (только чтение):</value>
+  </data>
   <data name="Text_85a70742a28e" xml:space="preserve">
     <value>Удалить сохранённый предмет</value>
+  </data>
+  <data name="Text_85ba837cb711" xml:space="preserve">
+    <value>разраб.: сколько пила Испытаний наносит в секунду от максимума жизни и щита, и насколько близко к центру это в клетках</value>
+  </data>
+  <data name="Text_86166dd1d685" xml:space="preserve">
+    <value>Перенести моих персонажей…</value>
   </data>
   <data name="Text_861e03332619" xml:space="preserve">
     <value>Файлы программы в {0} будут удалены, и это нельзя отменить. Старые сохранения и моды останутся там, пока вы не удалите их сами. Если эта копия использует клиент игры с того же диска, сначала он будет перемещён сюда.</value>
@@ -4247,6 +4911,9 @@
   <data name="Text_86cf366a184e" xml:space="preserve">
     <value>Удалить копию</value>
   </data>
+  <data name="Text_86d42618a090" xml:space="preserve">
+    <value>Или вернитесь назад и выберите новую пустую папку: тогда Waypoint установит LocalExile {0}, сделанный для {1}.</value>
+  </data>
   <data name="Text_8703b1f43ea7" xml:space="preserve">
     <value>нет локальных изменений</value>
   </data>
@@ -4262,6 +4929,9 @@
   <data name="Text_8799981821ae" xml:space="preserve">
     <value>Имя для «Создать», «Копировать» или «Переименовать»:</value>
   </data>
+  <data name="Text_87a0a889ad35" xml:space="preserve">
+    <value>Быстрая кампания</value>
+  </data>
   <data xml:space="preserve" name="Text_87bb59ba2f92">
     <value>Рабочая папка</value>
   </data>
@@ -4276,6 +4946,9 @@
   </data>
   <data name="Text_8815084551ec" xml:space="preserve">
     <value>live.ps1 уже выполняется.</value>
+  </data>
+  <data name="Text_881ed28611e8" xml:space="preserve">
+    <value>разраб.: планировка Лабиринта на сегодня для уровня сложности; комнаты, связи и секреты; /goto в область — играть комнату с её узлом</value>
   </data>
   <data name="Text_88259cd6f621" xml:space="preserve">
     <value>Регистрация аккаунта</value>
@@ -4297,6 +4970,9 @@
   </data>
   <data name="Text_889cb7596e7f" xml:space="preserve">
     <value>Выбрать цвет…</value>
+  </data>
+  <data name="Text_88a30612baf9" xml:space="preserve">
+    <value>В игре</value>
   </data>
   <data name="Text_88aa5090fa37" xml:space="preserve">
     <value>Планировка: {0} × {1} плиток</value>
@@ -4333,6 +5009,9 @@
   </data>
   <data name="Text_897b35f13239" xml:space="preserve">
     <value>{0}: от {1} до {2}</value>
+  </data>
+  <data name="Text_897f7947157c" xml:space="preserve">
+    <value>Сохраняет проверенный отчёт в один текстовый файл и показывает его: файл можно прикрепить или перетащить в чат</value>
   </data>
   <data xml:space="preserve" name="Text_898a809683dd">
     <value>Мод перезагружен.</value>
@@ -4376,6 +5055,9 @@
   <data name="Text_8a91c3ae834f" xml:space="preserve">
     <value>Случайное зерно</value>
   </data>
+  <data name="Text_8ab7f9856f66" xml:space="preserve">
+    <value>HC Ruthless Allflame</value>
+  </data>
   <data name="Text_8ad2eaa716dc" xml:space="preserve">
     <value>Для доступной для игры лиги необходим модуль Game.</value>
   </data>
@@ -4403,11 +5085,17 @@
   <data name="Text_8b57b64a80f5" xml:space="preserve">
     <value>Создать резервную копию сохранений этого релиза?</value>
   </data>
+  <data name="Text_8b5ad58d76bc" xml:space="preserve">
+    <value>Ваши персонажи остаются в {0} как есть. Waypoint больше не будет предлагать перенести их в этот релиз.</value>
+  </data>
   <data xml:space="preserve" name="Text_8b7df2ff57b5">
     <value>Некоторые сочетания своих цветов текста и фона имеют низкую контрастность. Измените цвета или сбросьте схему.</value>
   </data>
   <data name="Text_8b99483221c4" xml:space="preserve">
     <value>Легион</value>
+  </data>
+  <data name="Text_8b996dea9c17" xml:space="preserve">
+    <value>Объекты заданий</value>
   </data>
   <data xml:space="preserve" name="Text_8bc9335f3b83">
     <value>Восстановить выбор модов…</value>
@@ -4471,6 +5159,9 @@
   </data>
   <data name="Text_8dbc5c234ce1" xml:space="preserve">
     <value>{0}: выберите один из вариантов</value>
+  </data>
+  <data name="Text_8de109f741c7" xml:space="preserve">
+    <value>Синхронизация</value>
   </data>
   <data name="Text_8de4d4dac04c" xml:space="preserve">
     <value>пок. 2</value>
@@ -4547,6 +5238,9 @@
   <data name="Text_9045b1ddb963" xml:space="preserve">
     <value>Новое имя аккаунта</value>
   </data>
+  <data name="Text_904f70502906" xml:space="preserve">
+    <value>Сохранить в файл</value>
+  </data>
   <data name="Text_9057a199a1c0" xml:space="preserve">
     <value>Порт {0}: {1} (PID {2}), запущен {3:g}</value>
   </data>
@@ -4561,6 +5255,9 @@
   </data>
   <data name="Text_90facdb2d195" xml:space="preserve">
     <value>Прицел</value>
+  </data>
+  <data name="Text_915359c648ff" xml:space="preserve">
+    <value>разраб.: сколько горячая плита Испытаний наносит в секунду от максимума жизни и щита, и сколько держится на пике и отдыхает холодной</value>
   </data>
   <data name="Text_9158396951bf" xml:space="preserve">
     <value>То же, что «Остановить всё»: игра, запись планировок, серверы и служба аккаунтов.</value>
@@ -4601,11 +5298,17 @@
   <data xml:space="preserve" name="Text_92c1cdfdf4cb">
     <value>Включён</value>
   </data>
+  <data name="Text_92d2f77408b3" xml:space="preserve">
+    <value>Включить расширенный режим</value>
+  </data>
   <data name="Text_92ed295821cb" xml:space="preserve">
     <value>Этот игровой клиент общий с другими копиями LocalExile: переключение изменит и их настройки.</value>
   </data>
   <data name="Text_92f0131f4770" xml:space="preserve">
     <value>Вернуть все настройки, которые меняет Waypoint, к значениям по умолчанию?</value>
+  </data>
+  <data name="Text_92f1fcf2bacd" xml:space="preserve">
+    <value>Восхождения Phrecia</value>
   </data>
   <data xml:space="preserve" name="Text_92fef4d42c37">
     <value>Соберите мод или установите его DLL.</value>
@@ -4641,6 +5344,9 @@
   <data name="Text_93827aab09d1" xml:space="preserve">
     <value>Игра, моды, резервные копии, учётные записи, журналы, консоль и инструменты.</value>
   </data>
+  <data name="Text_93adccb219af" xml:space="preserve">
+    <value>LocalExile ещё работает</value>
+  </data>
   <data name="Text_93bcc3510b6f" xml:space="preserve">
     <value>Сундук с сокровищами</value>
   </data>
@@ -4668,11 +5374,20 @@
   <data xml:space="preserve" name="Text_9491bfb97e66">
     <value>Ожидание закрытия окна игры без принудительного завершения.</value>
   </data>
+  <data name="Text_94984f98e642" xml:space="preserve">
+    <value>Waypoint Tools не установлен: причина в разделе «Журналы».</value>
+  </data>
+  <data name="Text_949d1326b83e" xml:space="preserve">
+    <value>Проверка исполняемых файлов клиента с сохранением текущих ключей входа.</value>
+  </data>
   <data name="Text_94b04d14b4fa" xml:space="preserve">
     <value>Найти автоматически…</value>
   </data>
   <data name="Text_94e14eed87ef" xml:space="preserve">
     <value>клиент (PID {0}) закрыт</value>
+  </data>
+  <data name="Text_94ec0ea50d8d" xml:space="preserve">
+    <value>Грабьте затонувшие сокровища и используйте силу Всепламени. Solo Self-Found: без торговли и групп.</value>
   </data>
   <data name="Text_94fac69c8653" xml:space="preserve">
     <value>Дать LocalExile собственные настройки игры</value>
@@ -4691,6 +5406,9 @@
   </data>
   <data xml:space="preserve" name="Text_9575a529260a">
     <value>Оформление и доступность</value>
+  </data>
+  <data name="Text_9576946d6fd6" xml:space="preserve">
+    <value>В простом режиме играют в релиз</value>
   </data>
   <data name="Text_95784099d97d" xml:space="preserve">
     <value>{0} ещё выполняется</value>
@@ -4731,6 +5449,12 @@
   </data>
   <data xml:space="preserve" name="Text_964cf7280ca9">
     <value>Дополнительные имена для скрытия через запятую</value>
+  </data>
+  <data name="Text_9657fa1701fe" xml:space="preserve">
+    <value>Найден только клиент {0}, поэтому Waypoint установит {1} — последний LocalExile для него.</value>
+  </data>
+  <data name="Text_965d57dfaa36" xml:space="preserve">
+    <value>броня, уклонение и избегание; по умолчанию ваш уровень</value>
   </data>
   <data name="Text_96696ebb5f8d" xml:space="preserve">
     <value>Что копировать</value>
@@ -4801,11 +5525,17 @@
   <data name="Text_97bc1cb9f0ad" xml:space="preserve">
     <value>Перенести персонажей в «Новейшую»?</value>
   </data>
+  <data name="Text_97dfe569eddc" xml:space="preserve">
+    <value>разраб.: показать, задать или снять квестовые флаги</value>
+  </data>
   <data name="Text_9814c443a469" xml:space="preserve">
     <value>При выходе Waypoint сначала остановит службы этой рабочей копии. Если игра открыта, можно отменить выход или оставить всё работающим.</value>
   </data>
   <data name="Text_98210ede903e" xml:space="preserve">
     <value>Установите Node.js (руководство по настройке LocalExile использует Node 24) и нажмите «Проверить снова»: Waypoint заново читает PATH, так что перезапуск не нужен.</value>
+  </data>
+  <data name="Text_9825db2bf982" xml:space="preserve">
+    <value>Исходный код, {0}</value>
   </data>
   <data name="Text_9839ef01de05" xml:space="preserve">
     <value>Другие инструменты модов</value>
@@ -4843,6 +5573,9 @@
   <data name="Text_98d3dd871595" xml:space="preserve">
     <value>Последняя {0}</value>
   </data>
+  <data name="Text_98f334a494f1" xml:space="preserve">
+    <value>Для «Выдать предмет» нужен мод Waypoint Tools: он выдаёт предмет персонажу в игре. Установить его из официальных модов?</value>
+  </data>
   <data name="Text_990c09b02baf" xml:space="preserve">
     <value>Вышел LocalExile {0}; у вас {1}. Персонажи, ключи и клиент игры сохранятся.</value>
   </data>
@@ -4860,6 +5593,9 @@
   </data>
   <data xml:space="preserve" name="Text_993f024b650e">
     <value>Насыщенность</value>
+  </data>
+  <data name="Text_99522dd1fec8" xml:space="preserve">
+    <value>повернуть NPC здесь</value>
   </data>
   <data xml:space="preserve" name="Text_995c08ae21a7">
     <value>Выберите рабочую папку</value>
@@ -4882,8 +5618,14 @@
   <data xml:space="preserve" name="Text_99efec87ba2a">
     <value>Устраните конфликт рабочей папки</value>
   </data>
+  <data name="Text_9a05eeed8b20" xml:space="preserve">
+    <value>«Выдать предмет» работает через мод Waypoint Tools, а ни одна запущенная игра его не загрузила. Нажмите «Играть», включите мод в разделе «Моды», если он выключен, войдите в локацию персонажем и выдайте предмет снова.</value>
+  </data>
   <data name="Text_9a2ad8cb272e" xml:space="preserve">
     <value>Удалено сохранённых предметов: {0}</value>
+  </data>
+  <data name="Text_9a3cdf338f34" xml:space="preserve">
+    <value>Перенести персонажей в релиз?</value>
   </data>
   <data name="Text_9a71843838e4" xml:space="preserve">
     <value>Установите .NET 10 SDK для Windows x64 со страницы загрузки Microsoft и нажмите «Проверить снова»: Waypoint заново читает PATH, так что перезапуск не нужен.</value>
@@ -4911,7 +5653,7 @@
     <value>Начать заново с пустого предмета: без базы и свойств, поиск и фильтры очищены. Сохранённые предметы остаются.</value>
   </data>
   <data name="Text_9acf715d90c1" xml:space="preserve">
-    <value>Кража</value>
+    <value>Ограбление</value>
   </data>
   <data name="Text_9ae7976ac3c8" xml:space="preserve">
     <value>Этой программы нет</value>
@@ -4919,8 +5661,14 @@
   <data name="Text_9afaaba23e27" xml:space="preserve">
     <value>Учётная запись создана.</value>
   </data>
+  <data name="Text_9b091b44d79b" xml:space="preserve">
+    <value>Теперь в этой копии LocalExile для {0}. Нажмите «Играть».</value>
+  </data>
   <data name="Text_9b1120c28631" xml:space="preserve">
     <value>Папка журналов</value>
+  </data>
+  <data name="Text_9b1d93ed5c44" xml:space="preserve">
+    <value>разраб.: показать или задать бюджет очков пассивов Атласа, сохраняется</value>
   </data>
   <data name="Text_9b41ba20b8a3" xml:space="preserve">
     <value>Не загружен</value>
@@ -4952,6 +5700,9 @@
   <data name="Text_9bf4d9a05005" xml:space="preserve">
     <value>{0}: свойств: {1}. Пропущено строк: {2} (красные): у конструктора нет свойства с таким текстом.</value>
   </data>
+  <data name="Text_9c063237120d" xml:space="preserve">
+    <value>Работает с LocalExile {0}</value>
+  </data>
   <data name="Text_9c0f7a91cfa6" xml:space="preserve">
     <value>настройки игры общие с вашей обычной игрой</value>
   </data>
@@ -4961,14 +5712,26 @@
   <data name="Text_9c384372f6be" xml:space="preserve">
     <value>Запись остановлена. Существующие файлы сохранены.</value>
   </data>
+  <data name="Text_9c45a66aeb78" xml:space="preserve">
+    <value>В списке этой лиги есть модуль, который не установлен. LocalExile его пропускает. Снимите флажок, чтобы убрать его из списка.</value>
+  </data>
   <data name="Text_9c508bc48078" xml:space="preserve">
     <value>Подготовка</value>
   </data>
   <data name="Text_9c5499b7d628" xml:space="preserve">
     <value>Не удалось обновить: {0}</value>
   </data>
+  <data name="Text_9c6000ef5f5c" xml:space="preserve">
+    <value>Дополнительный предмет с каждого монстра выбранных редкостей: по умолчанию Сфера Возвышения с каждого уникального монстра.</value>
+  </data>
   <data name="Text_9c618d925c1c" xml:space="preserve">
     <value>Сервер обновлений: проверка обновлений клиента остаётся локальной</value>
+  </data>
+  <data name="Text_9c8b1f03b567" xml:space="preserve">
+    <value>Боты-напарники</value>
+  </data>
+  <data name="Text_9c8fdf7ac695" xml:space="preserve">
+    <value>Папка не изменена</value>
   </data>
   <data xml:space="preserve" name="Text_9ca428fef4d5">
     <value>Моды отключены глобально</value>
@@ -4997,6 +5760,9 @@
   <data name="Text_9d312d6843db" xml:space="preserve">
     <value>Не определено для этого режима</value>
   </data>
+  <data name="Text_9d3718c2d85f" xml:space="preserve">
+    <value>Текущий клиент {0} (заменяется):</value>
+  </data>
   <data xml:space="preserve" name="Text_9d39a3628a49">
     <value>Повторить операцию</value>
   </data>
@@ -5008,6 +5774,9 @@
   </data>
   <data name="Text_9d64ce84e2c3" xml:space="preserve">
     <value>Убрать {0}?</value>
+  </data>
+  <data name="Text_9d7515102958" xml:space="preserve">
+    <value>Самый маленький мод: /hello [имя] отвечает сведениями о персонаже.</value>
   </data>
   <data name="Text_9d9a3dd5ed4c" xml:space="preserve">
     <value>Мод из скриптов</value>
@@ -5060,6 +5829,12 @@
   <data name="Text_9ecdfa3146b3" xml:space="preserve">
     <value>Природа и стихии</value>
   </data>
+  <data name="Text_9ee98bd65288" xml:space="preserve">
+    <value>{0} создан для изолированной лиги, чьи персонажи и награды никогда не попадают в Standard. Его нельзя включить в лиге, которая ведёт в Standard.</value>
+  </data>
+  <data name="Text_9f0600e5de05" xml:space="preserve">
+    <value>Ruthless Allflame</value>
+  </data>
   <data name="Text_9f088dbebd6c" xml:space="preserve">
     <value>Расширенный</value>
   </data>
@@ -5093,8 +5868,14 @@
   <data name="Text_9fd8a334357b" xml:space="preserve">
     <value>Базовый размер группы: {0}–{1}</value>
   </data>
+  <data name="Text_9fecb420d06a" xml:space="preserve">
+    <value>Грабьте затонувшие сокровища и используйте силу Всепламени. Ruthless: крайняя нехватка предметов.</value>
+  </data>
   <data name="Text_9ff9b19918a1" xml:space="preserve">
     <value>Скопируйте команду и вставьте её в чат игры сочетанием Ctrl+V.</value>
+  </data>
+  <data name="Text_9fff23ea2428" xml:space="preserve">
+    <value>Отправная точка для копирования: /example считает убийства и области с момента загрузки мода.</value>
   </data>
   <data name="Text_a01017bcc8cb" xml:space="preserve">
     <value>В этом Gateway нет свойства {0}</value>
@@ -5150,6 +5931,12 @@
   <data xml:space="preserve" name="Text_a1ac9a887b35">
     <value>Проверка принадлежности каждого необходимого прослушиваемого порта.</value>
   </data>
+  <data name="Text_a20471ca67eb" xml:space="preserve">
+    <value>LocalExile {0} нужен клиент Path of Exile {1}, а на этом ПК есть только {2}. После этого обновления играть не получится, пока у вас не будет клиента {1}.</value>
+  </data>
+  <data name="Text_a22fe62f20bf" xml:space="preserve">
+    <value>Hardcore Allflame</value>
+  </data>
   <data name="Text_a25890814951" xml:space="preserve">
     <value>Остановить службы перед выходом</value>
   </data>
@@ -5170,6 +5957,9 @@
   </data>
   <data name="Text_a330c2786496" xml:space="preserve">
     <value>Всё равно запустить</value>
+  </data>
+  <data name="Text_a3337d964fce" xml:space="preserve">
+    <value>Общий чат</value>
   </data>
   <data name="Text_a34d444917a5" xml:space="preserve">
     <value>Не удалось прочитать {0}. Закройте игру и повторите попытку.</value>
@@ -5203,6 +5993,9 @@
   </data>
   <data name="Text_a3dc8f59f7b2" xml:space="preserve">
     <value>Папка Client должна быть отдельной копией внутри этой установки, а не ссылкой на другую папку.</value>
+  </data>
+  <data name="Text_a3e55e6e2d1c" xml:space="preserve">
+    <value>На этом ПК найден Path of Exile {0}. Waypoint может скопировать его поверх вашего текущего клиента.</value>
   </data>
   <data xml:space="preserve" name="Text_a3f721e4f70e">
     <value>Исполняемый файл отдельного клиента 3.29.3b: Client/Game.exe</value>
@@ -5245,6 +6038,9 @@
   </data>
   <data name="Text_a4cb3139c1c6" xml:space="preserve">
     <value>Серверы или игра работают. Они будут остановлены перед переключением: работающий Gateway начал бы пересборку посреди процесса.</value>
+  </data>
+  <data name="Text_a4cf3a88ad7d" xml:space="preserve">
+    <value>Команды чата для разработки и тестирования: телепорт, предметы, монстры, опыт, флаги заданий, тестовые удары и проверки протокола.</value>
   </data>
   <data name="Text_a4e4bc881019" xml:space="preserve">
     <value>Удаление…</value>
@@ -5333,6 +6129,9 @@
   <data name="Text_a67ecaab2e09" xml:space="preserve">
     <value>Службы остановлены. Выход из Waypoint.</value>
   </data>
+  <data name="Text_a6927c2b27f1" xml:space="preserve">
+    <value>Оставить эту версию?</value>
+  </data>
   <data name="Text_a6b4705c6883" xml:space="preserve">
     <value>Изменить…</value>
   </data>
@@ -5369,6 +6168,9 @@
   <data xml:space="preserve" name="Text_a7626cdbe094">
     <value>Мод без исходников</value>
   </data>
+  <data name="Text_a769ffad7e7f" xml:space="preserve">
+    <value>Выберите папку LocalExile, которая уже есть на этом компьютере: релиз или копию его исходного кода. Waypoint откроет её и оставит в этом списке.</value>
+  </data>
   <data name="Text_a76e13b98392" xml:space="preserve">
     <value>Вернуть</value>
   </data>
@@ -5378,6 +6180,9 @@
   <data name="Text_a7984ca9bfc9" xml:space="preserve">
     <value>Введите имя и пароль.</value>
   </data>
+  <data name="Text_a7af7ac59384" xml:space="preserve">
+    <value>Для «Выдать предмет» нужен мод Waypoint Tools.</value>
+  </data>
   <data name="Text_a7ba608e8a20" xml:space="preserve">
     <value>Порт всё ещё занят. Когда разберётесь, нажмите «Продолжить»: Waypoint спросит снова.</value>
   </data>
@@ -5386,6 +6191,9 @@
   </data>
   <data xml:space="preserve" name="Text_a80983dbe5df">
     <value>Нужны запущенный Gateway, включённый собранный мод и клиент в игровой области (Python + Frida).</value>
+  </data>
+  <data name="Text_a8117bf7369e" xml:space="preserve">
+    <value>Читает ветки LocalExile и origin, а также открытые pull request'ы LocalExile</value>
   </data>
   <data name="Text_a8233259d1a0" xml:space="preserve">
     <value>Уровень предмета {0}</value>
@@ -5407,6 +6215,9 @@
   </data>
   <data name="Text_a920c446a52e" xml:space="preserve">
     <value>Настройка клиента на этот компьютер</value>
+  </data>
+  <data name="Text_a94834d0a906" xml:space="preserve">
+    <value>разраб.: не-уникальный кластерный камень с чарами, в инвентарь; по умолчанию 3/4/8 пассивов и 0/1/2 гнёзд</value>
   </data>
   <data name="Text_a951cee7f57d" xml:space="preserve">
     <value>LocalExile использует те же настройки и сохранённый вход, что и ваша обычная Path of Exile.</value>
@@ -5435,6 +6246,9 @@
   <data name="Text_a9f51233a4ef" xml:space="preserve">
     <value>Остановить dev host</value>
   </data>
+  <data name="Text_aa128a84671e" xml:space="preserve">
+    <value>Настройка клиента требует внимания. Нажмите «Запустить мастер настройки» ниже, чтобы повторно проверить и обновить её, затем попробуйте запустить игру снова.</value>
+  </data>
   <data xml:space="preserve" name="Text_aa1bf9baa865">
     <value>Не удалось выбрать репозиторий: </value>
   </data>
@@ -5446,6 +6260,9 @@
   </data>
   <data name="Text_aaa73ac77213" xml:space="preserve">
     <value>Змея</value>
+  </data>
+  <data name="Text_aabff8b58455" xml:space="preserve">
+    <value>Phrecia</value>
   </data>
   <data name="Text_aac89777241c" xml:space="preserve">
     <value>Выполняется {0}; обновите, когда завершится.</value>
@@ -5504,14 +6321,23 @@
   <data name="Text_ac1f5a0e46c1" xml:space="preserve">
     <value>Игра не запущена: запустите её, войдите персонажем в локацию и выдайте предмет снова.</value>
   </data>
+  <data name="Text_ac4f361600ac" xml:space="preserve">
+    <value>Waypoint не удалось прочитать версию копии в {0}.</value>
+  </data>
   <data xml:space="preserve" name="Text_ac7fcf0ba22e">
     <value>Нет установленных модов</value>
+  </data>
+  <data name="Text_acb46a58f4f7" xml:space="preserve">
+    <value>Эти сохранения из более новой версии LocalExile, где учётные записи и персонажи хранятся в отдельных базах данных. Сначала переключитесь на эту версию.</value>
   </data>
   <data xml:space="preserve" name="Text_acb4bce11dae">
     <value>Выполняется операция с рабочей папкой.</value>
   </data>
   <data name="Text_acbaeabe2255" xml:space="preserve">
     <value>Эта копия перейдёт со старой версии на последние изменения LocalExile, и «Играть» будет обновлять её каждый день. Последние изменения могут быть менее стабильными. Сначала будет создана резервная копия ваших сохранений.</value>
+  </data>
+  <data name="Text_acf973ef28e0" xml:space="preserve">
+    <value>разраб.: удар в обход блока и сопротивления</value>
   </data>
   <data name="Text_ad050d3449ef" xml:space="preserve">
     <value>Отслеживаемые файлы изменены</value>
@@ -5528,8 +6354,14 @@
   <data name="Text_ad5b8321811a" xml:space="preserve">
     <value>Волны</value>
   </data>
+  <data name="Text_ad6c0863a408" xml:space="preserve">
+    <value>разраб.: выдать по два очка восхождения за каждый Лабиринт</value>
+  </data>
   <data name="Text_ad6e2a06e006" xml:space="preserve">
     <value>Исходный флаг</value>
+  </data>
+  <data name="Text_ad820a0bb543" xml:space="preserve">
+    <value>редкость и моды предмета в руке</value>
   </data>
   <data name="Text_ad909a80eb9a" xml:space="preserve">
     <value>Открытых запросов на слияние нет.</value>
@@ -5557,6 +6389,9 @@
   </data>
   <data name="Text_ae2ff967432c" xml:space="preserve">
     <value>Оставить старую версию, которая не меняется</value>
+  </data>
+  <data name="Text_ae36c52ce179" xml:space="preserve">
+    <value>разраб.: выдать маяки Атласа, приглашения и изначальные ключи</value>
   </data>
   <data name="Text_ae5ced38732e" xml:space="preserve">
     <value>Python нет в PATH. Установите Python 3.9 или новее с python.org, отметив «Add python.exe to PATH».</value>
@@ -5615,8 +6450,14 @@
   <data name="Text_afc05ca34f9e" xml:space="preserve">
     <value>В вашем форке (origin), но не в LocalExile</value>
   </data>
+  <data name="Text_afc5d553e253" xml:space="preserve">
+    <value>Waypoint Tools установлен. Запущенная игра загрузит его за секунду: войдите в локацию персонажем и выдайте предмет снова.</value>
+  </data>
   <data name="Text_afe3c1947d3b" xml:space="preserve">
     <value>Союз</value>
+  </data>
+  <data name="Text_b00ef4aaae35" xml:space="preserve">
+    <value>В копии в {0} есть ваши собственные изменения кода LocalExile, поэтому её персонажи могут не подойти этому релизу.</value>
   </data>
   <data name="Text_b016f6d52f72" xml:space="preserve">
     <value>Вы отложили изменения, когда ушли с {0}. Вернуть их сейчас?</value>
@@ -5624,8 +6465,14 @@
   <data name="Text_b0176d1229f3" xml:space="preserve">
     <value>Команда скопирована в буфер обмена.</value>
   </data>
+  <data name="Text_b02009e44201" xml:space="preserve">
+    <value>Не указана</value>
+  </data>
   <data name="Text_b03f0885df1b" xml:space="preserve">
     <value>{0} находится вне папки LocalExile в выпуске; ничего не изменено</value>
+  </data>
+  <data name="Text_b04ba18c60e2" xml:space="preserve">
+    <value>предмет в руке; отсутствующие значения бросаются</value>
   </data>
   <data name="Text_b064b4cd50cd" xml:space="preserve">
     <value>{0} нет, поэтому Waypoint найдёт программу сам.</value>
@@ -5681,6 +6528,9 @@
   <data name="Text_b269dc4e81a5" xml:space="preserve">
     <value>Команды</value>
   </data>
+  <data name="Text_b26a1f6c97cb" xml:space="preserve">
+    <value>Этому LocalExile нужен Path of Exile {0}, но найден только клиент {1}.</value>
+  </data>
   <data name="Text_b26fa9e01921" xml:space="preserve">
     <value>Оставить службы LocalExile работать</value>
   </data>
@@ -5711,6 +6561,9 @@
   <data name="Text_b30dfedf1111" xml:space="preserve">
     <value>Далее: модули</value>
   </data>
+  <data name="Text_b3186b1c4aae" xml:space="preserve">
+    <value>Редкость предметов</value>
+  </data>
   <data name="Text_b332c3492d5e" xml:space="preserve">
     <value>Настройка</value>
   </data>
@@ -5719,6 +6572,9 @@
   </data>
   <data xml:space="preserve" name="Text_b34ae7c4547d">
     <value>Локальный HEAD: </value>
+  </data>
+  <data name="Text_b3557e6a6fbe" xml:space="preserve">
+    <value>Ваши персонажи перенесены. Входите как обычно.</value>
   </data>
   <data name="Text_b370dc0062ea" xml:space="preserve">
     <value>live.ps1: собирает и запускает серверы, затем игру (закрывает запущенную)</value>
@@ -5735,11 +6591,17 @@
   <data xml:space="preserve" name="Text_b3b29e2c5678">
     <value>Профили восприятия заменяют акцентные цвета и цвета состояний, включая свои настройки. Высокая контрастность Windows имеет приоритет над всеми палитрами.</value>
   </data>
+  <data name="Text_b3b8ba86a135" xml:space="preserve">
+    <value>разраб.: сколько комнатный уборщик Испытаний наносит в секунду от максимума жизни и щита, и насколько близко к центру это в клетках</value>
+  </data>
   <data xml:space="preserve" name="Text_b3f384f14d32">
     <value>Сначала скопируйте полный клиент в папку Client этого репозитория. Подготовка создаст недостающие локальные ключи и исполняемый файл, затем выберет локальный шлюз в этой копии. Перед изменениями закройте игру и остановите службы.</value>
   </data>
   <data name="Text_b3f952e8b678" xml:space="preserve">
     <value>Кольцо</value>
+  </data>
+  <data name="Text_b43c089ad433" xml:space="preserve">
+    <value>LocalExile {0} не найден среди выпусков.</value>
   </data>
   <data name="Text_b45a804aa67c" xml:space="preserve">
     <value>Не запускайте игру и службы LocalExile до завершения изменения.</value>
@@ -5752,6 +6614,9 @@
   </data>
   <data name="Text_b47fb352feff" xml:space="preserve">
     <value>Её персонажи и тайник остаются отдельными от Standard.</value>
+  </data>
+  <data name="Text_b4a3da159930" xml:space="preserve">
+    <value>Порталы</value>
   </data>
   <data xml:space="preserve" name="Text_b4a5df23dc4d">
     <value>Ошибка манифеста</value>
@@ -5766,7 +6631,7 @@
     <value>Сохранённый выбор: {0}</value>
   </data>
   <data name="Text_b4cd5d1c0ce4" xml:space="preserve">
-    <value>Спуск</value>
+    <value>Исследование</value>
   </data>
   <data name="Text_b4fe28945512" xml:space="preserve">
     <value>Видимость лиги сохранена. Она применится при следующем запуске сервера.</value>
@@ -5777,8 +6642,14 @@
   <data xml:space="preserve" name="Text_b588f80b6484">
     <value>Журнал сбойного этапа</value>
   </data>
+  <data name="Text_b597c1f8a707" xml:space="preserve">
+    <value>Команды выполняются на серверах, когда есть их канал консоли; иначе строка копируется для чата игры.</value>
+  </data>
   <data name="Text_b5c120b316c2" xml:space="preserve">
     <value>Сохранённые</value>
+  </data>
+  <data name="Text_b607b1bd57e8" xml:space="preserve">
+    <value>скопируйте клиент 3.29.3c в Client через robocopy, затем скопируйте PathOfExile.exe в Game.exe</value>
   </data>
   <data name="Text_b61789ae5217" xml:space="preserve">
     <value>Оставьте хотя бы одну доступную для игры карточку лиги при создании персонажей.</value>
@@ -5797,6 +6668,9 @@
   </data>
   <data xml:space="preserve" name="Text_b6578325df01">
     <value>Как работают изменения модов</value>
+  </data>
+  <data name="Text_b6585392c740" xml:space="preserve">
+    <value>HC SSF R Allflame</value>
   </data>
   <data name="Text_b65ffe0cec61" xml:space="preserve">
     <value>Портал</value>
@@ -5894,6 +6768,15 @@
   <data name="Text_b8f6fa5921eb" xml:space="preserve">
     <value>Для выдачи предметов нужна Frida — инструмент, который взаимодействует с запущенной игрой. Waypoint может установить её в эту папку LocalExile. Она занимает около 180 МБ, а некоторые антивирусы на неё реагируют.</value>
   </data>
+  <data name="Text_b8f7c363043d" xml:space="preserve">
+    <value>Грабьте затонувшие сокровища и используйте силу Всепламени.</value>
+  </data>
+  <data name="Text_b8f92dd32433" xml:space="preserve">
+    <value>Создать лигу «{0}» в режиме «{1}»? {2} Существующие лиги и сохранения будут сохранены.</value>
+  </data>
+  <data name="Text_b917f086a09a" xml:space="preserve">
+    <value>Что нового</value>
+  </data>
   <data xml:space="preserve" name="Text_b9289f13fa7e">
     <value>Имя (3–32 латинские буквы, цифры, _ или -)</value>
   </data>
@@ -5909,11 +6792,17 @@
   <data name="Text_b9bd06a6286b" xml:space="preserve">
     <value>установите Node.js, затем: cd Tools\ooz; npm install</value>
   </data>
+  <data name="Text_b9bfc7335612" xml:space="preserve">
+    <value>разраб.: показать или выбрать запасную планировку обычных карт</value>
+  </data>
   <data name="Text_b9d5ec6bc16f" xml:space="preserve">
     <value>Этот клиент — ссылка на {0}, и всё, что запускается из этой папки, будет использовать те же настройки.</value>
   </data>
   <data name="Text_b9f4f560cff4" xml:space="preserve">
     <value>Запрос на слияние не из списка открытых: его HEAD будет получен с GitHub по номеру</value>
+  </data>
+  <data name="Text_ba183803c449" xml:space="preserve">
+    <value>Ваши учётные записи, персонажи и тайник из {0} копируются сюда; та папка только читается. Собственные данные этого релиза сначала сохраняются в резервную копию и откладываются.</value>
   </data>
   <data name="Text_ba2cad95033e" xml:space="preserve">
     <value>#{0} — из форка</value>
@@ -5921,8 +6810,11 @@
   <data name="Text_ba3ceaa2d395" xml:space="preserve">
     <value>Устанавливайте, обновляйте и настраивайте модификации.</value>
   </data>
+  <data name="Text_ba441484ed1c" xml:space="preserve">
+    <value>Обновить LocalExile?</value>
+  </data>
   <data name="Text_ba4e38e456ba" xml:space="preserve">
-    <value>Использовать локальный профиль запуска репозитория, если он есть</value>
+    <value>Использовать локальный профиль запуска из копии, если он есть</value>
   </data>
   <data name="Text_ba55baf7dd30" xml:space="preserve">
     <value>Применяет переопределения игровых данных к запущенной игре: нужен клиент в игре (Python + Frida)</value>
@@ -5941,6 +6833,9 @@
   </data>
   <data name="Text_baaf468928e9" xml:space="preserve">
     <value>Проверить порты серверов</value>
+  </data>
+  <data name="Text_bab5fc7180d9" xml:space="preserve">
+    <value>разраб.: принудительный удачный/неудачный бросок подавления</value>
   </data>
   <data name="Text_bac82328e0cd" xml:space="preserve">
     <value>Это сочетание модулей не определено для данной лиги и режима. Неизвестные сочетания заблокированы.</value>
@@ -5963,6 +6858,9 @@
   <data name="Text_bb213b706609" xml:space="preserve">
     <value>Сейчас ни одна лига не использует этот модуль.</value>
   </data>
+  <data name="Text_bb4f779ad98b" xml:space="preserve">
+    <value>разраб.: за сколько проигрывается анимация Emerge (0x1d1) шиповой ловушки Испытаний</value>
+  </data>
   <data name="Text_bb5e603fa102" xml:space="preserve">
     <value>Далее выберите модули и проверьте свою лигу.</value>
   </data>
@@ -5971,6 +6869,9 @@
   </data>
   <data name="Text_bb7234ec1245" xml:space="preserve">
     <value>Зарегистрировать</value>
+  </data>
+  <data name="Text_bb7f72918e71" xml:space="preserve">
+    <value>Старый LocalExile пока находится в {0}. Когда вы поиграете, раздел «Управление» спросит, удалить ли его.</value>
   </data>
   <data name="Text_bbab9192a19e" xml:space="preserve">
     <value>Не удалось загрузить настройки</value>
@@ -6030,13 +6931,16 @@
     <value>«{0}» — не цвет гнезда (R, G, B или W)</value>
   </data>
   <data name="Text_bdb03ff604f8" xml:space="preserve">
-    <value>Беспощадный режим</value>
+    <value>Ruthless</value>
   </data>
   <data name="Text_bdb4ae4706fa" xml:space="preserve">
     <value>Люди и спутники</value>
   </data>
   <data xml:space="preserve" name="Text_bdd254b65baa">
     <value>Сборка</value>
+  </data>
+  <data name="Text_bdeb4232b164" xml:space="preserve">
+    <value>не ответ: {0}</value>
   </data>
   <data name="Text_be330ee79b3c" xml:space="preserve">
     <value>Лиги</value>
@@ -6068,8 +6972,17 @@
   <data name="Text_bf0983d8b412" xml:space="preserve">
     <value>Отслеживаемые файлы не изменены</value>
   </data>
+  <data name="Text_bf91cdb0ca76" xml:space="preserve">
+    <value>Обслуживает игру с режимом работы сети «Синхронизация» (Lockstep), только на этом компьютере (Game_LOCKSTEP=1). Настройка самой игры не меняется. Применяется при следующем запуске Gateway.</value>
+  </data>
   <data name="Text_bfc5b531a3b4" xml:space="preserve">
     <value>Испытание на время</value>
+  </data>
+  <data name="Text_bfce30bdebb8" xml:space="preserve">
+    <value>Здесь можно включить любой установленный модуль, если включено всё, что ему требуется. Собственный набор этой лиги остаётся включённым, а модуль, созданный для изолированной лиги, остаётся в изолированных лигах.</value>
+  </data>
+  <data name="Text_bff37847d4ce" xml:space="preserve">
+    <value>разраб.: открыть дерево пассивов Атласа; S→C 0x7b вид 0x11</value>
   </data>
   <data name="Text_bffd26352bd5" xml:space="preserve">
     <value>Перед сохранением предпочтения вам один раз предложат выбрать действие при закрытии.</value>
@@ -6082,6 +6995,9 @@
   </data>
   <data xml:space="preserve" name="Text_c032d8c45d13">
     <value>Выбор установки</value>
+  </data>
+  <data name="Text_c0421deed267" xml:space="preserve">
+    <value>SSF Standard</value>
   </data>
   <data name="Text_c04278c627e5" xml:space="preserve">
     <value>Нажмите «Закончить игру», затем переключитесь.</value>
@@ -6124,6 +7040,9 @@
   </data>
   <data name="Text_c12805c5fe6e" xml:space="preserve">
     <value>Качество: +{0}%</value>
+  </data>
+  <data name="Text_c128c9f4bdea" xml:space="preserve">
+    <value>Редактор убежища</value>
   </data>
   <data name="Text_c141faa80e43" xml:space="preserve">
     <value>Огонь</value>
@@ -6207,7 +7126,7 @@
     <value>Официальный</value>
   </data>
   <data name="Text_c43612e396ba" xml:space="preserve">
-    <value>Внешний вид</value>
+    <value>Косметика</value>
   </data>
   <data name="Text_c451c3692d31" xml:space="preserve">
     <value>Информация о модах недоступна</value>
@@ -6217,6 +7136,9 @@
   </data>
   <data name="Text_c481efeab782" xml:space="preserve">
     <value>Время сервера</value>
+  </data>
+  <data name="Text_c49812a0c856" xml:space="preserve">
+    <value>Добыча боссов</value>
   </data>
   <data xml:space="preserve" name="Text_c4a5bd52b99e">
     <value>Индикаторы успеха</value>
@@ -6236,11 +7158,17 @@
   <data name="Text_c5132d954d7b" xml:space="preserve">
     <value>Запомнить для следующего раза</value>
   </data>
+  <data name="Text_c53d2d6c95e3" xml:space="preserve">
+    <value>Нажмите, чтобы увидеть другие папки LocalExile</value>
+  </data>
   <data name="Text_c53e89986e05" xml:space="preserve">
     <value>Изменения сразу применяются к рамке флага только в Waypoint. Оригинальное игровое изображение остаётся без изменений.</value>
   </data>
   <data name="Text_c54387284052" xml:space="preserve">
     <value>Вместо Python ответил ярлык python из Microsoft Store. Установите Python 3.9 или новее с python.org, отметив «Add python.exe to PATH».</value>
+  </data>
+  <data name="Text_c57f2ed47349" xml:space="preserve">
+    <value>Общение с другими игроками LocalExile: общий, торговый и личный чат идут через глобальный чат-сервер LocalExile.</value>
   </data>
   <data name="Text_c58597b15074" xml:space="preserve">
     <value>3–32 латинские буквы, цифры, _ или -</value>
@@ -6250,6 +7178,15 @@
   </data>
   <data name="Text_c5bb39f523b4" xml:space="preserve">
     <value>Установка Frida…</value>
+  </data>
+  <data name="Text_c5c2b10f54ff" xml:space="preserve">
+    <value>Автор: {0}</value>
+  </data>
+  <data name="Text_c5d149b24cfb" xml:space="preserve">
+    <value>разраб.: уникальный большой кластерный камень Voices с этим числом пустых пассивов, в инвентарь</value>
+  </data>
+  <data name="Text_c614098d531e" xml:space="preserve">
+    <value>Позволяет инструментам Waypoint работать с игрой без моста управления клиентом: через него выдаёт предметы кузнец предметов.</value>
   </data>
   <data name="Text_c630a782a9eb" xml:space="preserve">
     <value>Переустановить</value>
@@ -6300,6 +7237,9 @@
   <data xml:space="preserve" name="Text_c7353185b802">
     <value>Используйте подготовленный репозиторий или подготовьте отдельную копию клиента в выбранной папке. Поддерживается отдельный клиент PoE 3.29.3b.</value>
   </data>
+  <data name="Text_c73c8e3ad0e2" xml:space="preserve">
+    <value>Версия клиента {0}</value>
+  </data>
   <data xml:space="preserve" name="Text_c74950bf4f08">
     <value>Процесс и прослушиваемые порты проверены</value>
   </data>
@@ -6311,6 +7251,17 @@
   </data>
   <data xml:space="preserve" name="Text_c7a882f64135">
     <value>Не удалось загрузить варианты исходников: </value>
+  </data>
+  <data name="Text_c7b0c42e9e6d" xml:space="preserve">
+    <value>Скопируйте полную установку отдельного клиента PoE 3.29.3c в:
+{0}
+
+1. В Проводнике откройте папку поддерживаемого клиента с Content.ggpk и PathOfExile.exe (или Game.exe).
+2. Нажмите Ctrl+A, затем Ctrl+C, чтобы скопировать файлы; не перемещайте основную установку.
+3. Откройте выбранный репозиторий в другом окне Проводника. При необходимости создайте папку Client, откройте её и нажмите Ctrl+V.
+4. Дождитесь завершения копирования. Вернитесь на страницу подготовки и нажмите «Подготовить клиент».
+
+Установка Steam и более новый официальный клиент не поддерживаются. Waypoint не скачивает игру.</value>
   </data>
   <data name="Text_c7b81e4f8801" xml:space="preserve">
     <value>Выберите папку Path of Exile (с файлом Content.ggpk)</value>
@@ -6335,6 +7286,9 @@
   <data name="Text_c7f937836f5d" xml:space="preserve">
     <value>Выбор</value>
   </data>
+  <data name="Text_c804702d0b28" xml:space="preserve">
+    <value>Просмотрщику карт нужны данные игры (data\game-files.zip и data\tables) и либо генератор рельефа из рабочей копии, либо библиотеки установки.</value>
+  </data>
   <data name="Text_c80c49892e26" xml:space="preserve">
     <value>Прорицание</value>
   </data>
@@ -6353,17 +7307,32 @@
   <data name="Text_c83931177471" xml:space="preserve">
     <value>Это не предмет: скопируйте его через Ctrl+C в Path of Building или в игре.</value>
   </data>
+  <data name="Text_c866577db8d7" xml:space="preserve">
+    <value>0x1ba к вам; по умолчанию последний монстр, скорость 20</value>
+  </data>
   <data name="Text_c87d285421d0" xml:space="preserve">
     <value>Не удалось выбрать проверенную версию (git завершился с кодом {0}).</value>
+  </data>
+  <data name="Text_c881ce2fb9a6" xml:space="preserve">
+    <value>{0} содержит правила режима игры. Его можно включить для лиги, созданной в Waypoint на основе одной из этих: {1}.</value>
   </data>
   <data name="Text_c888f98938da" xml:space="preserve">
     <value>{0} дн. назад</value>
   </data>
+  <data name="Text_c88cb5f38942" xml:space="preserve">
+    <value>-Walkmaps: записать карту проходимости каждой области через Frida (GettingStarted, шаг 9)</value>
+  </data>
   <data name="Text_c88f2330c818" xml:space="preserve">
     <value>Закрыть Waypoint или оставить работать?</value>
   </data>
+  <data name="Text_c893fec1a12d" xml:space="preserve">
+    <value>Заменить игровой клиент?</value>
+  </data>
   <data xml:space="preserve" name="Text_c8ae1bb777a0">
     <value>Gateway запустил новый процесс в том же сеансе отслеживания. Войдите повторно, если игра вернулась на экран входа.</value>
+  </data>
+  <data name="Text_c8b0828a4c7a" xml:space="preserve">
+    <value>В официальных модах пока нет Waypoint Tools.</value>
   </data>
   <data name="Text_c8b5d313ef89" xml:space="preserve">
     <value>Эта копия уйдёт с проверенной версии на последние изменения LocalExile, и «Играть» будет обновлять её каждый день. Новые изменения не проверены, и что-то может сломаться. Сначала будет создана резервная копия ваших сохранений.</value>
@@ -6389,6 +7358,9 @@
   <data name="Text_c934e59747e8" xml:space="preserve">
     <value>Вернуться к прежней версии?</value>
   </data>
+  <data name="Text_c94f8b691e44" xml:space="preserve">
+    <value>95-й процентиль худшей секунды в окне (сервер публикует квантили по секундам)</value>
+  </data>
   <data name="Text_c95356784006" xml:space="preserve">
     <value>Указатели</value>
   </data>
@@ -6401,17 +7373,29 @@
   <data name="Text_c9b2c9b72ddd" xml:space="preserve">
     <value>Что делать при закрытии окна?</value>
   </data>
+  <data name="Text_c9be7a297f8d" xml:space="preserve">
+    <value>Персонажи возвращаются в релиз, только если он такой же, как «Новейшая», или новее: более новый LocalExile может сохранять то, что старый релиз не прочитает.</value>
+  </data>
   <data name="Text_c9cf9cba7b44" xml:space="preserve">
-    <value>Читает ветки LocalExile и origin, а также открытые запросы на слияние LocalExile</value>
+    <value>Читает ветки LocalExile и origin, а также открытые pull request'ы LocalExile</value>
   </data>
   <data name="Text_c9e0f4911e18" xml:space="preserve">
     <value>p95, мс</value>
+  </data>
+  <data name="Text_c9efab217fdd" xml:space="preserve">
+    <value>Не удалось скачать {0} с GitHub; попробуйте позже.</value>
+  </data>
+  <data name="Text_ca0a76c99b1e" xml:space="preserve">
+    <value>Настройка установит новую копию LocalExile из исходного кода. Что сделать с той, что есть сейчас?</value>
   </data>
   <data xml:space="preserve" name="Text_ca1844969742">
     <value>Недоступно</value>
   </data>
   <data xml:space="preserve" name="Text_ca4e5268289a">
     <value>Резервных копий: {0} · {1}</value>
+  </data>
+  <data name="Text_ca60a187a854" xml:space="preserve">
+    <value>Грабьте затонувшие сокровища и используйте силу Всепламени. Ruthless: крайняя нехватка предметов. Solo Self-Found.</value>
   </data>
   <data name="Text_ca6482a42bab" xml:space="preserve">
     <value>Взрыв</value>
@@ -6454,6 +7438,9 @@
   <data name="Text_cb52a8c99835" xml:space="preserve">
     <value>исключения/с</value>
   </data>
+  <data name="Text_cb6080c9d596" xml:space="preserve">
+    <value>шанс подавления заклинаний, бросок и снижение урона</value>
+  </data>
   <data name="Text_cb8603c8ce91" xml:space="preserve">
     <value>Автоматические копии</value>
   </data>
@@ -6472,11 +7459,17 @@
   <data name="Text_cba975052fbd" xml:space="preserve">
     <value>Сохраните настройки лиги перед применением выбора модулей.</value>
   </data>
+  <data name="Text_cbd69f331f76" xml:space="preserve">
+    <value>разраб.: переместить и повернуть NPC здесь</value>
+  </data>
   <data name="Text_cbd8e345bf34" xml:space="preserve">
     <value>Сначала закройте игру и остановите текущий LocalExile.</value>
   </data>
   <data xml:space="preserve" name="Text_cbef8c5002e9">
     <value>{0} | отслеживание изменений, PID {1}</value>
+  </data>
+  <data name="Text_cc2162d992f4" xml:space="preserve">
+    <value>Клиент изменился во время подготовки. Закройте его официальный лаунчер и повторите попытку.</value>
   </data>
   <data xml:space="preserve" name="Text_cc490cdeff7b">
     <value>Зависимости установлены.</value>
@@ -6487,6 +7480,9 @@
   <data name="Text_cc60bacb8e65" xml:space="preserve">
     <value>Общие для всех лиг, в которых работает этот мод.</value>
   </data>
+  <data name="Text_cc821633e514" xml:space="preserve">
+    <value>шанс и множитель критического удара атакой и заклинанием</value>
+  </data>
   <data name="Text_cc94d46f213b" xml:space="preserve">
     <value>Удалить старый…</value>
   </data>
@@ -6495,6 +7491,9 @@
   </data>
   <data name="Text_cca7aec3cf35" xml:space="preserve">
     <value>Вписать карту</value>
+  </data>
+  <data name="Text_ccbacd01c2c4" xml:space="preserve">
+    <value>На странице «Играть» релиза Waypoint предложит перенести ваших персонажей, если релиз такой же, как эта копия, или новее.</value>
   </data>
   <data name="Text_cccbd64fecc9" xml:space="preserve">
     <value>Доступен только просмотр, пока игра или службы работают либо их принадлежность не подтверждена. Остановите их и обновите данные перед изменением аккаунтов.</value>
@@ -6559,6 +7558,9 @@
   <data xml:space="preserve" name="Text_cf47dcf7cadf">
     <value>Что поддерживается</value>
   </data>
+  <data name="Text_cf53cb353693" xml:space="preserve">
+    <value>Без {0} новая лига получит режим лиги «{1}», но не её правила или содержимое.</value>
+  </data>
   <data name="Text_cf5c6c0d1737" xml:space="preserve">
     <value>При выходе из Waypoint службы продолжают работать.</value>
   </data>
@@ -6571,11 +7573,20 @@
   <data xml:space="preserve" name="Text_cfa63e97e7e5">
     <value>Включить мод</value>
   </data>
+  <data name="Text_cfb99654f169" xml:space="preserve">
+    <value>разраб.: что несёт следующая карта Исследования (S→C 0x240), чтобы разобрать её поля</value>
+  </data>
+  <data name="Text_cff965236d80" xml:space="preserve">
+    <value>Папка LocalExile: {0}, {1}</value>
+  </data>
   <data name="Text_d00aae6b7fbf" xml:space="preserve">
     <value>Магазин</value>
   </data>
   <data xml:space="preserve" name="Text_d010ff390617">
     <value>Панели</value>
+  </data>
+  <data name="Text_d029f87e3d80" xml:space="preserve">
+    <value>Пример</value>
   </data>
   <data name="Text_d03a6edefa0c" xml:space="preserve">
     <value>Все ошибки</value>
@@ -6597,6 +7608,9 @@
   </data>
   <data xml:space="preserve" name="Text_d10cdbf98c85">
     <value>ВЫБРАННЫЕ ИСХОДНИКИ</value>
+  </data>
+  <data name="Text_d12bce4a1886" xml:space="preserve">
+    <value>Укажите папку с PathOfExile.exe и Content.ggpk. Это должна быть автономная установка 3.29.3c: версии Steam и Epic не подходят, а скачать игру Waypoint не может.</value>
   </data>
   <data name="Text_d1373700538f" xml:space="preserve">
     <value>Ошибка: {0} завершился с кодом {1}; см. вывод и раздел «Журналы».</value>
@@ -6649,6 +7663,15 @@
   <data name="Text_d2b98fb53714" xml:space="preserve">
     <value>Перемещение</value>
   </data>
+  <data name="Text_d2c5e8fb499e" xml:space="preserve">
+    <value>разраб.: переместить и повернуть вейпоинт области; без аргументов покажет, где он</value>
+  </data>
+  <data name="Text_d2eb642e6489" xml:space="preserve">
+    <value>Ruthless: крайняя нехватка предметов. Solo Self-Found. Погибший персонаж переходит в SSF Ruthless.</value>
+  </data>
+  <data name="Text_d2ef8a350360" xml:space="preserve">
+    <value>Hardcore Ruthless Allflame</value>
+  </data>
   <data xml:space="preserve" name="Text_d3368cbffe23">
     <value>Доступность</value>
   </data>
@@ -6676,6 +7699,9 @@
   <data name="Text_d3d8d0a92084" xml:space="preserve">
     <value>Настройки лиги</value>
   </data>
+  <data name="Text_d40afb35e5e4" xml:space="preserve">
+    <value>Входит в собственный набор этой лиги. Перед отключением будет запрошено подтверждение.</value>
+  </data>
   <data name="Text_d43f97686636" xml:space="preserve">
     <value>Выбранные режимы: {0}</value>
   </data>
@@ -6692,7 +7718,10 @@
     <value>Ещё</value>
   </data>
   <data name="Text_d48776dd109e" xml:space="preserve">
-    <value>95-й перцентиль худшей секунды за период (сервер публикует квантили посекундно)</value>
+    <value>95-й процентиль худшей секунды в окне (сервер публикует квантили по секундам)</value>
+  </data>
+  <data name="Text_d4920c8068c8" xml:space="preserve">
+    <value>создаёт NPC рядом с вами</value>
   </data>
   <data name="Text_d494e53bf0b0" xml:space="preserve">
     <value>Dev host остановлен (регистрация запустит его)</value>
@@ -6704,7 +7733,7 @@
     <value>Обзор</value>
   </data>
   <data name="Text_d4c9f823432c" xml:space="preserve">
-    <value>-Walkmaps: записывать планировку каждой области через Frida (шаг 9 в GettingStarted)</value>
+    <value>-Walkmaps: записать карту проходимости каждой области через Frida (GettingStarted, шаг 9)</value>
   </data>
   <data name="Text_d4d7f382fdd3" xml:space="preserve">
     <value>Шаг «{0}» не выполнен. Исправьте указанную проблему и повторите: завершённые шаги выполняться заново не будут.</value>
@@ -6717,6 +7746,9 @@
   </data>
   <data name="Text_d505316d6f5f" xml:space="preserve">
     <value>Выход полностью закрывает Waypoint. В обоих случаях серверы и игра продолжают работать.</value>
+  </data>
+  <data name="Text_d583eddfd60b" xml:space="preserve">
+    <value>разраб.: принудительно удачный блок</value>
   </data>
   <data name="Text_d58f93b4a354" xml:space="preserve">
     <value>LocalExile можно обновить, только когда игра и её серверы закрыты. Закройте игру, дождитесь остановки серверов и снова нажмите «Обновить сейчас».</value>
@@ -6769,6 +7801,9 @@
   <data name="Text_d6d6be81ee89" xml:space="preserve">
     <value>{0}: обновлено. «Перезапустить серверы» (или «Играть») соберёт новую версию.</value>
   </data>
+  <data name="Text_d6ee7457df7a" xml:space="preserve">
+    <value>Игровой клиент в этой папке LocalExile — {0}, а её LocalExile нужен {1}. «Играть» предложит, что с этим сделать.</value>
+  </data>
   <data name="Text_d7001bf5b45e" xml:space="preserve">
     <value>куча GC</value>
   </data>
@@ -6777,6 +7812,9 @@
   </data>
   <data name="Text_d7329bd6c77b" xml:space="preserve">
     <value>Не удалось безопасно прочитать текущие настройки. Ничего не изменено.</value>
+  </data>
+  <data name="Text_d75559811285" xml:space="preserve">
+    <value>Убрать эту папку из списка. Сама папка и её файлы останутся на месте.</value>
   </data>
   <data name="Text_d762e323adff" xml:space="preserve">
     <value>Игровые модули</value>
@@ -6814,11 +7852,20 @@
   <data xml:space="preserve" name="Text_d8205881eccd">
     <value>Список PR GitHub недоступен. Локальные и полученные ветки доступны; можно ввести номер PR напрямую.</value>
   </data>
+  <data name="Text_d8216570a4e4" xml:space="preserve">
+    <value>Только для изолированных лиг</value>
+  </data>
+  <data name="Text_d82d265d278c" xml:space="preserve">
+    <value>Устанавливает или открывает опубликованный релиз LocalExile. Персонажи у него свои; те, что есть здесь, остаются в этой папке.</value>
+  </data>
   <data xml:space="preserve" name="Text_d838ad216459">
     <value>✓  Игра запущена</value>
   </data>
   <data name="Text_d83be5294fb4" xml:space="preserve">
     <value>Эта копия перейдёт со старой версии на последние изменения LocalExile, и «Играть» будет обновлять её каждый день. В последних изменениях что-то может сломаться. Сначала будет создана резервная копия ваших сохранений.</value>
+  </data>
+  <data name="Text_d847500939d6" xml:space="preserve">
+    <value>Серверы запущены: изменение сохраняется сейчас и вступит в силу при следующем запуске Gateway.</value>
   </data>
   <data name="Text_d848702976bf" xml:space="preserve">
     <value>Оставить текущий LocalExile как есть. У каждой копии свой прогресс.</value>
@@ -6859,6 +7906,12 @@
   <data name="Text_d958fa43d8ce" xml:space="preserve">
     <value>Не переключено: нет резервной копии.</value>
   </data>
+  <data name="Text_d96e4bfc2b2f" xml:space="preserve">
+    <value>разраб.: два ключа Hideouts.dat компонента Player, HASH16 в hex или id области убежища</value>
+  </data>
+  <data name="Text_d9bcb642d98c" xml:space="preserve">
+    <value>модули, загруженные при старте шлюза, из папок Modules/: версия, вид и хуки, и почему остальные не загрузились</value>
+  </data>
   <data name="Text_d9fe67c04cb0" xml:space="preserve">
     <value>Древний</value>
   </data>
@@ -6870,6 +7923,12 @@
 Зависимости: {2}
 {3}
 {4}</value>
+  </data>
+  <data name="Text_da64fd4c6663" xml:space="preserve">
+    <value>Ruthless: крайняя нехватка предметов. Погибший персонаж переходит в Ruthless.</value>
+  </data>
+  <data name="Text_da667f61f22b" xml:space="preserve">
+    <value>разраб.: выделить связанный набор пассивных узлов</value>
   </data>
   <data name="Text_da79ad6da3cf" xml:space="preserve">
     <value>Изгнанник-разбойник</value>
@@ -6892,6 +7951,9 @@
   <data name="Text_db13497649fa" xml:space="preserve">
     <value>Создание отдельного Python-окружения для этой копии.</value>
   </data>
+  <data name="Text_db16dbd13f0c" xml:space="preserve">
+    <value>шанс блока атакой и заклинанием и их пределы</value>
+  </data>
   <data name="Text_db17e9891545" xml:space="preserve">
     <value>Включён или выключен</value>
   </data>
@@ -6910,6 +7972,15 @@
   <data name="Text_db4cea7c5a2c" xml:space="preserve">
     <value>Path of Exile, подготовленный для локальных серверов</value>
   </data>
+  <data name="Text_db58922c2c0f" xml:space="preserve">
+    <value>SSF Hardcore Ruthless</value>
+  </data>
+  <data name="Text_db7c1df8e544" xml:space="preserve">
+    <value>разраб.: один MultiplexPortal рядом, в списке 0x8f устройства карт</value>
+  </data>
+  <data name="Text_db96ee29e4ed" xml:space="preserve">
+    <value>Survivors</value>
+  </data>
   <data name="Text_db9a4c7d4c19" xml:space="preserve">
     <value>CPU</value>
   </data>
@@ -6927,6 +7998,9 @@
   </data>
   <data name="Text_dc63ab18e32d" xml:space="preserve">
     <value>Сохранённый выбор включённых модов не подтверждает их загрузку на сервере.</value>
+  </data>
+  <data name="Text_dc6c0cd150d1" xml:space="preserve">
+    <value>Игра или её серверы запущены из этой папки. Waypoint остановит их, прежде чем открыть другую папку.</value>
   </data>
   <data name="Text_dc6c5ae4c245" xml:space="preserve">
     <value>Удалить {0}?</value>
@@ -6957,6 +8031,9 @@
   </data>
   <data name="Text_dd0abeaace42" xml:space="preserve">
     <value>Ремесленный префикс</value>
+  </data>
+  <data name="Text_dd1c36e6ced4" xml:space="preserve">
+    <value>лига Survivors</value>
   </data>
   <data name="Text_dd3db6ac0dfb" xml:space="preserve">
     <value>Добавить запись</value>
@@ -7006,8 +8083,17 @@
   <data xml:space="preserve" name="Text_dec1638d773b">
     <value>Возврат: Escape отменяет предпросмотр. Ctrl+R сбрасывает параметры в этом окне. В рабочем окне Ctrl+Alt+R возвращает стандартное оформление, не меняя репозиторий и сохранения.</value>
   </data>
+  <data name="Text_decaad6d7ea4" xml:space="preserve">
+    <value>Waypoint может установить LocalExile {0}, последнюю версию для {1}, в новую папку. Эта папка останется как есть.</value>
+  </data>
+  <data name="Text_ded9ea0a0a08" xml:space="preserve">
+    <value>разраб.: время между двумя шиповыми ловушками волны кольца Испытаний, с следующей волны</value>
+  </data>
   <data name="Text_deeb8da20758" xml:space="preserve">
     <value>репозиторий сервера поддерживает Waypoint</value>
+  </data>
+  <data name="Text_def6f3112826" xml:space="preserve">
+    <value>Войдите в игровую область для управления на ходу; иначе выбор сохранится и вступит в силу при следующем запуске Gateway.</value>
   </data>
   <data name="Text_df0663641d3e" xml:space="preserve">
     <value>Лестница</value>
@@ -7058,7 +8144,10 @@
     <value>Вождь</value>
   </data>
   <data name="Text_e0ad23f58ba8" xml:space="preserve">
-    <value>99-й перцентиль худшей секунды за период</value>
+    <value>99-й процентиль худшей секунды в окне</value>
+  </data>
+  <data name="Text_e0b03d95aed1" xml:space="preserve">
+    <value>Эта копия перейдёт со старой версии на последние изменения LocalExile. После этого вы обновляете её сами в разделе «Версии». Последние изменения могут быть менее стабильными. Сначала будет создана резервная копия ваших сохранений.</value>
   </data>
   <data name="Text_e0bfbac4f14b" xml:space="preserve">
     <value>Предвестник</value>
@@ -7075,6 +8164,9 @@
   <data xml:space="preserve" name="Text_e10d850954a8">
     <value>Роза</value>
   </data>
+  <data name="Text_e1133c7e9a75" xml:space="preserve">
+    <value>консоль выполняет только /команды; сообщение чата идёт через игру.</value>
+  </data>
   <data name="Text_e11ed003f60a" xml:space="preserve">
     <value>ошибка сборки: GameServer.Host
 {0}</value>
@@ -7088,8 +8180,14 @@
   <data name="Text_e16a630a20a6" xml:space="preserve">
     <value>Добавляет на боковую панель переключатель «Простой | Расширенный». Расширенный режим заменяет «Играть» разделом управления и добавляет версии, производительность и время работы сервера.</value>
   </data>
+  <data name="Text_e186a2e34b6f" xml:space="preserve">
+    <value>разраб.: вечный камень Легиона в инвентарь; сиды Elegant Hubris — отображаемые значения x20 2000-160000</value>
+  </data>
   <data name="Text_e191eb56478e" xml:space="preserve">
     <value>Медаль</value>
+  </data>
+  <data name="Text_e1950d942372" xml:space="preserve">
+    <value>на {0}</value>
   </data>
   <data name="Text_e197f8109b6e" xml:space="preserve">
     <value>Восстановить сохранения</value>
@@ -7154,6 +8252,12 @@
   <data name="Text_e2bec0c84c30" xml:space="preserve">
     <value>Требуется: {0}</value>
   </data>
+  <data name="Text_e2c3e1dc9225" xml:space="preserve">
+    <value>Собственные файлы журнала Waypoint, которые сохраняются между запусками</value>
+  </data>
+  <data name="Text_e2c82ab44aed" xml:space="preserve">
+    <value>Живая экономика</value>
+  </data>
   <data name="Text_e2d0a54968ea" xml:space="preserve">
     <value>Удалить</value>
   </data>
@@ -7172,8 +8276,14 @@
   <data name="Text_e33d34991e45" xml:space="preserve">
     <value>Под dotnet watch: сохранённое изменение кода Gateway применяется за несколько секунд, игра не прерывается; изменение, которое горячая перезагрузка применить не может, само перезапускает Gateway. Для изменений Auth, Patch или общих проектов нужно «Перезапустить серверы».</value>
   </data>
+  <data name="Text_e35520a7be64" xml:space="preserve">
+    <value>Забег Survivors</value>
+  </data>
   <data name="Text_e36274578842" xml:space="preserve">
     <value>Папка {0} не пуста. Выберите для загрузки пустую папку.</value>
+  </data>
+  <data name="Text_e36515230972" xml:space="preserve">
+    <value>разраб.: добавить n очков отмены, сохраняется</value>
   </data>
   <data name="Text_e36bc30435af" xml:space="preserve">
     <value>Вулкан</value>
@@ -7181,8 +8291,14 @@
   <data name="Text_e3a640bd65b5" xml:space="preserve">
     <value>Выберите модули для каждой лиги. Изменения состава требуют перезапуска серверов.</value>
   </data>
+  <data name="Text_e3aaf711bc78" xml:space="preserve">
+    <value>Другие ваши папки LocalExile</value>
+  </data>
   <data name="Text_e3b7b1ed944d" xml:space="preserve">
     <value>LocalExile в виде релиза: проверенный, обновляется, когда вы согласитесь.</value>
+  </data>
+  <data name="Text_e3ba7472396e" xml:space="preserve">
+    <value>{0} содержит правила режима игры. Если включить его здесь, они будут действовать для всех персонажей этой лиги со следующего запуска сервера, без собственных умений, торговцев и наград за задания этого режима, а игра по-прежнему будет показывать лигу как есть. Снимите флажок, чтобы вернуть всё назад.</value>
   </data>
   <data name="Text_e3ebaa16dd9d" xml:space="preserve">
     <value>Не найдено</value>
@@ -7199,11 +8315,20 @@
   <data name="Text_e448d0ca53ec" xml:space="preserve">
     <value>Получение последнего обновления</value>
   </data>
+  <data name="Text_e460de11bb28" xml:space="preserve">
+    <value>Waypoint Tools установлен из исходного кода: он соберётся при следующем запуске серверов или командой «Собрать мод» в разделе «Моды». Затем войдите в локацию персонажем и выдайте предмет снова.</value>
+  </data>
   <data name="Text_e487cafcf930" xml:space="preserve">
     <value>live.ps1 -Stop и dev host: игра, запись планировок, серверы и служба аккаунтов</value>
   </data>
+  <data name="Text_e48be159b57c" xml:space="preserve">
+    <value>Количество предметов</value>
+  </data>
   <data name="Text_e4a1e89ee1db" xml:space="preserve">
     <value>Предыдущий день</value>
+  </data>
+  <data name="Text_e4a82bc35138" xml:space="preserve">
+    <value>Команды выполняются на серверах, когда есть их канал консоли; иначе через игровой клиент (scripts/dev/client_control.py).</value>
   </data>
   <data name="Text_e4a97b87b06b" xml:space="preserve">
     <value>Исходный код, для работы над LocalExile</value>
@@ -7220,6 +8345,9 @@
   <data name="Text_e4e9436bc643" xml:space="preserve">
     <value>Создаёт недостающие ключи входа и Game.patched.exe в вашей копии клиента; имеющиеся сохраняются</value>
   </data>
+  <data name="Text_e4f146d56af4" xml:space="preserve">
+    <value>Команды выполняются на серверах (канал консоли Gateway) для персонажа в игре.</value>
+  </data>
   <data name="Text_e54674967f90" xml:space="preserve">
     <value>Новая копия находится в {0}. Нажмите «Играть» в Waypoint, чтобы запустить её.</value>
   </data>
@@ -7228,6 +8356,12 @@
   </data>
   <data name="Text_e5997acfabd7" xml:space="preserve">
     <value>Игра запущена: Waypoint ждёт здесь и вернётся, когда игра закроется.</value>
+  </data>
+  <data name="Text_e5b298cafb17" xml:space="preserve">
+    <value>«Не сейчас»: ничего не меняется, и в этот раз вы играете на {0}.</value>
+  </data>
+  <data name="Text_e5c22b639be4" xml:space="preserve">
+    <value>горячая перезагрузка модуля и зависимых, или всех; состояние начинается заново</value>
   </data>
   <data name="Text_e5d5f6f3c0d8" xml:space="preserve">
     <value>Запущенная сборка</value>
@@ -7238,8 +8372,14 @@
   <data name="Text_e6128fcc2b1e" xml:space="preserve">
     <value>Использовать отдельные настройки</value>
   </data>
+  <data name="Text_e61ca9b03292" xml:space="preserve">
+    <value>В этом релизе не указано, из какой версии кода LocalExile он собран, поэтому Waypoint не может определить, подходят ли ему ваши персонажи.</value>
+  </data>
   <data xml:space="preserve" name="Text_e62daa01ba01">
     <value>Выберите и проверьте рабочую папку, чтобы увидеть её копии.</value>
+  </data>
+  <data name="Text_e638157dcf26" xml:space="preserve">
+    <value>Перейти на версию для {0}</value>
   </data>
   <data name="Text_e64333c8348f" xml:space="preserve">
     <value>Видимому варианту режима нужна родительская карточка.</value>
@@ -7271,11 +8411,17 @@
   <data name="Text_e6deff541223" xml:space="preserve">
     <value>LocalExile нужны ещё некоторые данные. Укажите их, завершив настройку.</value>
   </data>
+  <data name="Text_e71b40130672" xml:space="preserve">
+    <value>Открыть {0}</value>
+  </data>
   <data name="Text_e721e319e5f9" xml:space="preserve">
     <value>Амулет</value>
   </data>
   <data name="Text_e74cca36ea73" xml:space="preserve">
     <value>МБ, МБ/с</value>
+  </data>
+  <data name="Text_e74d585d04f2" xml:space="preserve">
+    <value>Старый игровой клиент удалён. Новый добавит мастер настройки.</value>
   </data>
   <data name="Text_e75ba15efa68" xml:space="preserve">
     <value>Waypoint переносит свои файлы, только когда ничего не запущено. Нажмите «Закончить игру», затем попробуйте снова.</value>
@@ -7294,6 +8440,15 @@
   </data>
   <data name="Text_e806a291cfc3" xml:space="preserve">
     <value>Тестирование</value>
+  </data>
+  <data name="Text_e814cb5c8958" xml:space="preserve">
+    <value>Ruthless: крайняя нехватка предметов.</value>
+  </data>
+  <data name="Text_e824a8d9932b" xml:space="preserve">
+    <value>Обычный режим игры. Solo Self-Found: без торговли и групп.</value>
+  </data>
+  <data name="Text_e852aef86be8" xml:space="preserve">
+    <value>В лиге Standard; другие лиги предлагает собственный экран создания персонажа</value>
   </data>
   <data name="Text_e8545ec7e575" xml:space="preserve">
     <value>Точка неопределённой группы</value>
@@ -7326,10 +8481,13 @@
     <value>Светлые цвета</value>
   </data>
   <data name="Text_e913447f262a" xml:space="preserve">
-    <value>Хардкор</value>
+    <value>Hardcore</value>
   </data>
   <data xml:space="preserve" name="Text_e9182bbf5cec">
     <value>Удаление копии</value>
+  </data>
+  <data name="Text_e96c43c358a6" xml:space="preserve">
+    <value>Софткор</value>
   </data>
   <data xml:space="preserve" name="Text_e97166b54500">
     <value>enable</value>
@@ -7367,6 +8525,9 @@
   <data xml:space="preserve" name="Text_e9e895e3c405">
     <value>Войдите в игровую область для управления модами или остановите Gateway, чтобы сохранить выбор модов.</value>
   </data>
+  <data name="Text_e9ff0bf2b060" xml:space="preserve">
+    <value>разраб.: какую долю попадания дротика Испытаний в секунду наносит стак яда, с следующего попадания</value>
+  </data>
   <data name="Text_e9ff4eed6056" xml:space="preserve">
     <value>Родительская лига: {0}</value>
   </data>
@@ -7384,6 +8545,9 @@
   </data>
   <data name="Text_ea442a56be81" xml:space="preserve">
     <value>Начать без аккаунтов и персонажей. В конце вы создадите аккаунт.</value>
+  </data>
+  <data name="Text_ea4ae76ff94e" xml:space="preserve">
+    <value>показать или задать общий базовый бросок защиты надетой брони</value>
   </data>
   <data name="Text_ea4c3e2839b0" xml:space="preserve">
     <value>Ваши персонажи перенесены, так что входите как обычно. Моды, которые вы добавляли сами, не перенесены: они остались в старой папке.</value>
@@ -7417,6 +8581,9 @@
   </data>
   <data name="Text_eb1a70e39274" xml:space="preserve">
     <value>Отменить изменения</value>
+  </data>
+  <data name="Text_eb1f230afa51" xml:space="preserve">
+    <value>Последние изменения LocalExile; что-то может сломаться. Обновлять копию вы будете сами в разделе «Версии».</value>
   </data>
   <data xml:space="preserve" name="Text_eb24997abb6c">
     <value>Выберите репозиторий LocalExile в настройках.</value>
@@ -7471,6 +8638,9 @@
   </data>
   <data name="Text_ec963ffc911b" xml:space="preserve">
     <value>Проверка…</value>
+  </data>
+  <data name="Text_ec9dd872a688" xml:space="preserve">
+    <value>возвращает вас и монстров туда, где их видит сервер, при рассинхроне</value>
   </data>
   <data name="Text_eca8f3a20a81" xml:space="preserve">
     <value>Показывать и свойства, которым нужен уровень предмета выше текущего</value>
@@ -7563,7 +8733,7 @@
     <value>Игровое изображение недоступно — показан условный флаг.</value>
   </data>
   <data xml:space="preserve" name="Text_ef6691545d2c">
-    <value>Обычное</value>
+    <value>Standard</value>
   </data>
   <data xml:space="preserve" name="Text_ef6c0d9877bf">
     <value>коммит недоступен</value>
@@ -7582,6 +8752,9 @@
   </data>
   <data name="Text_ef9e6dd246cc" xml:space="preserve">
     <value>Выдать предмет</value>
+  </data>
+  <data name="Text_efb29fac69b1" xml:space="preserve">
+    <value>Награды Survivors</value>
   </data>
   <data name="Text_efb2c606a917" xml:space="preserve">
     <value>Frida не обязательна; не удалось проверить её наличие.</value>
@@ -7605,7 +8778,7 @@
     <value>Гриб</value>
   </data>
   <data name="Text_f072c8faa039" xml:space="preserve">
-    <value>Выпуск {0}</value>
+    <value>Релиз {0}</value>
   </data>
   <data name="Text_f082ac980336" xml:space="preserve">
     <value>Компас</value>
@@ -7615,6 +8788,9 @@
   </data>
   <data xml:space="preserve" name="Text_f0911b7e2f8c">
     <value>Поиск в выбранном журнале</value>
+  </data>
+  <data name="Text_f09e7cb492ee" xml:space="preserve">
+    <value>Обмен валюты</value>
   </data>
   <data name="Text_f0adaf010eb5" xml:space="preserve">
     <value>Выберите папку LocalExile, из которой нужно перенести сохранения.</value>
@@ -7642,6 +8818,9 @@
   </data>
   <data name="Text_f1fd5ed417a0" xml:space="preserve">
     <value>МБ, рабочий набор</value>
+  </data>
+  <data name="Text_f2042b0b650a" xml:space="preserve">
+    <value>Открывает мастер настройки, который подготовит LocalExile в выбранной вами папке</value>
   </data>
   <data name="Text_f24116ae1425" xml:space="preserve">
     <value>Добро пожаловать в Waypoint</value>
@@ -7688,6 +8867,9 @@
   <data name="Text_f2d1dab08310" xml:space="preserve">
     <value>NPC</value>
   </data>
+  <data name="Text_f2f09f63f9d3" xml:space="preserve">
+    <value>/com; список команд или команды, в имени которых это есть</value>
+  </data>
   <data name="Text_f2faba4b22de" xml:space="preserve">
     <value>Моды, модули и лиги</value>
   </data>
@@ -7700,6 +8882,9 @@
   <data name="Text_f30bd0b67351" xml:space="preserve">
     <value>Python с frida (запись планировок, консоль)</value>
   </data>
+  <data name="Text_f349e65a53cd" xml:space="preserve">
+    <value>разраб.: Impossible Escape для этого кейстона, в инвентарь</value>
+  </data>
   <data name="Text_f34ba9fc922c" xml:space="preserve">
     <value>Случайное имя</value>
   </data>
@@ -7709,11 +8894,20 @@
   <data xml:space="preserve" name="Text_f3ec74792130">
     <value>Службы остаются остановленными. Ошибка сборки не затронет базу сохранений.</value>
   </data>
+  <data name="Text_f3f4a5f98e08" xml:space="preserve">
+    <value>В 10 раз больше предметов с каждого убийства.</value>
+  </data>
+  <data name="Text_f3fbdca6c650" xml:space="preserve">
+    <value>разраб.: заряды, их максимум, минимум и остаток времени; задать, получить или очистить</value>
+  </data>
   <data name="Text_f3fca419194d" xml:space="preserve">
     <value>Закрепить эту строку как кнопку (чтобы убрать кнопку, щёлкните по ней правой кнопкой мыши)</value>
   </data>
   <data xml:space="preserve" name="Text_f4047b3ea27a">
     <value>Пример кнопки</value>
+  </data>
+  <data name="Text_f4063d1b2a07" xml:space="preserve">
+    <value>Открыть консоль</value>
   </data>
   <data xml:space="preserve" name="Text_f418537ab654">
     <value>Параметры цвета и шрифта помогают подобрать удобный вид. Важные состояния также обозначаются текстом или символами.</value>
@@ -7727,6 +8921,9 @@
   </data>
   <data name="Text_f4ba436410ce" xml:space="preserve">
     <value>Скверна</value>
+  </data>
+  <data name="Text_f4bb385af267" xml:space="preserve">
+    <value>Погибший в Hardcore персонаж переходит в Standard.</value>
   </data>
   <data xml:space="preserve" name="Text_f4bfa9a07c59">
     <value>Будет установлена зафиксированная зависимость Node в Tools/ooz командой npm ci. Глобальная установка не выполняется. Сначала установите Node.js.</value>
@@ -7743,6 +8940,9 @@
   <data name="Text_f4ed6bccdcb2" xml:space="preserve">
     <value>Делириум</value>
   </data>
+  <data name="Text_f4f3bad65021" xml:space="preserve">
+    <value>{0} содержит правила режима игры и относится к лигам этого режима.</value>
+  </data>
   <data name="Text_f4f5dca37b59" xml:space="preserve">
     <value>Аккаунтов: {0} из {1}</value>
   </data>
@@ -7757,6 +8957,9 @@
   </data>
   <data name="Text_f549a65bb648" xml:space="preserve">
     <value>Выбранная лига: {0} · {1}</value>
+  </data>
+  <data name="Text_f5520488718f" xml:space="preserve">
+    <value>Замена игрового клиента</value>
   </data>
   <data name="Text_f55c33b0abbd" xml:space="preserve">
     <value>Флаги лиг и режимы, определённые для создания персонажа.</value>
@@ -7784,6 +8987,9 @@
   </data>
   <data xml:space="preserve" name="Text_f6388410aa5a">
     <value> · файлы не проверены</value>
+  </data>
+  <data name="Text_f647fb4d1ce7" xml:space="preserve">
+    <value>Это клиент {0}, а этот LocalExile работает только с {1}. Сначала обновите LocalExile или выберите клиент {1}.</value>
   </data>
   <data xml:space="preserve" name="Text_f64a45cd7d47">
     <value>Выберите способ подготовки</value>
@@ -7832,6 +9038,9 @@
   </data>
   <data name="Text_f7a90ea11a44" xml:space="preserve">
     <value>Посмотреть, что случилось</value>
+  </data>
+  <data name="Text_f7b95d390f97" xml:space="preserve">
+    <value>Чтобы вернуться к другому LocalExile, нажмите «Изменить…» в разделе «Управление» и выберите {0}.</value>
   </data>
   <data name="Text_f7bf8de0a782" xml:space="preserve">
     <value>Настроить выдачу предметов?</value>
@@ -7902,6 +9111,9 @@
   <data xml:space="preserve" name="Text_f9d2f04d4584">
     <value>Запуск, сборка или перезапуск; проверьте вывод Gateway на ошибки</value>
   </data>
+  <data name="Text_f9ebd5052336" xml:space="preserve">
+    <value>не сборка 3.29.3c</value>
+  </data>
   <data xml:space="preserve" name="Text_fa15a5c1d610">
     <value>Бирюза</value>
   </data>
@@ -7919,6 +9131,9 @@
   </data>
   <data name="Text_fa77a5252d38" xml:space="preserve">
     <value>Врата</value>
+  </data>
+  <data name="Text_faa0f28e0c5b" xml:space="preserve">
+    <value>Больше не предлагать</value>
   </data>
   <data name="Text_faa6d163b29d" xml:space="preserve">
     <value>Цветовые схемы, свои цвета, шрифты для чтения, размер текста и параметры доступности.</value>
@@ -7974,6 +9189,9 @@
   <data xml:space="preserve" name="Text_fb42d9b4075f">
     <value>HEAD LocalExile недоступен.</value>
   </data>
+  <data name="Text_fb5829adf0ff" xml:space="preserve">
+    <value>Открыть текущий клиент</value>
+  </data>
   <data xml:space="preserve" name="Text_fb5b3abf52be">
     <value>Обновляется только скопированный архив клиента.</value>
   </data>
@@ -7988,6 +9206,9 @@
   </data>
   <data xml:space="preserve" name="Text_fba6c2c5d946">
     <value>Развернуть</value>
+  </data>
+  <data name="Text_fbaa340c6cfc" xml:space="preserve">
+    <value>разраб.: показать, задать или снять квестовые флаги лиги по id клиента, сохраняется для лиги</value>
   </data>
   <data name="Text_fbbe82ed6e1d" xml:space="preserve">
     <value>Сортировать моды по</value>
@@ -8007,6 +9228,12 @@
   <data name="Text_fc1c076ae7f5" xml:space="preserve">
     <value>Аккаунтов: {0}.</value>
   </data>
+  <data name="Text_fc34d7eee5c0" xml:space="preserve">
+    <value>разраб.: применить Journey Makanui, случайно или выбранный</value>
+  </data>
+  <data name="Text_fc8827aabd4f" xml:space="preserve">
+    <value>моды монстра; с модами: создать заново с этими аффиксами</value>
+  </data>
   <data xml:space="preserve" name="Text_fca91d59bc5a">
     <value>Для начала выберите репозиторий.</value>
   </data>
@@ -8018,6 +9245,9 @@
   </data>
   <data name="Text_fd249743c184" xml:space="preserve">
     <value>Новых изменений в LocalExile с вашей версии: {0}.</value>
+  </data>
+  <data name="Text_fd2d4d612ab3" xml:space="preserve">
+    <value>Текущий клиент {0} (заменяется, {1:0.#} ГБ):</value>
   </data>
   <data name="Text_fd4d54ace369" xml:space="preserve">
     <value>Уровень предмета: {0}</value>
@@ -8047,7 +9277,7 @@
     <value>Добавляет строку состояния, производительность и время работы сервера.</value>
   </data>
   <data name="Text_fdf8cf25d45d" xml:space="preserve">
-    <value>npm ci в Tools/ooz репозитория</value>
+    <value>npm ci в Tools/ooz копии</value>
   </data>
   <data xml:space="preserve" name="Text_fe08c7214df1">
     <value>Дополнительные имена учётных записей / персонажей для скрытия через запятую</value>
@@ -8067,6 +9297,9 @@
   <data name="Text_fea8224e17a4" xml:space="preserve">
     <value>Версия Steam или Epic: использовать нельзя</value>
   </data>
+  <data name="Text_fec5d0245d3c" xml:space="preserve">
+    <value>разраб.: переместить и повернуть склад этой области до выхода; он открывается из новой клетки</value>
+  </data>
   <data name="Text_fece8604a2c2" xml:space="preserve">
     <value>Настройки игры</value>
   </data>
@@ -8084,6 +9317,15 @@
   </data>
   <data name="Text_fef63c5ce56d" xml:space="preserve">
     <value>У релиза свои персонажи. Ваши останутся здесь, в «Новейшей», до вашего возвращения.</value>
+  </data>
+  <data name="Text_fefa7d678ebd" xml:space="preserve">
+    <value>Грабьте затонувшие сокровища и используйте силу Всепламени. Ruthless: крайняя нехватка предметов. Solo Self-Found. Погибший персонаж переходит в SSF Ruthless Allflame.</value>
+  </data>
+  <data name="Text_fefcc7a6858a" xml:space="preserve">
+    <value>Установка Waypoint Tools …</value>
+  </data>
+  <data name="Text_ff5919ed48cb" xml:space="preserve">
+    <value>Меняется только интерфейс Waypoint. Имена репозиториев, пути, хеши коммитов, игровые команды и сырые логи остаются как есть.</value>
   </data>
   <data name="Text_ff6c6bc8e40c" xml:space="preserve">
     <value>Репозиторий сервера</value>

@@ -53,13 +53,13 @@
                     <TextBlock x:Name="ForAccount" Grid.Column="1" Margin="0,4" FontWeight="SemiBold" />
                     <TextBlock Text="{l:Loc 'Password'}" Grid.Row="1" Margin="0,4,8,4" />
                     <PasswordBox x:Name="AccountPassword" Grid.Row="1" Grid.Column="1" Margin="0,2"
-                                 ToolTip="{l:Loc 'The account\'s password: the dev host logs in with it'}" />
+                                 ToolTip="{l:Loc &quot;The account's password: the dev host logs in with it&quot;}" />
                     <TextBlock Text="{l:Loc 'Name'}" Grid.Row="2" Margin="0,4,8,4" />
                     <TextBox x:Name="CharacterName" Grid.Row="2" Grid.Column="1" Margin="0,2" />
                     <TextBlock Text="{l:Loc 'Class'}" Grid.Row="3" Margin="0,4,8,4" />
                     <ComboBox x:Name="CharacterClass" Grid.Row="3" Grid.Column="1" Margin="0,2" />
                     <Button Content="{l:Loc 'Create'}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Margin="0,6,0,0" Click="Create"
-                            ToolTip="{l:Loc 'In the Standard league; the game\'s own creation screen offers the other leagues'}" />
+                            ToolTip="{l:Loc &quot;In the Standard league; the game's own creation screen offers the other leagues&quot;}" />
                 </Grid>
             </GroupBox>
         </Grid>

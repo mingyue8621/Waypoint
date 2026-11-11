@@ -10,7 +10,11 @@ sealed record ChatCommand(string Name, string Usage, IReadOnlyList<string> Args)
 
     /// <summary>The usage without its " (explanation)", as /commands lists it.</summary>
     public string Short => Usage.IndexOf(" (", StringComparison.Ordinal) is int i and >= 0 ? Usage[..i] : Usage;
-    public string Explanation => Usage.IndexOf(" (", StringComparison.Ordinal) is int i and >= 0 ? Usage[(i + 2)..].TrimEnd(')') : "";
+    /// <summary>The explaining text after the usage, in the launcher's language: the Gateway writes it in English, and the
+    /// launcher's catalog carries the reviewed translations (a command it has no entry for reads as the Gateway wrote it).</summary>
+    public string Explanation => L.Text(Usage.IndexOf(" (", StringComparison.Ordinal) is int i and >= 0 ? Usage[(i + 2)..].TrimEnd(')') : "");
+    /// <summary>The usage and its explanation, for a tooltip.</summary>
+    public string DisplayUsage => Explanation.Length > 0 ? $"{Short} — {Explanation}" : Short;
 }
 
 /// <summary>The Gateway's chat commands, from the Gateway itself (<c>GameServer.Gateway commands</c>), so the console's
@@ -26,12 +30,25 @@ sealed class CommandCatalog(IReadOnlyList<ChatCommand> commands, DateTime built 
     /// argument values may have changed.</summary>
     public bool Stale => File.Exists(Repo.ServerDll("Gateway")) && File.GetLastWriteTimeUtc(Repo.ServerDll("Gateway")) != Built;
 
+    /// <summary>The last list read, so that two sections asking at startup run the Gateway once; a Gateway built again is
+    /// read again (<see cref="Stale"/>).</summary>
+    static CommandCatalog? _loaded;
+    static readonly SemaphoreSlim Loading = new(1, 1);
+
     public static async Task<CommandCatalog> LoadAsync()
     {
         string dll = Repo.ServerDll("Gateway");
         if (!File.Exists(dll)) throw new FileNotFoundException(L.Text("{0} is not built yet: start the servers once (live.ps1 builds it)", dll));
         DateTime built = File.GetLastWriteTimeUtc(dll);
-        return new(Parse(await AskGateway(TimeSpan.FromSeconds(30), dll, "commands")), built);
+        if (_loaded is { } known && known.Built == built) return known;
+        await Loading.WaitAsync();
+        try
+        {
+            built = File.GetLastWriteTimeUtc(dll);
+            if (_loaded is { } again && again.Built == built) return again;
+            return _loaded = new(Parse(await AskGateway(TimeSpan.FromSeconds(30), dll, "commands")), built);
+        }
+        finally { Loading.Release(); }
     }
 
     /// <summary>Runs the built Gateway in one of its listing modes and returns what it printed. The process never outlives

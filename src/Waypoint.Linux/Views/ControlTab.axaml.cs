@@ -121,6 +121,8 @@ partial class ControlTab : UserControl
     internal event Action<string>? ShowLogRequested;
     /// <summary>Guided setup: the window opens the Setup section.</summary>
     internal event Action? ShowSetupRequested;
+    /// <summary>The checkout's old client was taken out: the window opens the setup guide for the new one.</summary>
+    internal event Action? ClientGuideRequested;
     /// <summary>The player wants a new git copy set up.</summary>
     internal event Action? NewCopyRequested;
     /// <summary>The player wants another folder (as on PlayTab; on Windows this section asks the application itself).</summary>
@@ -169,6 +171,10 @@ partial class ControlTab : UserControl
     {
         foreach (var row in _rows)
             row.Update(samples.FirstOrDefault(s => s.Service == row.Service) ?? new(row.Service, null, false, 0, 0, 0, 0, TimeSpan.Zero), _live);
+        // The old release is asked about with the game closed and nothing holding the folder.
+        var replaced = _live || samples.Any(s => s.Running) ? null : Replaced;
+        RemoveOldCard.IsVisible = replaced is not null;
+        if (replaced is not null) RemoveOldText.Text = L.Text("Has the new copy worked for you? You can delete your old LocalExile in {0} now.", replaced.Old);
         // With servers up the same live.ps1 run restarts them: what is needed after edits hot reload does not cover.
         bool anyUp = samples.Any(s => s.Service.Kind == ServiceKind.Server && s.Running);
         if (Repo.IsInstall)
@@ -234,15 +240,93 @@ partial class ControlTab : UserControl
         return false;
     }
 
+    /// <summary>A start of the game with a client of another build than the checkout's LocalExile would fail at the login
+    /// (<see cref="ClientUpdate"/>). A move to a client found elsewhere is asked once: an older client in this copy is then taken
+    /// out and the guide brings the found one; a copy on an older version of its own goes to the newest changes. A player who has
+    /// nothing newer than an older client is asked about the older version. Starts without the game (servers, a restart, a stop)
+    /// go on as before.</summary>
+    async Task<bool> ClientFits(LiveRequest request, bool again = false)
+    {
+        if (request.Mode is not (LiveMode.All or LiveMode.Client)) return true;
+        if (_checking) return false;
+        _checking = true;
+        try { return await ClientFitsNow(request, again); }
+        finally { _checking = false; }
+    }
+
+    /// <summary>A Play is being checked (<see cref="ClientFits"/>): a second one waits for nothing and starts nothing.</summary>
+    bool _checking;
+
+    async Task<bool> ClientFitsNow(LiveRequest request, bool again)
+    {
+        var owner = Owner;
+        string folder = Environment.CurrentDirectory;
+        int Show(DialogKind kind, string title, string message, string[] buttons) => Dialog.Show(owner, kind, title, message, null, buttons);
+        var (outcome, plan) = await ClientUpdate.EnsureAsync(folder, lookForNewer: SwitchToSource.OnTestedVersion(folder),
+            p => p.Kind == ClientUpdate.Kind.UpdateLocalExile && !SwitchToSource.OnTestedVersion(folder)
+                || ClientUpdate.AskMove(p, (title, message, details, buttons) => Dialog.Show(owner, DialogKind.Question, title, message, details, buttons), ViewTools.Open),
+            p => Dialog.Ask(owner, DialogKind.Question, ClientUpdate.Title(p), ClientUpdate.OlderText(p, release: false), ClientUpdate.Confirm(p)),
+            text => Dialog.Tell(owner, DialogKind.Error, L.Text("Replace the game client?"), text),
+            work => _shared.RunExclusiveAsync(L.Text("Replacing the game client"), work));
+        switch (outcome)
+        {
+            case ClientUpdate.Outcome.Fits:
+                return true;
+            case ClientUpdate.Outcome.Replaced:
+                Append(ClientUpdate.Moving(plan!));
+                Say(() => L.Text("The old game client was removed. The setup guide brings the new one."));
+                OpenGuideWith(plan!.Found);
+                return false;
+            case ClientUpdate.Outcome.UseOlder:
+                if (!await Editions.MoveToOlderAsync(_shared, plan!.Have, Show)) return false;
+                Say(() => L.Text("This copy is now on the LocalExile made for {0}. Press Play.", plan.Have));
+                // A copy with no client yet gets the older one through the guide.
+                if (!Directory.Exists(Path.Combine(folder, "Client"))) OpenGuideWith(plan.Found);
+                return false;
+            case ClientUpdate.Outcome.UpdateLocalExile when !again && SwitchToSource.OnTestedVersion(folder):
+                // Asked already: Get the newest changes' own question is answered for the player.
+                Append(ClientUpdate.Explain(plan!));
+                string question = L.Text("Get the newest changes?");
+                return await Editions.MoveToNewestAsync(_shared, (kind, title, message, buttons) => title == question ? 0 : Show(kind, title, message, buttons))
+                    && await ClientFitsNow(request, again: true);
+            case ClientUpdate.Outcome.UpdateLocalExile:
+                Dialog.Tell(owner, DialogKind.Warning, ClientUpdate.Title(plan!), ClientUpdate.Explain(plan!) + "\n\n" + ClientUpdate.HowToUpdateCopy);
+                return false;
+            default:
+                Say(() => L.Text("Not started: the game client does not fit this LocalExile."));
+                return false;
+        }
+    }
+
+    /// <summary>The setup guide, with <paramref name="client"/> chosen on its client page.</summary>
+    void OpenGuideWith(string? client)
+    {
+        if (client is not null)
+        {
+            _shared.Settings.SetupClient = client;
+            _shared.Settings.Save();
+        }
+        ClientGuideRequested?.Invoke();
+    }
+
     /// <summary>The exit code of what ran; null when nothing did.</summary>
     async Task<int?> Run(LiveRequest request, Func<LiveRequest, Action<string>, Task<int?>> run)
     {
+        if (!await ClientFits(request)) return null;
         if (!await PortsFree(request)) return null;
         if (!await BackUp(request)) return null;
         Append($"> {request.Describe()}");
         Say(() => L.Text("Running {0} …", request.Describe()));
         var started = Stopwatch.StartNew();
-        int? code = await run(request, line => Dispatcher.UIThread.Post(() => Append(line)));
+        int clientSetupFailure = 0;
+        int? code = await run(request, line =>
+        {
+            if (ClientExtractionFailure.IsHncFailure(line)) Interlocked.Exchange(ref clientSetupFailure, 1);
+            Dispatcher.UIThread.Post(() => Append(line));
+        });
+        ClientSetupFailed = code is not (null or 0) && clientSetupFailure != 0;
+        // The game started on this copy: the release its user wanted removed later is asked about once the game is closed.
+        if (code == 0 && request.Mode is (LiveMode.All or LiveMode.Client) && Editions.PlayedOn(_shared.Settings, Environment.CurrentDirectory)) _shared.Settings.Save();
         double seconds = started.Elapsed.TotalSeconds;
         Say(() => code switch
         {
@@ -260,10 +344,14 @@ partial class ControlTab : UserControl
         else await PlayAsync();
     }
 
+    /// <summary>The last Play attempt failed with the recognized client preparation error.</summary>
+    internal bool ClientSetupFailed { get; private set; }
+
     /// <summary>Play: also what the Versions section starts after a switch, and Simple mode's Play. The exit code of the run;
     /// null when none ran.</summary>
     internal async Task<int?> PlayAsync()
     {
+        ClientSetupFailed = false;
         if (PlaysOnlyTheGame(_shared.Monitor.Latest, Walkmaps.IsChecked == true, Repo.ClientOnlyTakesWalkmaps()))
         {
             // The servers stay as they are: only the game (again) against them.
@@ -446,8 +534,8 @@ partial class ControlTab : UserControl
     async void CheckData(object? sender, RoutedEventArgs e)
     {
         if (_shared.IsLiveRunning) { Say(() => L.Text("live.ps1 is running; check the game data when it is done.")); return; }
-        Append($"> {Repo.ExtractScript} -List");
-        int code = await Scripts.RunAsync(Repo.ExtractScript, ["-List"], line => Dispatcher.UIThread.Post(() => Append(line)));
+        Append($"> {Repo.ExtractScript} {string.Join(' ', Repo.ExtractListArguments)}");
+        int code = await Scripts.RunAsync(Repo.ExtractScript, Repo.ExtractListArguments, line => Dispatcher.UIThread.Post(() => Append(line)));
         Append($"(exit {code})");
     }
 
@@ -457,6 +545,52 @@ partial class ControlTab : UserControl
         // A desktop without xdg-open is no error of Waypoint's: nothing else here would catch it.
         try { Process.Start(new ProcessStartInfo("xdg-open", [Path.GetFullPath(Repo.Logs)]) { UseShellExecute = false })?.Dispose(); }
         catch (Win32Exception ex) { Append(ex.Message); }
+    }
+
+    /// <summary>The release this copy replaces, once its user has played here: the guide's "Remove the old one later".</summary>
+    ReleaseToRemove? Replaced => Repo.IsInstall ? null : Editions.Replaced(_shared.Settings, Environment.CurrentDirectory);
+
+    /// <summary>Deletes the old release's program files (<see cref="SwitchToSource.RemoveRelease"/>), holding the folder
+    /// meanwhile: a client this copy shares moves here, so nothing may start during it.</summary>
+    async void RemoveOldClicked(object? sender, RoutedEventArgs e)
+    {
+        if (_shared.IsLiveRunning || _shared.Monitor.Latest.Any(s => s.Running) || Replaced is not { } release) return;
+        if (!Dialog.Ask(Owner, DialogKind.Warning, L.Text("Delete your old LocalExile?"),
+                L.Text("This deletes the program files in {0}, and cannot be undone. Your old saves and mods stay there until you delete them yourself. A game client this copy uses moves here first when it is on the same drive.", release.Old),
+                L.Text("Delete"))) return;
+        RemovedRelease? removed = null;
+        Exception? failed = null;
+        bool ran = await _shared.RunExclusiveAsync(L.Text("Deleting your old LocalExile"), async () =>
+        {
+            Say(() => L.Text("Deleting your old LocalExile"));
+            try { removed = await Task.Run(() => SwitchToSource.RemoveRelease(release.Old, Environment.CurrentDirectory)); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException) { failed = ex; }
+        });
+        if (!ran) return;
+        if (removed is null)
+        {
+            // Nothing is noted as done: the question stays, and a stopped removal can be asked for again.
+            string why = failed?.Message ?? "";
+            Say(() => L.Text("Waypoint couldn't delete your old LocalExile: {0}", why));
+            Append(_state());
+            return;
+        }
+        _shared.Settings.RemoveRelease = null;
+        _shared.Settings.Save();
+        string data = Path.Combine(release.Old, "data");
+        Say(removed.ClientMoved ? () => L.Text("Your old LocalExile is deleted, and the game client moved here. Your old saves are still in {0}.", data)
+            : () => L.Text("Your old LocalExile is deleted. Your old saves are still in {0}.", data));
+        Append(_state());
+        ShowServices(_shared.Monitor.Latest);
+        // A client that moved here is this copy's own now: what reads the folder reads it again.
+        _ = _shared.Workspace.RefreshAsync();
+    }
+
+    void KeepOldClicked(object? sender, RoutedEventArgs e)
+    {
+        _shared.Settings.RemoveRelease = null;
+        _shared.Settings.Save();
+        ShowServices(_shared.Monitor.Latest);
     }
 
     void ChangeServer(object? sender, RoutedEventArgs e)

@@ -15,7 +15,7 @@ namespace Waypoint;
 public partial class InstallTab : UserControl
 {
     Shared _shared = null!;
-    bool _working, _stopping, _failed, _needsSetup, _withClient = true;
+    bool _working, _checking, _stopping, _failed, _needsSetup, _withClient = true;
     string? _stage;
     long? _current, _total;
     /// <summary>The words shown, as functions, so that a language change says them again.</summary>
@@ -28,12 +28,12 @@ public partial class InstallTab : UserControl
 
     /// <summary>The window runs the setup guide.</summary>
     internal event Action? SetupRequested;
+    /// <summary>The player has only an older client: the window sets up the last LocalExile made for it, in a new folder.</summary>
+    internal event Action? OlderReleaseRequested;
+    /// <summary>This release was updated from here: the window drops its update card.</summary>
+    internal event Action? Updated;
     /// <summary>The window opens the logs.</summary>
     internal event Action? DetailsRequested;
-    /// <summary>The player wants another folder.</summary>
-    internal event Action? ChangeFolderRequested;
-    /// <summary>The player wants a new git copy set up.</summary>
-    internal event Action? NewCopyRequested;
 
     public InstallTab() => InitializeComponent();
 
@@ -45,8 +45,8 @@ public partial class InstallTab : UserControl
     {
         _shared = shared;
         if (!Repo.IsInstall) return;
+        _ = LookForOlderAsync();
         Offer.Attach(shared.Settings);
-        Edition.Attach(shared);
         Profile.Attach(shared);
         StepList.ItemsSource = _steps;
         shared.Monitor.Sampled += _ => Dispatcher.BeginInvoke(Show);
@@ -60,16 +60,35 @@ public partial class InstallTab : UserControl
     internal void InstallChanged(Func<string>? note = null)
     {
         if (!Repo.IsInstall) return;
+        _ = LookForOlderAsync();
         _needsSetup = false;
         _failed = false;
         _note = note;
         Show();
     }
 
+    /// <summary>The client build of the older LocalExile this folder runs, while a client of that build is all the player has:
+    /// Play then says, quietly, that it won't last (<see cref="ClientUpdate.OlderNote"/>). Looked for in the background; a
+    /// client of the current build found instead is Play's to move to.</summary>
+    string? _olderBuild, _olderLookedFor;
+
+    async Task LookForOlderAsync()
+    {
+        string folder = Environment.CurrentDirectory;
+        string? need = ClientLocator.Needed(folder);
+        // Looked for again only when the folder's LocalExile changed (an update, a move to another version).
+        if (need is not null && need == _olderLookedFor) return;
+        _olderLookedFor = need;
+        _olderBuild = need is not null && ClientLocator.IsOlder(need, ClientLocator.Build)
+            && await Task.Run(() => ClientUpdate.FindClient(ClientLocator.Build, default)) is null ? need : null;
+        Show();
+    }
+
     void Show()
     {
         bool needsSetup = _needsSetup || !LocalExileReleases.IsSetUp(Folder);
-        bool busy = _working || _shared.IsLiveRunning;
+        bool busy = _working || _checking || _shared.IsLiveRunning;
+        RunSetupLink.IsEnabled = !busy && !AnythingRunning;
         Headline.Text = _headline?.Invoke() ?? (GameRunning ? L.Text("The game is running")
             : needsSetup ? L.Text("LocalExile isn't ready yet")
             : L.Text("Ready to play"));
@@ -78,22 +97,61 @@ public partial class InstallTab : UserControl
         Working.Visibility = busy && (!Theme.Current.ReduceMotion || _total is > 0) ? Visibility.Visible : Visibility.Collapsed;
         Working.IsIndeterminate = _total is not > 0;
         if (_total is > 0 and { } total) Working.Value = 100d * (_current ?? 0) / total;
-        string? note = _note?.Invoke();
+        string? note = _note?.Invoke() ?? (_olderBuild is { } older ? ClientUpdate.OlderNoteFor(older) : null);
         Note.Text = note ?? "";
         Note.Visibility = note is null ? Visibility.Collapsed : Visibility.Visible;
         DetailsLink.Visibility = _failed && !busy ? Visibility.Visible : Visibility.Collapsed;
         // A step that writes the client or the keys is not cut short.
         StopLink.Visibility = !_stopping && !LocalExileReleases.MustFinish(_stage) && (_working || AnythingRunning) ? Visibility.Visible : Visibility.Collapsed;
-        FolderText.Text = Folder;
         Elapsed.Text = _working ? L.Text("Running for {0}", _clock.Elapsed.ToString(@"m\:ss")) : "";
         VersionText.Text = LocalExileReleases.Installed(Folder) is { } version ? L.Text("LocalExile {0}", version) : "";
         Offer.Show(!busy && !AnythingRunning && !needsSetup);
+        string? from = _bringLater ? null : Editions.BringFrom(_shared.Settings);
+        // The check holds the folder as any work does (busy): its card stays, and says what Waypoint is doing.
+        BringCard.Visibility = from is not null && (_bringChecking || !busy && !AnythingRunning) && !needsSetup ? Visibility.Visible : Visibility.Collapsed;
+        if (from is not null) BringText.Text = L.Text("Your characters are still in {0}. Waypoint can bring them here when this release is the same as or newer than that copy.", from);
+        BringButton.Content = _bringChecking ? L.Text("Checking…") : L.Text("Bring my characters…");
+        BringNeverLink.Content = L.Text("Don't offer again");
+        BringButton.IsEnabled = BringLaterButton.IsEnabled = BringNeverLink.IsEnabled = !_bringChecking;
+    }
+
+    /// <summary>"Not now" on the characters card: until Waypoint starts again.</summary>
+    bool _bringLater;
+    /// <summary>Waypoint is finding out whether the characters fit, which may fetch LocalExile's newest code.</summary>
+    bool _bringChecking;
+
+    async void BringClicked(object sender, RoutedEventArgs e)
+    {
+        var owner = Window.GetWindow(this);
+        bool brought = await Editions.BringToReleaseAsync(_shared, (kind, title, message, buttons) => Dialog.Show(owner, kind, title, message, null, buttons),
+            checking => { _bringChecking = checking; Show(); });
+        if (brought) _note = () => L.Text("Your characters came with you. Log in as usual.");
+        Show();
+    }
+
+    /// <summary>"Don't offer again" on the characters card: for good, after one question.</summary>
+    void BringNeverClicked(object sender, RoutedEventArgs e)
+    {
+        var owner = Window.GetWindow(this);
+        Editions.StopOfferingBring(_shared, (kind, title, message, buttons) => Dialog.Show(owner, kind, title, message, null, buttons));
+        Show();
+    }
+
+    void BringLaterClicked(object sender, RoutedEventArgs e)
+    {
+        _bringLater = true;
+        Show();
     }
 
     void MainClicked(object sender, RoutedEventArgs e)
     {
         if (_needsSetup || !LocalExileReleases.IsSetUp(Folder)) { SetupRequested?.Invoke(); return; }
         _ = PlayAsync();
+    }
+
+    void RunSetupClicked(object sender, RoutedEventArgs e)
+    {
+        if (!_working && !_checking && !_shared.IsLiveRunning && !AnythingRunning) SetupRequested?.Invoke();
     }
 
     internal Task PlayAsync() => RunAsync(["run", "--no-update-check"], true);
@@ -103,13 +161,38 @@ public partial class InstallTab : UserControl
 
     async Task RunAsync(string[] arguments, bool withClient)
     {
-        if (_working || _shared.IsLiveRunning || !await BackUp()) return;
+        if (_working || _checking || _shared.IsLiveRunning) return;
+        _checking = true;
+        Show();
+        string[]? client;
+        try
+        {
+            client = withClient ? await ClientFits() : [];
+            if (client is not null && !await BackUp()) client = null;
+        }
+        finally { _checking = false; }
+        Show();
+        if (client is null) return;
+        if (client.Length > 0)
+        {
+            // The found client comes in through LocalExile.exe's setup, which starts nothing, so that the game settings can come
+            // back before the game starts (ClientUpdate.AfterNewClient).
+            if (await RunToolAsync(["setup", "--no-update-check", .. client], false, () => L.Text("Copy the game client")) is not { Code: 0 }) return;
+            try { ClientUpdate.AfterNewClient(Folder, client[1]); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { _shared.Logs.Write($"after the new client: {e.Message}", Severity.Warning); }
+        }
+        await RunToolAsync(arguments, withClient, () => withClient ? L.Text("Starting the game") : L.Text("Starting the servers"));
+    }
+
+    /// <summary>One run of LocalExile.exe, with its steps on this page; what it answered, or null when it could not run.</summary>
+    async Task<LocalExileResult?> RunToolAsync(string[] arguments, bool withClient, Func<string> headline)
+    {
         _working = true;
         _failed = false;
         _stopping = false;
         _note = null;
         _withClient = withClient;
-        _headline = () => withClient ? L.Text("Starting the game") : L.Text("Starting the servers");
+        _headline = headline;
         _steps.Clear();
         _row = null;
         _log.Clear();
@@ -143,6 +226,80 @@ public partial class InstallTab : UserControl
         _headline = null;
         Finished(result, failure);
         Show();
+        return failure is null ? result : null;
+    }
+    /// <summary>A run with a client of another build than this release needs would fail at the login (<see cref="ClientUpdate"/>).
+    /// A player with a client of the current build is moved to it without a question: this release is updated to the newest
+    /// (saves copied first), an older client is taken out, and LocalExile.exe is given the found one; the arguments to add, or
+    /// null when nothing starts. Only a player who has nothing newer than an older client is asked, about the older version.</summary>
+    async Task<string[]?> ClientFits(bool again = false)
+    {
+        var owner = Window.GetWindow(this);
+        var (outcome, plan) = await ClientUpdate.EnsureAsync(Folder, lookForNewer: true,
+            p => ClientUpdate.AskMove(p, (title, message, details, buttons) => Dialog.Show(owner, DialogKind.Question, title, message, details, buttons), path => Process.Start(new ProcessStartInfo("explorer.exe") { ArgumentList = { path }, UseShellExecute = false })?.Dispose()),
+            p => Dialog.Ask(owner, DialogKind.Question, ClientUpdate.Title(p),
+                ClientUpdate.OlderText(p, release: true), ClientUpdate.Confirm(p)),
+            text => Dialog.Tell(owner, DialogKind.Error, L.Text("Replace the game client?"), text),
+            work => _shared.RunExclusiveAsync(L.Text("Replacing the game client"), work));
+        switch (outcome)
+        {
+            case ClientUpdate.Outcome.Fits:
+                return [];
+            case ClientUpdate.Outcome.Replaced:
+                _shared.Logs.Write(ClientUpdate.Moving(plan!), Severity.Info);
+                _note = () => ClientUpdate.Moving(plan!);
+                Show();
+                return ClientUpdate.ClientArguments(plan!);
+            case ClientUpdate.Outcome.UseOlder:
+                OlderReleaseRequested?.Invoke();
+                return null;
+            case ClientUpdate.Outcome.UpdateLocalExile when !again:
+                return await UpdateRelease(plan!) ? await ClientFits(again: true) : null;
+            default:
+                _note = () => L.Text("Not started: the game client does not fit this LocalExile.");
+                Show();
+                return null;
+        }
+    }
+
+    /// <summary>This release onto LocalExile's newest, with the steps on this page: the client the player has is newer than it.</summary>
+    async Task<bool> UpdateRelease(ClientUpdate.Plan plan)
+    {
+        _shared.Logs.Write(ClientUpdate.Explain(plan), Severity.Info);
+        _headline = () => L.Text("Updating LocalExile");
+        Show();
+        LocalExileRelease? updated = null;
+        string? failure = null;
+        bool ran = await _shared.RunExclusiveAsync(L.Text("LocalExile update"), async () =>
+        {
+            try
+            {
+                using var http = Updates.Client();
+                updated = await ClientUpdate.UpdateReleaseAsync(http, Folder, _shared.Settings.AutomaticBackups, text => Dispatcher.BeginInvoke(() => { _note = () => text; Show(); }));
+            }
+            catch (Exception e) when (e is System.Net.Http.HttpRequestException or TaskCanceledException or IOException or UnauthorizedAccessException
+                or InvalidOperationException or InvalidDataException or System.Text.Json.JsonException)
+            {
+                failure = e.Message;
+            }
+        });
+        _headline = null;
+        _note = null;
+        if (updated is not null)
+        {
+            _shared.Logs.Write($"LocalExile updated to {updated.Version}", Severity.Info);
+            Updated?.Invoke();
+            Show();
+            return true;
+        }
+        // Nothing changed: the next Play asks again, rather than going on from the Continue given for this one.
+        ClientUpdate.Forget(Folder);
+        string reason = !ran ? L.Text("Something else is using LocalExile. Try again when it is done.")
+            : failure is not null ? L.Text("The update failed: {0}", failure) + "\n\n" + L.Text("Nothing was changed. Press Play to try again.")
+            : L.Text("LocalExile {0} is the newest release.", LocalExileReleases.Installed(Folder)?.ToString() ?? "");
+        Dialog.Tell(Window.GetWindow(this), DialogKind.Warning, L.Text("LocalExile update"), reason);
+        Show();
+        return false;
     }
 
     /// <summary>As on the Control section: a start gets a backup of the saves first, or the player's word to go on without.</summary>
@@ -222,7 +379,9 @@ public partial class InstallTab : UserControl
         _failed = true;
         string? reason = failure ?? result?.Error?.Split('\n')[0];
         _row?.Show(SetupState.Failed, reason ?? "");
-        _note = () => L.Text("The game didn't start.") + (reason is null ? "" : "\n" + reason);
+        _note = ClientExtractionFailure.IsHncFailure(failure ?? result?.Error)
+            ? () => ClientExtractionFailure.RecoveryHint
+            : () => L.Text("The game didn't start.") + (reason is null ? "" : "\n" + reason);
     }
 
     void Write(string line)
@@ -245,10 +404,6 @@ public partial class InstallTab : UserControl
         _headline = _working ? _headline : null;
         Show();
     }
-
-    void ChangeFolderClicked(object sender, RoutedEventArgs e) => ChangeFolderRequested?.Invoke();
-
-    void NewCopyClicked(object sender, RoutedEventArgs e) => NewCopyRequested?.Invoke();
 
     void DetailsClicked(object sender, RoutedEventArgs e) => DetailsRequested?.Invoke();
 }

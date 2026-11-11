@@ -1,0 +1,9 @@
+<Application x:Class="LocalExile.ServerTool.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <!-- Waypoint's own look: its Shell.xaml restyles Material Design into the flat palette the Control section uses. -->
+        <ResourceDictionary Source="/Waypoint;component/Shell.xaml" />
+    </Application.Resources>
+</Application>

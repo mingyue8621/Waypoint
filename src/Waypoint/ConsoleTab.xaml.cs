@@ -41,13 +41,13 @@ public partial class ConsoleTab : UserControl
         };
     }
 
-    /// <summary>A release has no client control bridge to send through: a line is copied, for the game's chat.</summary>
+    /// <summary>A release has no client control bridge: its commands run on the Gateway's own console channel, and only a
+    /// Gateway without one (an older build) leaves a line to be copied for the game's chat.</summary>
     void ShowRelease()
     {
         if (!Repo.IsInstall) return;
         GameStatusButton.Visibility = Visibility.Collapsed;
-        SendButton.Content = L.Text("Copy");
-        State.Text = L.Text("Copy a command, then paste it into the game's chat with Ctrl+V.");
+        State.Text = L.Text("Commands run on the servers (the Gateway's console channel), on the character in game.");
     }
 
     bool _reloading;
@@ -94,7 +94,7 @@ public partial class ConsoleTab : UserControl
         Suggestions.ItemsSource = items;
         SuggestionPopup.IsOpen = items.Count > 0 && Input.IsKeyboardFocused;
         if (items.Count > 0) Suggestions.SelectedIndex = 0;
-        Hint.Text = _catalog.Of(Input.Text)?.Usage ?? "";
+        Hint.Text = _catalog.Of(Input.Text)?.DisplayUsage ?? "";
     }
 
     async Task LoadValues(string kind)
@@ -189,28 +189,40 @@ public partial class ConsoleTab : UserControl
         text = text.Trim();
         if (text.Length == 0 || _sending) return;
         _sending = true;
-        SendButton.IsEnabled = GameStatusButton.IsEnabled = false;
+        SendButton.IsEnabled = GameStatusButton.IsEnabled = WhoButton.IsEnabled = false;
         try
         {
-            if (!Repo.IsInstall && !await FridaSetup.EnsureAsync(_shared, Window.GetWindow(this), L.Text("Console"), Append)) return;
-            await SendPrepared(text);
+            // A command runs on the Gateway itself when it has the console channel (data/console.json): no game client and no
+            // Frida, and the replies come back as lines instead of the client's chat. A release has no bridge at all, so that
+            // channel is its way to run one.
+            int? channel = text.StartsWith('/') ? await ServerConsole.PortAsync() : null;
+            if (channel is null && !Repo.IsInstall
+                && !await FridaSetup.EnsureAsync(_shared, Window.GetWindow(this), L.Text("Console"), Append)) return;
+            await SendPrepared(text, channel);
         }
-        finally { _sending = false; SendButton.IsEnabled = GameStatusButton.IsEnabled = true; }
+        finally { _sending = false; SendButton.IsEnabled = GameStatusButton.IsEnabled = WhoButton.IsEnabled = true; }
     }
 
-    async Task SendPrepared(string text)
+    async Task SendPrepared(string text, int? channel)
     {
         _shared.Settings.Remember(text);
         _shared.Settings.Save();
         _historyIndex = _shared.Settings.History.Count;
         Input.Clear();
         SuggestionPopup.IsOpen = false;
+        if (channel is { } port)
+        {
+            Append($"> {text}");
+            await RunOnServer(port, text);
+            return;
+        }
         if (Repo.IsInstall)
         {
             try
             {
                 Clipboard.SetText(text);
                 Append(L.Text("Copied: {0}", text));
+                Append("  " + L.Text("The servers do not answer this command: their Gateway has no console channel (start it once with this launcher's build)."));
             }
             catch (System.Runtime.InteropServices.ExternalException ex) { Problem(ex.Message); }
             return;
@@ -229,6 +241,62 @@ public partial class ConsoleTab : UserControl
             Problem(ex.Message);
         }
         finally { SendButton.IsEnabled = true; }
+    }
+
+    /// <summary>Runs the line on the Gateway and shows what it answered. The Gateway's replies also reach the character's
+    /// chat panel, as a line typed there would.</summary>
+    async Task RunOnServer(int port, string text)
+    {
+        try
+        {
+            var reply = await ServerConsole.RequestAsync(port, new JsonObject { ["op"] = "run", ["line"] = text },
+                TimeSpan.FromSeconds(90));
+            if (reply["ok"]?.GetValue<bool>() != true)
+            {
+                string error = reply["error"]?.GetValue<string>() ?? "";
+                Append("  ! " + (error switch
+                {
+                    "no_player" => L.Text("no character is in game: log in, enter an area, then send again."),
+                    "not_a_command" => L.Text("the console runs /commands; a chat line goes through the game."),
+                    _ => error,
+                }));
+                return;
+            }
+            if (reply["character"]?.GetValue<string>() is { Length: > 0 } character)
+                Append("  " + L.Text("on {0}", character));
+            if (reply["lines"] is not JsonArray lines || lines.Count == 0) { Append("  " + L.Text("(no reply)")); return; }
+            foreach (var line in lines) Append($"  {line?.GetValue<string>()}");
+        }
+        catch (Exception ex) when (ex is System.Net.Sockets.SocketException or IOException or TimeoutException
+            or System.Text.Json.JsonException or InvalidOperationException or ObjectDisposedException)
+        {
+            Problem(ex.Message);
+        }
+    }
+
+    /// <summary>The characters a command can run on, and the area each is in.</summary>
+    async void WhoClicked(object sender, RoutedEventArgs e)
+    {
+        if (_sending) return;
+        if (await ServerConsole.PortAsync() is not { } port)
+        {
+            Append("  ! " + L.Text("the servers' console channel is not there: start a Gateway built with it."));
+            return;
+        }
+        try
+        {
+            var reply = await ServerConsole.RequestAsync(port, new JsonObject { ["op"] = "who" }, TimeSpan.FromSeconds(15));
+            var players = reply["players"] as JsonArray ?? [];
+            Append("> who");
+            if (players.Count == 0) Append("  " + L.Text("no character is in game"));
+            foreach (var player in players)
+                Append($"  {player?["character"]?.GetValue<string>()}  {player?["area"]?.GetValue<string>()}");
+        }
+        catch (Exception ex) when (ex is System.Net.Sockets.SocketException or IOException or TimeoutException
+            or System.Text.Json.JsonException or InvalidOperationException or ObjectDisposedException)
+        {
+            Problem(ex.Message);
+        }
     }
 
     void Problem(string message)
@@ -287,7 +355,7 @@ public partial class ConsoleTab : UserControl
             var button = new Button
             {
                 Content = line,
-                ToolTip = $"{_catalog.Of(line)?.Usage ?? line}\n{L.Text("Puts the line in the box; Enter or Send sends it.")}",
+                ToolTip = $"{_catalog.Of(line)?.DisplayUsage ?? line}\n{L.Text("Puts the line in the box; Enter or Send sends it.")}",
                 FontFamily = (System.Windows.Media.FontFamily)FindResource("Mono"),
             };
             button.Click += (_, _) => Put(line);

@@ -16,7 +16,8 @@ unchanged. It does not download Path of Exile, bundle LocalExile or offer a publ
 
 ## Install
 
-Requirements: Windows 10/11 x64, the .NET 10 Desktop Runtime, and your own standalone PoE **3.29.3b** client. The setup guide
+Requirements: Windows 10/11 x64, the .NET 10 Desktop Runtime, and your own standalone PoE **3.29.3c** client (a player who has only 3.29.3b gets
+the last LocalExile made for it, see [Game client builds](docs/launcher.md#game-client-builds)). The setup guide
 offers two ways to get LocalExile:
 
 - **The ready-to-play release** (recommended). Nothing else to install: Waypoint downloads the release, checks its SHA-256, and
@@ -32,10 +33,10 @@ offers two ways to get LocalExile:
 | [Git](https://git-scm.com/downloads/win) | Branches and pull requests |
 | [Python 3.9+](https://www.python.org/downloads/windows/) | Data extraction, consistent save backups, the account tools. Tick the installer's *Add python.exe to PATH*; Waypoint also finds a Python installed without it |
 | [Node.js](https://nodejs.org/en/download) | The bundle-decompression dependency |
-| Your own standalone PoE **3.29.3b** client | A separate copy in the checkout's `Client` folder; Steam layout and newer clients are unsupported |
+| Your own standalone PoE **3.29.3c** client | A separate copy in the checkout's `Client` folder; Steam layout and other builds are unsupported |
 
-Frida (`pip install frida`) is optional: it is needed for walk maps, the console, live mod control and the item crafter's Give
-item, not for ordinary play. The crafter offers to install it.
+Frida (`pip install frida`) is optional: it is needed for walk maps, the console and live mod control, not for ordinary play.
+The item crafter's Give item uses the Waypoint Tools mod instead, which it offers to install.
 
 1. Download `Waypoint.exe` from the latest release on this repository's **Releases** page.
 2. Put it anywhere and start it.
@@ -53,7 +54,7 @@ where they are. Neither old file is changed.
 
 Linux has its own executable and interface (`src/Waypoint.Linux`, Avalonia) over the same engine, and the Windows app is
 built as before. It needs the .NET 10 SDK, [umu-launcher](https://github.com/Open-Wine-Components/umu-launcher) and your own
-standalone PoE **3.29.3b** client. A source checkout also needs PowerShell 7 (`dotnet tool install --global PowerShell`), Git,
+standalone PoE **3.29.3c** client. A source checkout also needs PowerShell 7 (`dotnet tool install --global PowerShell`), Git,
 Python 3.9+ and Node.js.
 
 ```bash
@@ -63,31 +64,32 @@ dotnet run --project src/Waypoint.Linux
 Game settings and the saved login are kept in `~/.local/share/LocalExile/wine-prefix`: every LocalExile of yours shares them, they
 stay when an install is deleted, and your normal Path of Exile does not use them.
 
-The ready-to-play route needs a release with a `-linux-x64` zip. Until LocalExile publishes one, the setup guide sets up the
-source code instead. Not on Linux yet: walk maps, the client control bridge (the Console copies commands instead of sending
+The ready-to-play route needs a release with a `-linux-x64` zip; LocalExile publishes one since v0.2.0-beta. For an older release
+without one, the setup guide sets up the source code instead. Not on Linux yet: walk maps, the client control bridge (the Console copies commands instead of sending
 them), the item crafter, the tray and the appearance editor.
 
 ## Simple and Advanced modes
 
 On a release install some sections do less, because a release has no source, Frida or per-service control: **Console** copies
-commands for you to paste into the game's chat, **Mods** enables and disables built mods only, **Control** starts and stops
-everything together, and **Tools** needs a source checkout: **Get the item crafter…** sets one up beside your release and can bring
-your characters. When a newer LocalExile release is out, a green card offers to install it.
+commands for you to paste into the game's chat, **Mods** installs a mod's release but cannot build one from source, **Control** starts and stops
+everything together, and the item crafter's **Give item** goes through the Waypoint Tools mod, which it offers to install. When a newer LocalExile release is out, a green card offers to install it.
 Nothing changes until you accept and the game is closed. Your saves are copied first, and `data\` and `Client\` are kept.
 **Settings → Keep LocalExile up to date** turns the prompt off.
 
-A new player starts in **Simple mode**: **Play**, **Mods**, **Backups**, **Accounts**, **Logs**, **Console**, **Tools** and **Settings**. On a source checkout **Play** does
-everything. It backs up your saves, gets the newest code at most once a day, builds it and starts the game. If an update doesn't
-start, Waypoint goes back to the version you had and starts that. **Go back to the version you had** stays for a week after an
-update, and **Settings → Keep LocalExile up to date** turns updates off. An update is the latest code, not a release; a bug
-inside the game is what the way back is for.
+A new player starts in **Simple mode**: **Play**, **Mods**, **Modules**, **Leagues**, **Backups**, **Accounts**, **Tools** and
+**Settings**, with **Console** and **Logs** one click away on Tools. Simple mode plays the release. A source checkout is always shown in **Advanced mode**: it
+plays from **Control** and its user updates it from **Versions**. Waypoint never updates a source checkout by itself.
 
-Source checkouts also show **Modules** and **Leagues**, with editing enabled only when the checkout exposes the supported
-settings and league-choice hooks. The league card's name, description and mode links have a read-only preview.
+The folder Waypoint works on is at the top of the sidebar. A click lists your other LocalExile folders, a release or any
+number of source checkouts, and choosing one opens it: no file moves, and Waypoint asks before it stops anything.
+**Add a folder you already have…** puts another one in the list.
 
-A copy with anything of your own (another branch, a fork as `origin`, changes, your own commits) is never updated by itself.
+**Modules** and **Leagues** can be edited on a release from v0.2.0-beta on and on a source checkout that exposes the
+supported settings and league-choice hooks: which modules a league uses, their settings, and new leagues. Any installed
+module can be ticked for any league when what it needs is on, Player Bots among them; turning off a league's own bundle
+(Ruthless in a Ruthless league) asks first, the Survivors modules stay in isolated leagues, and the rules of a game mode (Ruthless) go with that mode's leagues and with leagues made in Waypoint. A release hides and shows only the leagues made in Waypoint. The league card's name, description and mode links have a read-only preview.
 
-**Settings → Developer → Developer Mode** adds a **Simple | Advanced** switch at the bottom of the sidebar: **Advanced** gives every section below, with
+On a release install, **Settings → Developer → Developer Mode** adds a **Simple | Advanced** switch at the bottom of the sidebar: **Advanced** gives every section below, with
 full control over branches and pull requests. Someone coming from an earlier launcher starts there.
 
 ## Sections
@@ -131,6 +133,42 @@ dotnet publish src/Waypoint -o .
 
 A build from source has no version and never offers updates. Everything else, from the sections to the code layout and
 how a release is made, is in [docs/launcher.md](docs/launcher.md); what comes next is in [docs/roadmap.md](docs/roadmap.md).
+
+## The two small launchers
+
+`src/ServerLauncher` and `src/ClientLauncher` build two single-purpose windows that carry none of the setup, install or
+update screens above; both drive the same checkout adapter, so a checkout that runs from Waypoint runs from them:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\Publish-Two.ps1     # bin\solo\流放之路服务端.exe + 流放之路登录器.exe
+```
+
+- **流放之路服务端.exe** — Waypoint itself under this build's name, for the servers: every section (Control, Versions,
+  Mods, Backups, Accounts, Performance, Timings, Logs, Console, Tools, Settings) with the install, setup and release pages
+  and the game's own Play left out. It runs on either home, found by itself — the folder it sits in first, then the one it
+  was started from, then Waypoint's saved folder: in a **source checkout** (the folder with `GameServer.slnx`) its Control
+  section drives `scripts\dev\live.ps1`; in a **release install** (the folder with `LocalExile.exe`) **启动服务器 /
+  全部停止** run `LocalExile.exe` itself, the way the release does, and the pages that install or update stay out of the
+  sidebar (Control's buttons still reach them). There is no folder picker.
+- **流放之路登录器.exe** — the login launcher: two buttons. **进入游戏** starts the client; **注册账号** opens a window of
+  its own and creates the account **on the server**, over the network (`GameServer.Auth`'s registration listener on
+  tcp/20497, a JSON line per request), so the same window serves the host and a player. Which server that is, is one file
+  beside it: `server.json`
+  (`{"server": "203.0.113.7", "patchPort": 12995, "registerPort": 20497}`), every field optional:
+  - **the host's copy** (no `server.json`, so 127.0.0.1): **进入游戏** starts the game — `Client\Game.patched.exe` when the
+    servers already listen, `LocalExile.exe` when they do not (started hidden: no console window pops up, and the status
+    line follows its progress through the patch port and the client's process);
+  - **a player's copy** (`server.json` naming the server): **进入游戏** checks that the server's patch port answers and then
+    starts `Client\Game.patched.exe --patching-server <server>:12995`; no `LocalExile.exe`, no `data\`. 注册账号 still works
+    — it goes to `<server>:20497`. Wrap it with the `Client\` folder and that one json file.
+
+The server launcher finds the checkout by itself (its own folder or a parent with `GameServer.slnx`), remembers a chosen
+folder in `launchers.json` beside Waypoint's settings, and can be copied anywhere inside the checkout's folder. The login
+launcher needs nothing of that: the folder it sits in is the install.
+
+Both windows are titled **流放之路**, and `GitRepositoryProbe.UpstreamUrl` (`src/Launcher.Core/RepositoryLocator.cs`) names
+this build's own fork — `https://github.com/mingyue8621/LocalExile.git` — as what Versions compares against and what the
+fetch, branch and pull-request routes use.
 
 Waypoint is under the [MIT license](LICENSE). OpenDyslexic is under the [SIL Open Font License](src/Waypoint/Fonts/OFL.txt).
 

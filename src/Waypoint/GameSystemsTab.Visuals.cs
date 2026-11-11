@@ -99,7 +99,7 @@ public sealed partial class GameSystemsTab
         var icon = Pennant(card.Primary.Hardcore, flagName: card.Name); icon.Margin = new Thickness(0, 0, 10, 0);
         DockPanel.SetDock(icon, Dock.Left); row.Children.Add(icon);
         var words = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-        words.Children.Add(Type(card.Name, 14, true));
+        words.Children.Add(Type(card.DisplayName, 14, true));
         var caption = Type(card.Visible ? L.Text("League flag") : L.Text("Not shown"), 11, false, "Shell.TextSecondary");
         caption.Margin = new Thickness(0, 5, 0, 0); words.Children.Add(caption); row.Children.Add(words);
         return row;

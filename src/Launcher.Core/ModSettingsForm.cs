@@ -13,7 +13,7 @@ public sealed record ModSetting(string Name, string Type, JsonNode? Default, str
 {
     public static readonly string[] EditableTypes = ["bool", "integer", "number", "range", "choice", "choices", "text", "list", "map", "group"];
     public bool Editable => EditableTypes.Contains(Type);
-    public string Title => Label.Length > 0 ? Label : Name;
+    public string Title => L.Text(Label.Length > 0 ? Label : Name);
     /// <summary>A percent is kept as a fraction (0.15) and shown as 15.</summary>
     public bool IsPercent => Format == "percent" && Type is "number" or "integer";
     public double DisplayScale => Format == "percent" ? 100 : 1;

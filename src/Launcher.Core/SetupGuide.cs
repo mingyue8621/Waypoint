@@ -197,13 +197,34 @@ public static class SetupSequence
         }
     }
 
-    /// <summary>Generates the game data. Each entry is stamped only once it is complete, so an entry cut short runs again.</summary>
+    /// <summary>Whether the checkout's extract-data.ps1 takes -Servers: from LocalExile's database split on, the servers read
+    /// the client tables from client.db and live.ps1 extracts only what they still read.</summary>
+    public static bool ExtractsForServers(string checkout)
+    {
+        try { return Regex.IsMatch(File.ReadAllText(Path.Combine(checkout, "scripts", "dev", "extract-data.ps1")), @"\[switch\]\$Servers\b", RegexOptions.IgnoreCase); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { return false; }
+    }
+
+    /// <summary>Generates the game data, what the servers read when the script can tell (<see cref="ExtractsForServers"/>). Each
+    /// entry is stamped only once it is complete, so an entry cut short runs again.</summary>
     public static async Task ExtractAsync(string checkout, Action<string> output, CancellationToken stop)
     {
         string powershell = Platform.PowerShell;
         string last = "";
-        int code = await ToolProcess.RunAsync(powershell, ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", Path.Combine("scripts", "dev", "extract-data.ps1")],
-            checkout, line => { if (line.Trim().Length > 0) last = line; output(line); }, stop);
-        if (code != 0) throw new IOException(last.Length > 0 ? last : L.Text("The game data could not be extracted (exit {0}).", code));
+        bool hncFailure = false;
+        string[] arguments = ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", Path.Combine("scripts", "dev", "extract-data.ps1"),
+            .. (ExtractsForServers(checkout) ? new[] { "-Servers" } : [])];
+        int code = await ToolProcess.RunAsync(powershell, arguments,
+            checkout, line =>
+            {
+                if (line.Trim().Length > 0) last = line;
+                hncFailure |= ClientExtractionFailure.IsHncFailure(line);
+                output(line);
+            }, stop);
+        if (code != 0)
+        {
+            string failure = last.Length > 0 ? last : L.Text("The game data could not be extracted (exit {0}).", code);
+            throw new IOException(hncFailure ? ClientExtractionFailure.Describe(checkout, failure) : failure);
+        }
     }
 }

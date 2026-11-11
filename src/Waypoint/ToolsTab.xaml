@@ -5,10 +5,6 @@
              xmlns:l="clr-namespace:Waypoint">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="20,16,20,16">
-            <StackPanel x:Name="ReleaseNote" Visibility="Collapsed" Margin="0,0,0,14" MaxWidth="720" HorizontalAlignment="Left">
-                <TextBlock TextWrapping="Wrap" Text="{l:Loc 'Your version of LocalExile does not have the item crafter yet. A new copy of LocalExile does, and you can bring your characters with you.'}" />
-                <Button Content="{l:Loc 'Get the item crafter…'}" HorizontalAlignment="Left" Margin="0,8,0,0" Click="GetCrafterClicked" />
-            </StackPanel>
             <WrapPanel>
                 <Border Width="340" Margin="0,0,14,14" Padding="18,16" CornerRadius="8" BorderThickness="1"
                         Background="{DynamicResource Shell.Panel}" BorderBrush="{DynamicResource Shell.Border}">
@@ -50,6 +46,33 @@
                             <TextBlock Text="{l:Loc 'Lab layout'}" FontSize="15" FontWeight="SemiBold" />
                             <TextBlock Style="{StaticResource Shell.Secondary}" TextWrapping="Wrap" Margin="0,4,0,0"
                                        Text="{l:Loc 'The day\'s Labyrinth of every tier as a map: its rooms, the shortest way to Izaro, gauntlets, puzzles, Darkshrines, keys and doors.'}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+                <!-- Simple mode's list has neither Console nor Logs: they open from here. Advanced mode lists both. -->
+                <Border x:Name="ConsoleCard" Visibility="Collapsed" Width="340" Margin="0,0,14,14" Padding="18,16" CornerRadius="8" BorderThickness="1"
+                        Background="{DynamicResource Shell.Panel}" BorderBrush="{DynamicResource Shell.Border}">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Bottom" HorizontalAlignment="Left" Click="OpenConsole" Content="{l:Loc 'Open console'}" Margin="0,12,0,0" />
+                        <md:PackIcon DockPanel.Dock="Left" Kind="Console" Width="36" Height="36" Margin="0,0,14,0" VerticalAlignment="Top"
+                                     Foreground="{DynamicResource Shell.Accent}" />
+                        <StackPanel>
+                            <TextBlock Text="{l:Loc 'Console'}" FontSize="15" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource Shell.Secondary}" TextWrapping="Wrap" Margin="0,4,0,0"
+                                       Text="{l:Loc 'Look up the server\'s commands and use one in the game.'}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+                <Border x:Name="LogsCard" Visibility="Collapsed" Width="340" Margin="0,0,14,14" Padding="18,16" CornerRadius="8" BorderThickness="1"
+                        Background="{DynamicResource Shell.Panel}" BorderBrush="{DynamicResource Shell.Border}">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Bottom" HorizontalAlignment="Left" Click="OpenLogs" Content="{l:Loc 'Open logs'}" Margin="0,12,0,0" />
+                        <md:PackIcon DockPanel.Dock="Left" Kind="TextBoxOutline" Width="36" Height="36" Margin="0,0,14,0" VerticalAlignment="Top"
+                                     Foreground="{DynamicResource Shell.Accent}" />
+                        <StackPanel>
+                            <TextBlock Text="{l:Loc 'Logs'}" FontSize="15" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource Shell.Secondary}" TextWrapping="Wrap" Margin="0,4,0,0"
+                                       Text="{l:Loc 'What Waypoint, the servers and the game wrote down: where to look when something went wrong.'}" />
                         </StackPanel>
                     </DockPanel>
                 </Border>

@@ -1,0 +1,339 @@
+<Window x:Class="LocalExile.ClientTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="流放之路" Width="1080" Height="680" MinWidth="960" MinHeight="600"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanMinimize"
+        Background="#0B0D12" TextElement.Foreground="{StaticResource Text}"
+        FontFamily="Microsoft YaHei UI, Segoe UI" FontSize="13">
+    <Window.Resources>
+        <!-- The key art fills the window; the right side darkens so the panels read on top of it. Set from
+             Art\hero.png (or .jpg) beside the executable; the gradient below is what shows without it. -->
+        <LinearGradientBrush x:Key="HeroFallback" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#2A1010" Offset="0" />
+            <GradientStop Color="#1A0C0C" Offset="0.45" />
+            <GradientStop Color="#0B0D12" Offset="0.75" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="HeroShade" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#00000000" Offset="0" />
+            <GradientStop Color="#66000000" Offset="0.42" />
+            <GradientStop Color="#F20B0D12" Offset="0.62" />
+            <GradientStop Color="#FF0B0D12" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="BannerFallback" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#3A1414" Offset="0" />
+            <GradientStop Color="#241417" Offset="0.5" />
+            <GradientStop Color="#1A1D25" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="StartButton" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#F5C05A" Offset="0" />
+            <GradientStop Color="#E39A2E" Offset="1" />
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="PanelFill" Color="#E6161920" />
+        <SolidColorBrush x:Key="RowHover" Color="#1F242E" />
+        <SolidColorBrush x:Key="Hair" Color="#2A2E39" />
+
+        <Style x:Key="TopTab" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Muted}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Margin" Value="22,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style x:Key="TopTabOn" TargetType="TextBlock" BasedOn="{StaticResource TopTab}">
+            <Setter Property="Foreground" Value="#F3E6C8" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style x:Key="SubTab" TargetType="Border">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="14,7" />
+            <Setter Property="Margin" Value="0,0,2,0" />
+        </Style>
+        <Style x:Key="SubTabOn" TargetType="Border" BasedOn="{StaticResource SubTab}">
+            <Setter Property="Background" Value="#2A1F14" />
+            <Setter Property="BorderBrush" Value="{StaticResource Accent}" />
+            <Setter Property="BorderThickness" Value="0,0,0,2" />
+        </Style>
+        <!-- 顶栏的两个入口：真按钮，点了开弹窗 -->
+        <Style x:Key="TopTabButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource Muted}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Margin" Value="22,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent" Padding="4,3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#F3E6C8" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TopTabButtonOn" TargetType="Button" BasedOn="{StaticResource TopTabButton}">
+            <Setter Property="Foreground" Value="#F3E6C8" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <!-- 小号链接文字：更多 ›、精选攻略 & 常用工具 -->
+        <Style x:Key="LinkText" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource Muted}" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource Accent}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- 横幅上的五个入口：点了开弹窗 -->
+        <Style x:Key="BannerTab" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource Muted}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="0,0,2,0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Body" Background="Transparent" Padding="14,7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#F0DFB8" />
+                                <Setter TargetName="Body" Property="Background" Value="#1A1F28" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="BannerTabOn" TargetType="Button" BasedOn="{StaticResource BannerTab}">
+            <Setter Property="Foreground" Value="#F0DFB8" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Body" Background="#2A1F14" BorderBrush="{StaticResource Accent}" BorderThickness="0,0,0,2" Padding="14,7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- 公告列表的一行：整行可点，鼠标移上去有底色 -->
+        <Style x:Key="NewsRow" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Body" Background="Transparent" Padding="6,0" CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Body" Property="Background" Value="#1F242E" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="NewsTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#C9C3B6" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+        <Style x:Key="NewsDate" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#6E6A62" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="12,0,0,0" />
+        </Style>
+        <Style x:Key="Start" TargetType="Button">
+            <Setter Property="Foreground" Value="#2A1B06" />
+            <Setter Property="Background" Value="{StaticResource StartButton}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Width" Value="220" />
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Body" Background="{TemplateBinding Background}" CornerRadius="23">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Body" Property="Opacity" Value="0.9" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Body" Property="Opacity" Value="0.4" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border BorderBrush="{StaticResource Hair}" BorderThickness="1">
+        <Grid>
+            <!-- 主视觉：整窗铺底，右侧压暗给资讯面板让位 -->
+            <Border Background="{StaticResource HeroFallback}" />
+            <Image x:Name="HeroImage" Stretch="UniformToFill" SnapsToDevicePixels="True" />
+            <Border Background="{StaticResource HeroShade}" />
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="92" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="72" />
+                </Grid.RowDefinitions>
+
+                <!-- 顶栏：推荐 / 社区，中间是标题，右边是最小化与关闭 -->
+                <Border Grid.Row="0" Background="Transparent" MouseLeftButtonDown="CaptionDrag">
+                    <DockPanel Margin="18,0,8,0">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="VersionText" Foreground="{StaticResource Muted}" FontSize="11" Margin="0,0,10,0" VerticalAlignment="Center" />
+                            <Button Content="—" Style="{StaticResource Caption}" Click="MinimizeClicked" ToolTip="最小化" />
+                            <Button Content="✕" Style="{StaticResource Caption}" Click="CloseClicked" ToolTip="关闭" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Button Content="推荐" Style="{StaticResource TopTabButtonOn}" Click="SeasonClicked" ToolTip="这个服务端启用了哪些模组" />
+                            <StackPanel Margin="14,0" VerticalAlignment="Center">
+                                <TextBlock Text="流放之路" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#F0DFB8" />
+                                <TextBlock Text="降 临" FontSize="11" HorizontalAlignment="Center" Foreground="{StaticResource Accent}" Margin="0,1,0,0" />
+                            </StackPanel>
+                            <Button Content="社区" Style="{StaticResource TopTabButton}" Click="CommunityClicked" ToolTip="文件都在哪、说明怎么更新" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <!-- 主体：左边主视觉上的标题与注册，右边横幅与资讯 -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="420" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" VerticalAlignment="Bottom" Margin="34,0,20,26">
+                        <TextBlock Text="不删档测试 火爆进行中" FontSize="21" FontWeight="SemiBold" Foreground="#F4E7CC" />
+                        <TextBlock Text="本地离线服务器 · 全程单机运行" Foreground="{StaticResource Muted}" FontSize="12.5" Margin="0,8,0,0" />
+                        <Button x:Name="RegisterButton" Content="注册账号" Style="{StaticResource Quiet}" HorizontalAlignment="Left"
+                                Margin="0,18,0,0" Width="168" Height="40" Click="RegisterClicked"
+                                ToolTip="在服务器上创建一个新账号" />
+                    </StackPanel>
+
+                    <Grid Grid.Column="1" Margin="6,0,18,12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="2.15*" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- 横幅 -->
+                        <Border Grid.Row="0" CornerRadius="6" BorderBrush="#3A2A1C" BorderThickness="1" ClipToBounds="True">
+                            <Grid>
+                                <Border Background="{StaticResource BannerFallback}" />
+                                <Image x:Name="BannerImage" Stretch="UniformToFill" />
+                                <Border>
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#B3000000" Offset="0" />
+                                            <GradientStop Color="#3A000000" Offset="0.55" />
+                                            <GradientStop Color="#CC000000" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <StackPanel VerticalAlignment="Center" Margin="26,0,26,0">
+                                    <TextBlock Text="— 流放之路 · 本地服务器 —" Foreground="{StaticResource Accent}" FontSize="12.5" />
+                                    <TextBlock Text="同路人集结！目的地瓦尔克拉斯" FontSize="27" FontWeight="Bold" Foreground="#F7ECD6" Margin="0,10,0,0" />
+                                    <TextBlock Text="服务端、客户端、存档全在本机：不删档，随时下线随时接着玩。" Foreground="#CFC7B6" FontSize="13" Margin="0,10,0,0" TextWrapping="Wrap" MaxWidth="520" />
+                                </StackPanel>
+                                <StackPanel x:Name="BannerTabs" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="18,0,18,12">
+                                    <Button x:Name="TabSeason" Content="赛季特色" Tag="season" Style="{StaticResource BannerTabOn}" Click="BannerTabClicked" ToolTip="服务端装了哪些模组、开了哪些" />
+                                    <Button x:Name="TabDrops" Content="掉落调整" Tag="drops" Style="{StaticResource BannerTab}" Click="BannerTabClicked" ToolTip="掉落与收益的倍率怎么改" />
+                                    <Button x:Name="TabBots" Content="机器人队友" Tag="bots" Style="{StaticResource BannerTab}" Click="BannerTabClicked" ToolTip="玩家机器人模块" />
+                                    <Button x:Name="TabNotes" Content="更新日志" Tag="notes" Style="{StaticResource BannerTab}" Click="BannerTabClicked" ToolTip="服务端每个版本改了什么" />
+                                    <Button x:Name="TabFaq" Content="常见问题" Tag="faq" Style="{StaticResource BannerTab}" Click="BannerTabClicked" ToolTip="注册、进游戏、存档" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- 公告与新闻 -->
+                        <Border Grid.Row="2" CornerRadius="6" Background="{StaticResource PanelFill}" BorderBrush="{StaticResource Hair}" BorderThickness="1">
+                            <Grid Margin="18,10,18,10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                                    <Button DockPanel.Dock="Right" Content="更多 ›" Style="{StaticResource LinkText}" Click="ChangeLogClicked" ToolTip="完整的更新日志" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="公告" Foreground="#F0DFB8" FontSize="13.5" FontWeight="SemiBold" />
+                                        <TextBlock Text="新闻" Foreground="{StaticResource Muted}" FontSize="13.5" Margin="18,0,0,0" />
+                                    </StackPanel>
+                                </DockPanel>
+                                <!-- 公告行由代码从 更新说明.md 填充：每条都是一个可点的按钮，点开该版本详情 -->
+                                <StackPanel x:Name="NewsList" Grid.Row="1" />
+                                <TextBlock x:Name="NewsEmpty" Grid.Row="1" Text="没找到 更新说明.md：把它放在登录器旁边，这里就会显示服务端每一版更新。"
+                                           Foreground="{StaticResource Muted}" FontSize="11.5" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+
+                <!-- 底栏：左边提示与状态，右边服务器与开始游戏 -->
+                <Border Grid.Row="2" Background="#F00F1218" BorderBrush="{StaticResource Hair}" BorderThickness="0,1,0,0">
+                    <DockPanel Margin="22,0,18,0">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Background="#1B2029" CornerRadius="15" Padding="14,7" Margin="0,0,14,0" BorderBrush="{StaticResource Hair}" BorderThickness="1">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="7" Height="7" Fill="{StaticResource Good}" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="ServerLabel" Text="本地服务器" Foreground="#D6CFBF" FontSize="12.5" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                            <Button x:Name="PlayButton" Content="开始游戏" Style="{StaticResource Start}" Click="PlayClicked" />
+                        </StackPanel>
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                            <Button Content="精选攻略 &amp; 常用工具" Style="{StaticResource LinkText}" FontSize="12"
+                                    HorizontalAlignment="Left" Click="ToolsClicked" ToolTip="服务端启动器里能做什么、游戏内常用命令" />
+                            <TextBlock x:Name="StatusText" Text="还没有账号就先注册一个；进入游戏后在游戏窗口里登录。"
+                                       Foreground="{StaticResource Muted}" FontSize="11.5" Margin="0,4,0,0"
+                                       TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

@@ -14,12 +14,19 @@ public sealed record ModRequest(string Id = "", string Project = "", string Stag
     IReadOnlyList<ModRequest>? Batch = null, string ExpectedHash = "");
 public sealed record ModEntry(string Id, string Version, string Kind, string[] Depends, bool Enabled, string Status,
     string Detail, string Folder, string Project, string Fingerprint, string Name = "", string Description = "", string Author = "",
-    bool IsScript = false)
+    bool IsScript = false, IReadOnlyList<string>? ClientVersions = null)
 {
+    /// <summary>The checkout this mod was read from, so that its settings file under <c>data/</c> can be found without
+    /// guessing from the folder's depth (a mods folder can be moved). Empty for an entry not read from a checkout.</summary>
+    public string Root { get; init; } = "";
     /// <summary>The manifest's name, or the id for a mod without one.</summary>
-    public string Title => Name.Length > 0 ? Name : Id;
+    /// <summary>The manifest's name in the launcher's language (LocalExile-Mods names every mod and the launcher's catalogs
+    /// carry the reviewed translations), or the id for a mod without one.</summary>
+    public string Title => L.Text(Name.Length > 0 ? Name : Id);
     /// <summary>The declarations of its settings (settings.json beside its mod.json), when it has any.</summary>
     public string SettingsFile => Folder.Length > 0 && File.Exists(Path.Combine(Folder, ModSettingsForm.DeclarationsFile)) ? Path.Combine(Folder, ModSettingsForm.DeclarationsFile) : "";
+    /// <summary>Its own icon.png: beside its mod.json, or in its source project before it is built; "" when it has none.</summary>
+    public string IconFile { get; init; } = "";
     public string SearchText => $"{Id} {Name} {Author} {Description} {Version} {Kind} {Status} {Detail}";
     public string DisplayDetail => L.Describe(Detail);
     public string Summary => $"{Version} · {L.Text(Kind)} · " + (Status == "Disabled" ? L.Text("Disabled") : $"{L.Text(Enabled ? "Enabled" : "Disabled")} · {L.Text(Status)}");
@@ -66,7 +73,7 @@ public static class ModCatalog
         return hash;
     }
     sealed record Manifest(string Id, string Version, string Kind, string[] Depends, string Assembly, bool Enabled,
-        string Name = "", string Description = "", string Author = "");
+        string Name = "", string Description = "", string Author = "", string[]? ClientVersions = null);
     /// <summary>The assembly a manifest names (its id's .dll by default).</summary>
     internal static string AssemblyName(string folderId, string json) => ParseJson(folderId, json).Assembly;
     static Manifest Parse(string folderId, string path) => ParseJson(folderId, Read(path));
@@ -95,10 +102,33 @@ public static class ModCatalog
         if (enabled.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.True or JsonValueKind.False)) throw new InvalidDataException("enabled must be true or false.");
         string assembly = Text("assembly", id + ".dll");
         if (Path.GetFileName(assembly) != assembly || assembly.IndexOfAny(['/', '\\', ':']) >= 0 || !assembly.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("Assembly must be a DLL in the mod folder.");
-        // name, description and author are Waypoint's (LocalExile-Mods' AGENTS.md); the Gateway ignores them.
+        // name, description, author and compatibleClientVersions are Waypoint's (LocalExile-Mods' AGENTS.md); the Gateway
+        // ignores them.
         return new(id, Text("version", "0"), kind, dependencies, assembly, enabled.ValueKind != JsonValueKind.False,
-            Text("name", ""), Text("description", ""), Text("author", ""));
+            Text("name", ""), Text("description", ""), Text("author", ""), ClientCompatibility.Read(Field(ClientCompatibility.Field)));
     }
+    /// <summary>The ids of the checkout's modules (<c>Modules/**/module.json</c>, as Game Systems reads them), which a mod may
+    /// depend on beside other mods. None when they cannot be read.</summary>
+    internal static HashSet<string> ModuleIds(string root)
+    {
+        var ids = new HashSet<string>(StringComparer.Ordinal);
+        try
+        {
+            foreach (string file in GameSystems.Manifests(Path.Combine(root, "Modules"), "module.json"))
+            {
+                try
+                {
+                    using var json = JsonDocument.Parse(File.ReadAllText(file));
+                    ids.Add(json.RootElement.TryGetProperty("id", out var id) && id.ValueKind == JsonValueKind.String
+                        ? id.GetString()! : Path.GetFileName(Path.GetDirectoryName(file)!));
+                }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException) { }
+            }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+        return ids;
+    }
+
     public static ModEntry[] Read(RuntimeSnapshot snapshot)
     {
         var environment = snapshot.ModEnvironment;
@@ -121,10 +151,10 @@ public static class ModCatalog
                         if (!source.TryAdd(manifest.Id, Path.GetRelativePath(snapshot.Root, project))) throw new InvalidDataException("Multiple source projects use this ID.");
                         entries[manifest.Id] = new(manifest.Id, manifest.Version, manifest.Kind, manifest.Depends, manifest.Enabled,
                             "Not built", "Build this source mod before enabling it.", Path.Combine(environment.Folder, manifest.Id), source[manifest.Id], "",
-                            manifest.Name, manifest.Description, manifest.Author);
+                            manifest.Name, manifest.Description, manifest.Author, ClientVersions: manifest.ClientVersions) { Root = snapshot.Root };
                     }
                     catch (Exception ex) when (ex is IOException or InvalidDataException or JsonException or InvalidOperationException or ArgumentException)
-                    { entries[id] = new(id, "?", "?", [], false, "Invalid source", ex.Message, folder, "", ""); }
+                    { entries[id] = new(id, "?", "?", [], false, "Invalid source", ex.Message, folder, "", "") { Root = snapshot.Root }; }
                 }
             }
         }
@@ -152,18 +182,22 @@ public static class ModCatalog
                         string.Join('\n', scripts.Select(f => Path.GetFileName(f) + "|" + Fingerprint(f)))))) : "";
                     entries[id] = new(id, manifest.Version, manifest.Kind, manifest.Depends, enabled, built ? "Not checked" : "Missing DLL",
                         built ? "Runtime status has not been confirmed." : "Build this mod or install its DLL.", folder, source.GetValueOrDefault(id, ""), hash,
-                        manifest.Name, manifest.Description, manifest.Author, script);
+                        manifest.Name, manifest.Description, manifest.Author, script, manifest.ClientVersions) { Root = snapshot.Root };
                 }
                 catch (Exception ex) when (ex is IOException or InvalidDataException or JsonException or InvalidOperationException or ArgumentException)
-                { entries[id] = new(id, "?", "?", [], false, "Invalid manifest", ex.Message, folder, source.GetValueOrDefault(id, ""), ""); }
+                { entries[id] = new(id, "?", "?", [], false, "Invalid manifest", ex.Message, folder, source.GetValueOrDefault(id, ""), "") { Root = snapshot.Root }; }
             }
         }
         var runtime = ParseRuntimeReport(environment.RuntimeReport);
+        var modules = ModuleIds(snapshot.Root);
         foreach (var original in entries.Values.ToArray())
         {
             var entry = original with { Enabled = choices.GetValueOrDefault(original.Id, original.Enabled) };
             if (entry.Status.StartsWith("Invalid", StringComparison.Ordinal) || entry.Status == "Missing DLL") continue;
-            string[] missing = entry.Depends.Where(id => !entries.TryGetValue(id, out var dep) || !dep.Enabled || dep.Status is "Missing DLL" or "Not built" || dep.Status.StartsWith("Invalid", StringComparison.Ordinal)).ToArray();
+            // A dependency is another mod or, as the Gateway's ModHost.Dependency has it, one of the modules (the Game module).
+            string[] missing = entry.Depends.Where(id => entries.TryGetValue(id, out var dep)
+                ? !dep.Enabled || dep.Status is "Missing DLL" or "Not built" || dep.Status.StartsWith("Invalid", StringComparison.Ordinal)
+                : !modules.Contains(id)).ToArray();
             string status = !environment.Enabled ? "Mods disabled globally" : !entry.Enabled ? "Disabled" : entry.Status == "Not built" ? "Not built"
                 : missing.Length > 0 ? "Dependency blocked" : snapshot.Services.Any(s => s.Name == "Gateway" && s.IsRunning) ? "Not checked" : "Gateway stopped";
             string detail = missing.Length > 0 ? "Needs: " + string.Join(", ", missing) : entry.Detail;
@@ -175,7 +209,16 @@ public static class ModCatalog
             }
             entries[entry.Id] = entry with { Status = status, Detail = detail };
         }
-        return entries.Values.OrderBy(e => e.Id, StringComparer.Ordinal).ToArray();
+        return entries.Values.OrderBy(e => e.Id, StringComparer.Ordinal).Select(e => e with { IconFile = FindIcon(e, snapshot.Root) }).ToArray();
+    }
+    static string FindIcon(ModEntry entry, string root)
+    {
+        foreach (string folder in new[] { entry.Folder, entry.Project.Length > 0 ? Path.GetDirectoryName(Path.Combine(root, entry.Project)) ?? "" : "" })
+        {
+            string file = Path.Combine(folder, ModRepository.IconName);
+            if (folder.Length > 0 && File.Exists(file) && Physical(file)) return file;
+        }
+        return "";
     }
     /// <summary>Turns a mod on or off in the server's own choices file (<c>mod-state.txt</c>), replacing the file at once. A
     /// stopped Gateway reads it at its next start; a running one that watches the file (LocalExile since 2026-11-07) loads or

@@ -2,8 +2,10 @@ using System.Net.Http;
 using System.Text.Json.Nodes;
 #if WINDOWS
 using ModIconKind = MaterialDesignThemes.Wpf.PackIconKind;
+using ModIconImage = System.Windows.Media.ImageSource;
 #else
 using ModIconKind = Material.Icons.MaterialIconKind;
+using ModIconImage = Avalonia.Media.IImage;
 #endif
 
 namespace Waypoint;
@@ -32,7 +34,7 @@ sealed record BrowseItem(ModSource Source, ModListing Listing, ModRelease? Relea
     /// <summary>A project without a release installs as source, built later with the .NET 10 SDK.</summary>
     public bool NeedsBuild => Release is null && Listing.IsProject;
 
-    public string Title => Listing.Name;
+    public string Title => L.Text(Listing.Name);
     public string Byline => L.Text("by {0}", Listing.Author.Length > 0 ? Listing.Author : Source.Owner);
     public string VersionText => Offer switch
     {
@@ -44,16 +46,39 @@ sealed record BrowseItem(ModSource Source, ModListing Listing, ModRelease? Relea
     public ModJob? Job { get; init; }
     public bool HasJob => Job is not null;
     public bool ShowButton => Job is null;
-    public bool CanAct => !Repo.IsInstall && Offer != ModOffer.Installed && Job is null;
+    public bool CanAct => !Repo.LegacyReleaseMods && Offer != ModOffer.Installed && Job is null;
     public string ActionText => Offer switch { ModOffer.Install => L.Text("Install"), ModOffer.Update => L.Text("Update"), _ => L.Text("Installed") };
+    /// <summary>Its button is an Update: drawn green.</summary>
+    public bool IsUpdate => Offer == ModOffer.Update;
     public string Origin => Release is not null ? L.Text("Release {0}", Release.Tag)
         : Listing.IsProject ? L.Text("No release: installs the source") : L.Text("Scripts: no build needed");
     public string SearchText => $"{Listing.Id} {Listing.Name} {Listing.Author} {Listing.Description}";
     public string Initial => ModsText.Initial(Title);
     public ModIconKind Icon => ModsText.Icon(Listing.Id);
-    public string Description => Listing.Description;
+    /// <summary>The installed mod's own icon.png, else the repository's.</summary>
+    public string IconFile => Installed?.IconFile is { Length: > 0 } own ? own : ModRepository.IconFile(Source, Listing.Id);
+    public ModIconImage? IconImage => ModsText.IconImage(IconFile);
+    /// <summary>Without an icon.png of its own, a mod shows its symbol.</summary>
+    public bool ShowSymbol => IconImage is null;
+    public string Description
+    {
+        get
+        {
+            string text = Listing.Description;
+            return text.Length > 0 ? L.Text(text) : "";
+        }
+    }
     public bool HasDescription => Description.Length > 0;
-    public string Metadata => string.Join(" · ", new[] { Latest, Author, TypeText }.Where(s => s.Length > 0));
+    public string Metadata => Author;
+    /// <summary>The LocalExile versions it declares; the list shows these, not the mod's own version.</summary>
+    public IReadOnlyList<string> ClientVersions => Listing.ClientVersions ?? [];
+    public string ClientText => ModsText.ClientText(ClientVersions);
+    /// <summary>It names the LocalExile versions it works with, and this checkout's is not one of them.</summary>
+    public bool Incompatible => !ClientCompatibility.Fits(ClientVersions, Repo.ClientVersion);
+    public string? IncompatibleTip => Incompatible ? ModsText.IncompatibleTip(ClientVersions) : null;
+    /// <summary>Under the package status: the version change of an update.</summary>
+    public string VersionChange => Offer == ModOffer.Update ? VersionText : "";
+    public bool HasVersionChange => VersionChange.Length > 0;
     public string PackageStatus => Offer == ModOffer.Update ? L.Text("Update available") : Offer == ModOffer.Installed ? L.Text("Installed")
         : NeedsBuild ? L.Text("Source project") : Release is not null ? L.Text("Release") : L.Text("Scripts");
     public bool ShowOfferAction => Job is null && Offer != ModOffer.Installed;
@@ -80,7 +105,7 @@ sealed record VersionRow(BrowseItem Item, ModRelease Release)
         }
     }
     public bool IsInstalled => Item.InstalledVersion is { } installed && !installed.IsNewerThan(Release.Version) && !Release.Version.IsNewerThan(installed);
-    public bool CanAct => !Repo.IsInstall && !IsInstalled;
+    public bool CanAct => !Repo.LegacyReleaseMods && !IsInstalled;
     public string ActionText => IsInstalled ? L.Text("Installed") : L.Text("Install");
 }
 
@@ -115,57 +140,123 @@ sealed class ModJob(string id, string text) : System.ComponentModel.INotifyPrope
 /// <summary>What a row of My Mods offers to do, in the order it sorts.</summary>
 enum RowAction { Update, Reinstall, Build, NotLoaded, UpToDate }
 
-/// <summary>A column My Mods sorts by.</summary>
-enum ModSort { Enabled, Name, Action, Latest, Author }
+/// <summary>A column My Mods and Browse sort by: its heading is a button.</summary>
+enum ModSort { Enabled, Name, Client, Status, Action }
 
-/// <summary>My Mods' order: by a column, then by name.</summary>
+/// <summary>The lists' order: by a column, then by name.</summary>
 static class ModSorting
 {
-    public static IEnumerable<InstalledRow> Sort(IEnumerable<InstalledRow> rows, ModSort by, bool descending)
+    static readonly StringComparer ByName = StringComparer.CurrentCultureIgnoreCase;
+
+    // Text by name, versions as versions; what has none comes first.
+    static readonly Comparer<object?> Keys = Comparer<object?>.Create((x, y) => (x, y) switch
     {
-        var byName = StringComparer.CurrentCultureIgnoreCase;
-        var versions = Comparer<string>.Create((x, y) => (ReleaseVersion.Parse(x), ReleaseVersion.Parse(y)) switch
-        {
-            ({ } a, { } b) => a.IsNewerThan(b) ? 1 : b.IsNewerThan(a) ? -1 : 0,
-            (null, null) => string.CompareOrdinal(x, y),
-            (null, _) => -1,
-            _ => 1,
-        });
-        var ordered = by switch
-        {
-            ModSort.Enabled => descending ? rows.OrderBy(r => r.Enabled) : rows.OrderByDescending(r => r.Enabled),
-            ModSort.Action => descending ? rows.OrderByDescending(r => r.Action) : rows.OrderBy(r => r.Action),
-            ModSort.Latest => descending ? rows.OrderByDescending(r => r.Latest, versions) : rows.OrderBy(r => r.Latest, versions),
-            ModSort.Author => descending ? rows.OrderByDescending(r => r.Author, byName) : rows.OrderBy(r => r.Author, byName),
-            _ => descending ? rows.OrderByDescending(r => r.Title, byName) : rows.OrderBy(r => r.Title, byName),
-        };
-        return by == ModSort.Name ? ordered : ordered.ThenBy(r => r.Title, byName);
+        (string a, string b) => ByName.Compare(a, b),
+        (ReleaseVersion a, ReleaseVersion b) => a.CompareTo(b),
+        (null, null) => 0,
+        (null, _) => -1,
+        (_, null) => 1,
+        _ => Comparer<object>.Default.Compare(x, y),
+    });
+
+    public static IEnumerable<InstalledRow> Sort(IEnumerable<InstalledRow> rows, ModSort by, bool descending) => Order(rows, r => r.Title, descending, by switch
+    {
+        ModSort.Enabled => r => r.Enabled ? 0 : 1,
+        ModSort.Client => r => Newest(r.ClientVersions),
+        ModSort.Status => r => r.PackageStatus,
+        ModSort.Action => r => (int)r.Action,
+        _ => null,
+    });
+
+    public static IEnumerable<BrowseItem> Sort(IEnumerable<BrowseItem> rows, ModSort by, bool descending) => Order(rows, r => r.Title, descending, by switch
+    {
+        ModSort.Client => r => Newest(r.ClientVersions),
+        ModSort.Status => r => r.PackageStatus,
+        ModSort.Action => r => (int)r.Offer,
+        _ => null,
+    });
+
+    static IEnumerable<T> Order<T>(IEnumerable<T> rows, Func<T, string> title, bool descending, Func<T, object?>? key)
+    {
+        if (key is null) return descending ? rows.OrderByDescending(title, ByName) : rows.OrderBy(title, ByName);
+        return (descending ? rows.OrderByDescending(key, Keys) : rows.OrderBy(key, Keys)).ThenBy(title, ByName);
     }
+
+    static ReleaseVersion? Newest(IReadOnlyList<string> versions) => versions.Select(ReleaseVersion.Parse).OfType<ReleaseVersion>().Max();
 
     /// <summary>A column's heading, with an arrow when the list is sorted by it.</summary>
     public static string Heading(ModSort column, ModSort by, bool descending)
     {
         string text = column switch
         {
-            ModSort.Enabled => L.Text("Enabled"),
+            ModSort.Enabled => L.Text("Use"),
+            ModSort.Client => L.Text("Client version"),
+            ModSort.Status => L.Text("Package status"),
             ModSort.Action => L.Text("Action"),
-            ModSort.Latest => L.Text("Latest version"),
-            ModSort.Author => L.Text("Author"),
-            _ => L.Text("Name"),
+            _ => L.Text("Mod"),
         };
-        return column == by ? text + (descending ? "  ▼" : "  ▲") : text;
+        return column == by ? text + (descending ? " ▼" : " ▲") : text;
     }
 }
 
 /// <summary>A row of My Mods: an installed mod, and what a repository offers of it (for Update and its latest version).</summary>
 sealed record InstalledRow(ModEntry Entry, BrowseItem? Offer)
 {
-    public string Title => Entry.Name.Length > 0 ? Entry.Name : Offer?.Title ?? Entry.Id;
+    public string Title => L.Text(Entry.Name.Length > 0 ? Entry.Name : Offer?.Title ?? Entry.Id);
     public string Initial => ModsText.Initial(Title);
     public ModIconKind Icon => ModsText.Icon(Entry.Id);
-    public string Description => Entry.Description.Length > 0 ? Entry.Description : Offer?.Listing.Description ?? "";
+    /// <summary>The installed mod's own icon.png, else its repository's.</summary>
+    public string IconFile => Entry.IconFile.Length > 0 ? Entry.IconFile : Offer?.IconFile ?? "";
+    public ModIconImage? IconImage => ModsText.IconImage(IconFile);
+    /// <summary>Without an icon.png of its own, a mod shows its symbol.</summary>
+    public bool ShowSymbol => IconImage is null;
+    public string Description
+    {
+        get
+        {
+            string text = Entry.Description.Length > 0 ? Entry.Description : Offer?.Listing.Description ?? "";
+            return text.Length > 0 ? WithCurrentMultiplier(L.Text(text)) : "";
+        }
+    }
+    /// <summary>
+    /// A description is its manifest's fixed sentence ("10 times as many item drops", "每次击杀的掉落数量 ×10。"): when the
+    /// mod declares a multiplier setting, the number in it is replaced by the one now in effect, so the row and the page
+    /// say ×4 after the player picked ×4 instead of keeping the shipped ×10.
+    /// </summary>
+    string WithCurrentMultiplier(string text)
+    {
+        string current = CurrentMultiplier;
+        if (current.Length == 0 || current is "10") return text;
+        string replaced = System.Text.RegularExpressions.Regex.Replace(text, @"×\s*\d+(?:\.\d+)?", "×" + current);
+        return System.Text.RegularExpressions.Regex.Replace(replaced, @"\b\d+(?:\.\d+)?\s+times\b", current + " times");
+    }
+    /// <summary>The multiplier now in effect, from the mod's declarations and the player's own values; "" when it has none.</summary>
+    string CurrentMultiplier
+    {
+        get
+        {
+            if (Entry.SettingsFile.Length == 0 || Entry.Folder.Length == 0) return "";
+            // The checkout that read this mod knows its root; walking up Mods/Binaries/<id> is only the fallback.
+            string root = Entry.Root.Length > 0 ? Entry.Root
+                : Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Entry.Folder))) ?? "";
+            if (root.Length == 0) return "";
+            try
+            {
+                var form = ModSettingsForm.Load(Entry.Id, Entry.SettingsFile, root);
+                if (form.Settings.FirstOrDefault(setting => setting.Format == "multiplier") is not { } chosen) return "";
+                return ModSettingsForm.Show(form.Current(chosen), chosen);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or System.Text.Json.JsonException)
+            { return ""; }
+        }
+    }
     public bool HasDescription => Description.Length > 0;
-    public string Metadata => string.Join(" · ", new[] { Entry.Version, Author, Entry.IsScript ? L.Text("Script mod") : "" }.Where(s => s.Length > 0));
+    public string Metadata => string.Join(" · ", new[] { Author, Entry.IsScript ? L.Text("Script mod") : "" }.Where(s => s.Length > 0));
+    /// <summary>The LocalExile versions its installed mod.json declares, else what its repository's listing does.</summary>
+    public IReadOnlyList<string> ClientVersions => Entry.ClientVersions is { Count: > 0 } own ? own : Offer?.ClientVersions ?? [];
+    public string ClientText => ModsText.ClientText(ClientVersions);
+    public bool Incompatible => !ClientCompatibility.Fits(ClientVersions, Repo.ClientVersion);
+    public string? IncompatibleTip => Incompatible ? ModsText.IncompatibleTip(ClientVersions) : null;
     public string PackageStatus => HasUpdate ? L.Text("Update available") : !IsBuilt ? L.Text("Not built")
         : Offer is null ? L.Text("Installed") : L.Text("Up to date");
     public string VersionChange => HasUpdate ? L.Text("{0} → {1}", Entry.Version, Latest) : "";
@@ -198,13 +289,16 @@ sealed record InstalledRow(ModEntry Entry, BrowseItem? Offer)
     /// <summary>The Action column as text, not a button: Up to date, or Not loaded.</summary>
     public bool UpToDate => !HasButton && Job is null;
     /// <summary>Build compiles the source project (a source checkout), or installs the repository's copy when there is none.</summary>
-    public bool CanAct => !Repo.IsInstall && Job is null && Action switch
+    public bool CanAct => !Repo.LegacyReleaseMods && Job is null && Action switch
     {
         RowAction.Update or RowAction.Reinstall => true,
         RowAction.Build => (Entry.Project.Length > 0 && !Repo.IsInstall) || Offer is not null,
         _ => false,
     };
-    public string? ActionTip => Action == RowAction.Build && !CanAct ? L.Text("This mod has no source project to build here; install it again from Browse.") : null;
+    public string? ActionTip => Action == RowAction.Update ? VersionChange
+        : Action == RowAction.Build && !CanAct ? L.Text("This mod has no source project to build here; install it again from Browse.") : null;
+    /// <summary>Its button is an Update: drawn green.</summary>
+    public bool IsUpdate => Action == RowAction.Update;
     public string Latest => Offer?.Latest ?? "";
     public string Author => Entry.Author.Length > 0 ? Entry.Author : Offer?.Author ?? "";
     /// <summary>Under the name: the installed version, and a problem when there is one.</summary>
@@ -310,6 +404,7 @@ sealed class ModBrowser(Shared shared)
             var view = await ModRepository.ReadAsync(_http, source);
             _views[source.Key] = view;
             _errors.Remove(source.Key);
+            _ = RefreshIconsAsync(view);
             return view;
         }
         catch (Exception e) when (e is HttpRequestException or InvalidDataException or System.Text.Json.JsonException or TaskCanceledException)
@@ -317,6 +412,22 @@ sealed class ModBrowser(Shared shared)
             _errors[source.Key] = e.Message;
             return _views.GetValueOrDefault(source.Key);
         }
+    }
+
+    /// <summary>A mod's icon.png changed: the lists draw their rows again.</summary>
+    public event Action? IconsChanged;
+
+    /// <summary>Brings the kept icons up to date behind the list, which shows them as they were until this ends. An icon that
+    /// cannot be read stays as it was; a mod without one shows its symbol.</summary>
+    async Task RefreshIconsAsync(ModRepositoryView view)
+    {
+        int changed = 0;
+        await Parallel.ForEachAsync(view.Mods, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (mod, stop) =>
+        {
+            try { if (await ModRepository.RefreshIconAsync(_http, view.Source, mod, ModRepository.IconFile(view.Source, mod.Id), stop)) Interlocked.Increment(ref changed); }
+            catch (Exception e) when (e is HttpRequestException or TaskCanceledException or IOException or UnauthorizedAccessException) { }
+        });
+        if (changed > 0) IconsChanged?.Invoke();
     }
 
     /// <summary>The rows of a repository read before, matched to the installed mods by id.</summary>
@@ -574,9 +685,26 @@ sealed class ModBrowser(Shared shared)
         finally { try { Directory.Delete(folder, recursive: true); } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { } }
     }
 
+    /// <summary>Reads the checkout's LocalExile version again (<see cref="Repo.ClientVersion"/>): a release's release.json, a
+    /// source checkout's newest version tag. A switch or an update changes it.</summary>
+    public static async Task RefreshClientVersionAsync()
+    {
+        if (Repo.IsInstall) { Repo.ClientVersion = LocalExileReleases.Installed(Environment.CurrentDirectory); return; }
+        try
+        {
+            var result = await Git.RunAsync(null, "describe", "--tags", "--abbrev=0", "--match", "v[0-9]*");
+            Repo.ClientVersion = result.Ok ? ReleaseVersion.Parse(result.Output.Trim()) : null;
+        }
+        catch (Exception e) when (e is System.ComponentModel.Win32Exception or InvalidOperationException) { Repo.ClientVersion = null; }
+    }
+
+    /// <summary>The question before installing, updating or building a mod made for other LocalExile versions.</summary>
+    public static string IncompatibleQuestion() =>
+        L.Text("This mod is incompatible with your client version: {0}. Are you sure you want to install it?", Repo.ClientVersion?.ToString() ?? "?");
+
     internal static void RequireModernMods()
     {
-        if (Repo.IsInstall) throw new InvalidOperationException(L.Text("This release does not declare compatibility with downloadable mods. Use a current source checkout to install or update mods."));
+        if (Repo.LegacyReleaseMods) throw new InvalidOperationException(L.Text("This release does not declare compatibility with downloadable mods. Use a current source checkout to install or update mods."));
     }
 }
 
@@ -601,6 +729,13 @@ static class ModsText
         return report.Count == 0 ? L.Text("Live load: not checked")
             : L.Text("Last checked: {0} loaded", report.Count(e => e.Value.Status == "Loaded (last checked)"));
     }
+    /// <summary>The Mods section's warning on a release whose server cannot load compiled mods
+    /// (<see cref="Repo.ReleaseModsMayNotLoad"/>); "" on any other. A warning only: every action stays available.</summary>
+    public static string MayNotLoadNotice() => Repo.ReleaseModsMayNotLoad
+        ? L.Text("LocalExile {0} has a bug that stops most downloaded mods from loading. Update LocalExile to {1} or newer to fix it. You can still install, change and remove mods here.",
+            "v" + Repo.ClientVersion, "v" + Repo.FirstReleaseLoadingMods)
+        : "";
+
     /// <summary>Presentation-only defaults, using the same native symbol family as the module library.</summary>
     public static ModIconKind Icon(string id) => id.ToLowerInvariant() switch
     {
@@ -609,6 +744,47 @@ static class ModsText
         "itemrarity" => ModIconKind.DiamondStone, "example" => ModIconKind.CodeBraces,
         "hello" => ModIconKind.ChatOutline, _ => ModIconKind.PuzzleOutline
     };
+
+    // The lists draw their rows often: a file is decoded again only when it changes.
+    static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (long Length, DateTime Written, ModIconImage? Image)> IconImages = new();
+
+    /// <summary>A mod's icon.png as an image; null, for the mod's symbol, when there is no such file or it is not a usable PNG.</summary>
+    public static ModIconImage? IconImage(string file)
+    {
+        if (file.Length == 0) return null;
+        try
+        {
+            var info = new FileInfo(file);
+            if (!info.Exists) return null;
+            if (IconImages.TryGetValue(file, out var known) && known.Length == info.Length && known.Written == info.LastWriteTimeUtc) return known.Image;
+            ModIconImage? image = null;
+            try { if (info.Length <= 1 << 20 && File.ReadAllBytes(file) is var bytes && ModRepository.IsIcon(bytes)) image = Decode(bytes); }
+            // Decoders throw many kinds for a damaged file, and any of them only means this mod has no icon to show.
+            catch (Exception e) when (e is not (IOException or UnauthorizedAccessException)) { }
+            IconImages[file] = (info.Length, info.LastWriteTimeUtc, image);
+            return image;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException) { return null; }
+    }
+
+    static ModIconImage Decode(byte[] bytes)
+    {
+#if WINDOWS
+        var image = new System.Windows.Media.Imaging.BitmapImage();
+        image.BeginInit();
+        image.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+        image.CreateOptions = System.Windows.Media.Imaging.BitmapCreateOptions.IgnoreColorProfile;
+        image.DecodePixelWidth = 256;
+        image.StreamSource = new MemoryStream(bytes);
+        image.EndInit();
+        image.Freeze();
+        return image;
+#else
+        using var stream = new MemoryStream(bytes);
+        return Avalonia.Media.Imaging.Bitmap.DecodeToWidth(stream, 256);
+#endif
+    }
+
     /// <summary>Only an explicit runtime report can supply a last-checked load state; saved choices never do.</summary>
     public static string RuntimeStatus(RuntimeSnapshot? state, string id)
     {
@@ -644,10 +820,19 @@ static class ModsText
         var parts = new List<string>();
         if (installed is not null) parts.Add(L.Text("Installed {0}", installed.Version));
         if (item is not null && (installed is null || item.Latest != installed.Version)) parts.Add(L.Text("Latest {0}", item.Latest));
+        var client = installed?.ClientVersions is { Count: > 0 } own ? own : item?.ClientVersions ?? [];
+        parts.Add(L.Text("Client version {0}", ClientText(client)));
         if (item?.Release?.Published is { } published) parts.Add(published.ToLocalTime().ToString("d"));
         if (item?.Release is { ZipBytes: > 0 } release) parts.Add(L.Text("{0:N0} KB", Math.Max(1, release.ZipBytes / 1024)));
         return string.Join("   ·   ", parts);
     }
+
+    /// <summary>A mod's compatible client versions as the lists show them.</summary>
+    public static string ClientText(IReadOnlyList<string> versions) => versions.Count > 0 ? ClientCompatibility.Text(versions) : L.Text("Not declared");
+
+    /// <summary>The warning beside a mod made for other LocalExile versions.</summary>
+    public static string IncompatibleTip(IReadOnlyList<string> versions) =>
+        L.Text("Made for LocalExile {0}; this checkout runs {1}.", ClientCompatibility.Text(versions), Repo.ClientVersion?.ToString() ?? "?");
 
     /// <summary>The question before an uninstall.</summary>
     public static string UninstallQuestion(ModEntry mod) =>

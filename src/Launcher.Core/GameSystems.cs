@@ -3,7 +3,11 @@ using System.Text.Json.Nodes;
 
 namespace Launcher.Core;
 
-public sealed record ContentEnvironment(string Modules, string Leagues, string Choices, bool CanChoose, bool CanEditSettings = false, bool CanCreate = false);
+/// <summary>Where a folder's modules, leagues and its user's module choices are, and what the adapter lets Waypoint change
+/// there. <paramref name="ShippedLeaguesFixed"/>: a release, whose own leagues' files an update writes over, so only a
+/// league made in Waypoint is hidden or shown there.</summary>
+public sealed record ContentEnvironment(string Modules, string Leagues, string Choices, bool CanChoose, bool CanEditSettings = false, bool CanCreate = false,
+    bool ShippedLeaguesFixed = false);
 public sealed record GameSystem(string Id, string Path, string Name, string Description, string[] Depends, string Folder)
 {
     public string SettingsFile => System.IO.Path.Combine(Folder, "settings.json");
@@ -15,11 +19,15 @@ public sealed record GameLeague(string Name, string Folder, string[] BaseSystems
 {
     public string SettingsFile => Path.Combine(Folder, "settings.json");
     public bool IsMain => !HasEntryOf && EntryOf.Length == 0;
+    /// <summary>The league's name and description in the launcher's language; its own id keeps the manifest's text.</summary>
+    public string DisplayName => L.Text(Name);
+    public string DisplayDescription => L.Text(Description);
     public override string ToString() => Name;
 }
 public sealed record GameLeagueCard(string Name, GameLeague[] Variants, bool Visible = true, bool IsFlag = true)
 {
     public GameLeague Primary => Variants.FirstOrDefault(l => l.Name.Equals(Name, StringComparison.OrdinalIgnoreCase)) ?? Variants[0];
+    public string DisplayName => L.Text(Name);
     public override string ToString() => Visible ? Name : L.Text("{0} (not shown)", Name);
 }
 
@@ -50,7 +58,7 @@ public sealed partial class GameSystems
         return value;
     }
     static string Id(string path) => Normal(path).Split('/')[^1];
-    static IEnumerable<string> Manifests(string folder, string manifest)
+    internal static IEnumerable<string> Manifests(string folder, string manifest)
     {
         if (!Directory.Exists(folder)) yield break;
         var pending = new Stack<(string Folder, int Depth)>(); pending.Push((folder, 0)); int count = 0;
@@ -109,14 +117,8 @@ public sealed partial class GameSystems
     public JsonObject Plan(GameLeague league, IEnumerable<string> selected)
     {
         if (!Environment.CanChoose) throw new InvalidOperationException(L.Text("This server does not expose supported league system overrides. Update LocalExile to edit these choices."));
-        if (league.Systems.Any(p => !Systems.Any(s => s.Path.Equals(p, StringComparison.OrdinalIgnoreCase)))) throw new InvalidOperationException(L.Text("A selected module is missing."));
         if (!Configurable(league)) throw new InvalidOperationException(L.Text("Ended or non-playable league definitions are read-only."));
         var paths = selected.Select(Normal).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
-        var active = paths.Select(p => Systems.SingleOrDefault(s => s.Path.Equals(p, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException(L.Text("A selected module is missing."))).ToArray();
-        if (league.Creatable && !active.Any(s => s.Id.Equals("Game", StringComparison.OrdinalIgnoreCase))) throw new InvalidOperationException(L.Text("The Game module is required for a playable league."));
-        foreach (var system in active)
-            foreach (string dependency in system.Depends)
-                if (!active.Any(s => s.Id.Equals(dependency, StringComparison.OrdinalIgnoreCase))) throw new InvalidOperationException(L.Text("{0} needs {1}. Enable the required module first.", system.Name, dependency));
         ValidateComposition(league, paths);
         var result = (JsonObject)Choices.DeepClone();
         string key = result.Select(p => p.Key).FirstOrDefault(k => k.Equals(league.Name, StringComparison.OrdinalIgnoreCase)) ?? league.Name;

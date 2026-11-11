@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- 流放之路登录器.exe: the login launcher of a release install, and nothing else. It registers an account through
+       the release's own tool (app\GameServer.Auth.exe) and starts the game (Client\Game.patched.exe when the servers
+       already listen, LocalExile.exe beside it otherwise). It carries nothing of Waypoint's adapter, so it works on a
+       machine that has no source checkout: only the folder it sits in. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>流放之路登录器</AssemblyName>
+    <RootNamespace>LocalExile.ClientTool</RootNamespace>
+    <Version>0.0.0-dev</Version>
+    <ApplicationIcon>..\..\branding\app.ico</ApplicationIcon>
+    <SatelliteResourceLanguages>en;zh-CN</SatelliteResourceLanguages>
+    <RuntimeIdentifier Condition="'$(Configuration)' == 'Release'">win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="..\..\branding\app.ico" Link="app.ico" />
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+</Project>

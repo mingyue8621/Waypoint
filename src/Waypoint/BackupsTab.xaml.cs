@@ -49,11 +49,13 @@ public partial class BackupsTab : UserControl
         try
         {
             string? selected = Chosen?.Id;
-            var backups = BackupCatalog.Read(state.SaveDatabase);
+            var backups = BackupCatalog.Read(state);
             BackupList.ItemsSource = backups;
             BackupList.SelectedItem = backups.FirstOrDefault(b => b.Id == selected);
-            Status.Text = L.Text("{0} backups for {1}", backups.Length, state.SaveDatabase);
-            Status.ToolTip = state.SaveDatabase;
+            // The player's data folder: characters.db and auth.db since the 0.3.0 split, one saves.db before it.
+            string data = Path.GetDirectoryName(state.SaveDatabase) ?? state.SaveDatabase;
+            Status.Text = L.Text("{0} backups for {1}", backups.Length, data);
+            Status.ToolTip = data;
             Empty.Visibility = backups.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
             Empty.Text = L.Text("No backups yet. Use Back up now to save a copy of your current progress.");
         }
@@ -99,8 +101,8 @@ public partial class BackupsTab : UserControl
 
     void OpenFolder(object sender, RoutedEventArgs e)
     {
-        if (State is { } state && Directory.Exists(BackupCatalog.DirectoryFor(state.SaveDatabase)))
-            Process.Start(new ProcessStartInfo("explorer.exe") { ArgumentList = { BackupCatalog.DirectoryFor(state.SaveDatabase) }, UseShellExecute = false })?.Dispose();
+        if (State is { } state && Directory.Exists(BackupCatalog.DirectoryFor(state)))
+            Process.Start(new ProcessStartInfo("explorer.exe") { ArgumentList = { BackupCatalog.DirectoryFor(state) }, UseShellExecute = false })?.Dispose();
     }
 
     bool Confirm(string title, string text, string action) =>

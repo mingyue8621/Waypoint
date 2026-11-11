@@ -22,6 +22,26 @@ static class Repo
     /// live.ps1, adapter or git is not offered. Set once at startup.</summary>
     public static bool IsInstall { get; set; }
 
+    /// <summary>The LocalExile version the checkout runs, which a mod's <c>compatibleClientVersions</c> are checked against: a
+    /// release's release.json, a source checkout's newest version tag (<c>git describe</c>). Null when unknown.</summary>
+    public static ReleaseVersion? ClientVersion { get; set; }
+
+    /// <summary>The first release made for downloadable mods: it ships an empty Mods\Binaries\ for Waypoint to fill.</summary>
+    public static ReleaseVersion FirstDownloadableModsRelease { get; } = ReleaseVersion.Parse("0.2.0-beta")!;
+
+    /// <summary>A release older than <see cref="FirstDownloadableModsRelease"/> (or of no readable version): it keeps the mods
+    /// it shipped with, built for an older mod API, so Waypoint installs, updates and edits none there.</summary>
+    public static bool LegacyReleaseMods => IsInstall && (ClientVersion is null || ClientVersion.CompareTo(FirstDownloadableModsRelease) < 0);
+
+    /// <summary>The first release whose GameServer.Modding.dll loads the compiled mods of LocalExile-Mods (LocalExile #762).</summary>
+    public static ReleaseVersion FirstReleaseLoadingMods { get; } = ReleaseVersion.Parse("0.2.2-beta")!;
+
+    /// <summary>A release made for downloadable mods but older than <see cref="FirstReleaseLoadingMods"/> (v0.2.0-beta,
+    /// v0.2.1-beta): its GameServer.Modding.dll carries the release's version (0.2.x), the mods are built for 1.0.0.0, and
+    /// the server refuses them with "Could not load file or assembly 'GameServer.Modding'". Waypoint only says so: nothing
+    /// is refused there, since a player must still be able to remove a mod, and a script mod is compiled by the server.</summary>
+    public static bool ReleaseModsMayNotLoad => IsInstall && !LegacyReleaseMods && ClientVersion!.CompareTo(FirstReleaseLoadingMods) < 0;
+
     /// <summary>Where the folder picker starts: a "LocalExile" folder beside the launcher's own repository when it is a
     /// checkout (the usual layout, LocalExile\ and LocalExile-Launcher\ side by side), else the launcher's folder.</summary>
     public static string Suggested(string launcherFolder)
@@ -33,14 +53,17 @@ static class Repo
 
     /// <summary>The checkout's branch, from its HEAD file (no git process): a short commit when detached, null when the
     /// checkout has none (not a git checkout, or unreadable).</summary>
-    public static string? Branch()
+    public static string? Branch() => BranchIn(".");
+
+    /// <summary>As <see cref="Branch"/>, of the checkout in <paramref name="folder"/>: another folder of the list.</summary>
+    public static string? BranchIn(string folder)
     {
         try
         {
-            // A worktree's .git is a file naming its git directory.
-            string git = ".git";
+            // A worktree's .git is a file naming its git directory, which may be written relative to the worktree.
+            string git = Path.Combine(folder, ".git");
             if (File.Exists(git) && File.ReadAllText(git).Trim() is var link && link.StartsWith("gitdir:", StringComparison.Ordinal))
-                git = link["gitdir:".Length..].Trim();
+                git = Path.Combine(folder, link["gitdir:".Length..].Trim());
             string head = Path.Combine(git, "HEAD");
             return File.Exists(head) ? BranchOf(File.ReadAllText(head)) : null;
         }
@@ -101,6 +124,8 @@ static class Repo
         && !script.Contains("-ClientOnly cannot be combined with -NoClient, -Only or -Walkmaps", StringComparison.Ordinal);
 
     public static string ExtractScript { get; } = Path.Combine("scripts", "dev", "extract-data.ps1");
+    /// <summary>extract-data.ps1 -List, for only the entries the servers read when the script has -Servers (live.ps1 extracts those).</summary>
+    public static string[] ExtractListArguments => Launcher.Core.SetupSequence.ExtractsForServers(".") ? ["-Servers", "-List"] : ["-List"];
     public static string ClientControl { get; } = Path.Combine("scripts", "dev", "client_control.py");
     public static string Logs { get; } = "logs";
 

@@ -2,6 +2,8 @@
   <Folder Name="/src/">
     <Project Path="src/Launcher.Core/Launcher.Core.csproj" />
     <Project Path="src/Waypoint/Waypoint.csproj" />
+    <Project Path="src/ServerLauncher/ServerLauncher.csproj" />
+    <Project Path="src/ClientLauncher/ClientLauncher.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Launcher.Checks/Launcher.Checks.csproj" />

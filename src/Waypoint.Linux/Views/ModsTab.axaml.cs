@@ -26,8 +26,8 @@ partial class ModsTab : UserControl
     IReadOnlyDictionary<string, BrowseItem> _offers = new Dictionary<string, BrowseItem>();
     IReadOnlyList<BrowseItem> _items = [];
     bool _busy, _filling;
-    ModSort _sort = ModSort.Name;
-    bool _descending, _fillingSort;
+    ModSort _sort = ModSort.Name, _browseSort = ModSort.Name;
+    bool _descending, _browseDescending;
     BrowseItem? _pageItem;
     ModEntry? _pageEntry;
     string _pageReadme = "";
@@ -55,6 +55,7 @@ partial class ModsTab : UserControl
         if (Repo.IsInstall) BuildAllItem.IsVisible = CheckModsItem.IsVisible = false;
         shared.Workspace.Changed += () => Dispatcher.UIThread.Post(Render);
         _browser.JobsChanged += () => Dispatcher.UIThread.Post(Render);
+        _browser.IconsChanged += () => Dispatcher.UIThread.Post(Render);
         shared.LiveRunning += running => Dispatcher.UIThread.Post(() =>
         {
             _busy = running;
@@ -63,12 +64,12 @@ partial class ModsTab : UserControl
         L.Current.PropertyChanged += (_, _) =>
         {
             FillSources();
-            FillSortChoices();
             Render();
         };
         ViewTools.WhenShown(this, async () =>
         {
             await shared.Workspace.RefreshAsync();
+            await ModBrowser.RefreshClientVersionAsync();
             await _browser.ReadAllAsync(again: false);
             Render();
         });
@@ -79,7 +80,13 @@ partial class ModsTab : UserControl
             return true;
         }, TimeSpan.FromSeconds(2));
         FillSources();
-        FillSortChoices();
+        Render();
+        _ = RefreshClientAsync();
+    }
+
+    async Task RefreshClientAsync()
+    {
+        await ModBrowser.RefreshClientVersionAsync();
         Render();
     }
 
@@ -97,8 +104,8 @@ partial class ModsTab : UserControl
             notice = L.Text("Could not inspect mods: ") + ex.Message;
         }
         if (state is not null && supported && !state.ModEnvironment!.Enabled) notice = L.Text("Mods off in launch profile (Game_MODS=0)");
-        notice = string.Join("\n", new[] { notice, ModsText.ChoicesNotice(state) }.Where(s => s.Length > 0));
-        if (Repo.IsInstall) notice = L.Text("This release does not declare compatibility with downloadable mods. Use a current source checkout to install or update mods.");
+        notice = string.Join("\n", new[] { ModsText.MayNotLoadNotice(), notice, ModsText.ChoicesNotice(state) }.Where(s => s.Length > 0));
+        if (Repo.LegacyReleaseMods) notice = L.Text("This release does not declare compatibility with downloadable mods. Use a current source checkout to install or update mods.");
         Notice.Text = notice;
         Notice.IsVisible = notice.Length > 0;
         _offers = _browser.Offers(_entries);
@@ -118,7 +125,7 @@ partial class ModsTab : UserControl
     }
 
     /// <summary>Whether a mod operation can start: a checkout with a mod host, nothing else running, no conflicts.</summary>
-    bool CanUse => State is { ModEnvironment.Supported: true, Conflicts.Length: 0 } && !_busy && !Repo.IsInstall;
+    bool CanUse => State is { ModEnvironment.Supported: true, Conflicts.Length: 0 } && !_busy && !Repo.LegacyReleaseMods;
 
     void Filter()
     {
@@ -126,7 +133,7 @@ partial class ModsTab : UserControl
         var failures = GatewayMods.LoadErrors(State);
         var rows = ModSorting.Sort(_entries.Select(e => new InstalledRow(e, _offers.GetValueOrDefault(e.Id)) { Job = _browser.Job(e.Id), LoadError = failures.GetValueOrDefault(e.Id, "") })
             .Where(r => r.SearchText.Contains(text, StringComparison.OrdinalIgnoreCase)), _sort, _descending).ToList();
-        SortDirection.Content = _descending ? "↓" : "↑";
+        ShowHeadings();
         int updates = _entries.Count(e => _offers.GetValueOrDefault(e.Id)?.Offer == ModOffer.Update);
         InstalledCount.Text = text.Length > 0 ? L.Text("{0} of {1} installed mods", rows.Count, _entries.Length)
             : L.Text("{0} installed · {1} updates", _entries.Length, updates);
@@ -157,6 +164,7 @@ partial class ModsTab : UserControl
     async void RefreshInstalled(object? sender, RoutedEventArgs e)
     {
         await _shared.Workspace.RefreshAsync();
+        await ModBrowser.RefreshClientVersionAsync();
         await _browser.ReadAllAsync(again: true);
         Render();
     }
@@ -245,20 +253,30 @@ partial class ModsTab : UserControl
         Render();
     }
 
-    void FillSortChoices()
+    /// <summary>A column's heading: sorts its list by it, and a second click reverses the order.</summary>
+    void SortBy(object? sender, RoutedEventArgs e)
     {
-        _fillingSort = true; SortPicker.Items.Clear();
-        foreach (var column in Enum.GetValues<ModSort>())
-            SortPicker.Items.Add(new ComboBoxItem { Content = column == ModSort.Action ? L.Text("Package status") : ModSorting.Heading(column, (ModSort)(-1), false), Tag = column });
-        SortPicker.SelectedItem = SortPicker.Items.OfType<ComboBoxItem>().First(i => Equals(i.Tag, _sort));
-        _fillingSort = false;
+        if (sender is not Button { Tag: ModSort column } button) return;
+        if (button.Parent == BrowseHeadings)
+        {
+            _browseDescending = _browseSort == column && !_browseDescending;
+            _browseSort = column;
+            ShowBrowse();
+        }
+        else
+        {
+            _descending = _sort == column && !_descending;
+            _sort = column;
+            Filter();
+        }
     }
-    void SortChoiceChanged(object? sender, SelectionChangedEventArgs e)
+
+    void ShowHeadings()
     {
-        if (_shared is null || _fillingSort || SortPicker.SelectedItem is not ComboBoxItem { Tag: ModSort column }) return;
-        _sort = column; _descending = false; Filter();
+        foreach (var button in InstalledHeadings.Children.OfType<Button>()) button.Content = ModSorting.Heading((ModSort)button.Tag!, _sort, _descending);
+        foreach (var button in BrowseHeadings.Children.OfType<Button>()) button.Content = ModSorting.Heading((ModSort)button.Tag!, _browseSort, _browseDescending);
     }
-    void ReverseSort(object? sender, RoutedEventArgs e) { _descending = !_descending; Filter(); }
+
     void OpenRowDetails(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button button) return;
@@ -285,6 +303,8 @@ partial class ModsTab : UserControl
     async Task BuildAsync(ModEntry entry)
     {
         if (!CanUse) return;
+        if (new InstalledRow(entry, _offers.GetValueOrDefault(entry.Id)).Incompatible
+            && !Dialog.Ask(Owner, DialogKind.Warning, entry.Title, ModBrowser.IncompatibleQuestion(), L.Text("Build"), L.Text("Cancel"))) return;
         try
         {
             if (await _browser.BuildAsync(entry) is { Ok: false }) ShowLog(true);
@@ -330,6 +350,7 @@ partial class ModsTab : UserControl
             if (!Dialog.Ask(Owner, DialogKind.Info, L.Text("Install from source"), ModBrowser.SourceWarning(item), L.Text("Install"), L.Text("Cancel"))) return;
         }
         if (!item.Source.IsOfficial && !Dialog.Ask(Owner, DialogKind.Warning, L.Text("Install from {0}", item.Source.Key), ModsText.Untrusted(item), L.Text("Install"), L.Text("Cancel"))) return;
+        if (item.Incompatible && !Dialog.Ask(Owner, DialogKind.Warning, item.Title, ModBrowser.IncompatibleQuestion(), L.Text("Install"), L.Text("Cancel"))) return;
         try
         {
             if (await _browser.InstallAsync(item) is { Ok: false }) ShowLog(true);
@@ -427,7 +448,8 @@ partial class ModsTab : UserControl
         if (_browser is null || Source is not { } source) return;
         _items = _browser.Items(source, _entries);
         string text = (BrowseSearch.Text ?? "").Trim();
-        var shown = _items.Where(i => i.SearchText.Contains(text, StringComparison.OrdinalIgnoreCase)).ToList();
+        var shown = ModSorting.Sort(_items.Where(i => i.SearchText.Contains(text, StringComparison.OrdinalIgnoreCase)), _browseSort, _browseDescending).ToList();
+        ShowHeadings();
         BrowseList.ItemsSource = shown;
         BrowseCount.Text = _browser.View(source) is null ? "" : L.Text("{0} mods", _items.Count);
         string? problem = ModsText.BrowseProblem(_browser, source);
@@ -507,8 +529,14 @@ partial class ModsTab : UserControl
         ModPage.IsVisible = true;
         SettingsEditor.Show(ChoiceScopeHint, false);
         PageTabs.SelectedItem = ModOverviewPage;
+        PageScroll.ScrollToHome();
         RefreshPage();
         _ = LoadReadmeAsync(item, entry);
+    }
+
+    void PageTabChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_shared is not null) UpdateSettingsButtons();
     }
 
     void ClosePage(object? sender, RoutedEventArgs e)
@@ -539,6 +567,8 @@ partial class ModsTab : UserControl
         if (item is null && entry is null) { ClosePage(this, new RoutedEventArgs()); return; }
         string title = entry is null ? item!.Title : new InstalledRow(entry, item).Title;
         PageIcon.Kind = ModsText.Icon(id);
+        PageImage.Source = ModsText.IconImage(entry is null ? item!.IconFile : new InstalledRow(entry, item).IconFile);
+        PageIcon.IsVisible = PageImage.Source is null;
         BackText.Text = L.Text(Pages.SelectedItem == BrowsePage ? "Back to Browse" : "Back to My Mods");
         PageTitle.Text = title;
         string author = entry?.Author is { Length: > 0 } a ? a : item?.Author ?? "";
@@ -559,10 +589,9 @@ partial class ModsTab : UserControl
         if (PageTabs.SelectedItem is TabItem { IsVisible: false }) PageTabs.SelectedItem = ModOverviewPage;
         PagePackageStatus.Text = entry is null ? "" : new InstalledRow(entry, item).PackageStatus;
         SettingsEditor.Show(PagePackageStatus, entry is not null && _pageJob is null);
-        SettingsEditor.Show(RuntimeCard, entry is not null);
-        SavedChoiceText.Text = L.Text("Saved choice: {0}", L.Text(entry?.Enabled == true ? "Enabled" : "Disabled"));
-        RuntimeStatusText.Text = L.Text("Live load status: {0}", ModsText.RuntimeStatus(State, id));
-        PageCheckStatus.IsEnabled = CheckModsItem.IsEnabled;
+        string? incompatible = entry is not null ? new InstalledRow(entry, item).IncompatibleTip : item?.IncompatibleTip;
+        PageIncompatibleText.Text = incompatible ?? "";
+        SettingsEditor.Show(PageIncompatible, incompatible is not null);
         ShowSettings(entry);
         if (_pageReadme.Length == 0) ShowOverview(PageDescription.Text ?? "");
     }
@@ -577,6 +606,9 @@ partial class ModsTab : UserControl
             if (job is not null) job.PropertyChanged += PageJobChanged;
         }
         PageAction.Content = job?.Text ?? _pageItem?.ActionText ?? "";
+        // An Update is green, as in the lists.
+        PageAction.Classes.Set("accent", _pageItem?.IsUpdate != true);
+        PageAction.Classes.Set("update", _pageItem?.IsUpdate == true);
         SettingsEditor.Show(PageAction, job is not null || _pageItem?.Offer is ModOffer.Install or ModOffer.Update);
     }
 
@@ -612,11 +644,11 @@ partial class ModsTab : UserControl
     void ShowSettings(ModEntry? entry)
     {
         // Refreshes must not replace a form that still belongs to this installed mod.
-        if (!Repo.IsInstall && entry is not null && _form?.Id == entry.Id && SettingsPanel.Children.Count > 0)
+        if (!Repo.LegacyReleaseMods && entry is not null && _form?.Id == entry.Id && SettingsPanel.Children.Count > 0)
         { UpdateSettingsButtons(); return; }
         _form = null; _settingsEditor = null; _inputs.Clear(); SettingsPanel.Children.Clear();
         SettingsEditor.Show(SettingsActions, false); SettingsEditor.Show(SettingsFooter, false); SettingsHint.Text = "";
-        if (Repo.IsInstall)
+        if (Repo.LegacyReleaseMods)
         {
             SettingsNotice(L.Text("Settings support unavailable"), L.Text("This release does not declare compatibility with downloadable mod settings. Use a compatible source checkout to edit them.")); return;
         }
@@ -650,7 +682,7 @@ partial class ModsTab : UserControl
     }
     void UpdateSettingsButtons()
     {
-        SettingsEditor.Show(SettingsFooter, _settingsEditor is not null);
+        SettingsEditor.Show(SettingsFooter, _settingsEditor is not null && PageTabs.SelectedItem == ModSettingsPage);
         bool dirty = _settingsEditor?.Dirty == true;
         SaveSettingsButton.IsEnabled = CanUse && dirty; ResetSettingsButton.IsEnabled = CanUse && _form is not null;
         DiscardSettingsButton.IsEnabled = dirty;

@@ -78,7 +78,7 @@ public sealed partial class GameSystemsTab
         var identity = Type(L.Text("Gameplay module · {0}", module.Id), 12, false, "Shell.TextSecondary"); identity.Margin = new Thickness(0, 6, 0, 0); body.Children.Add(identity);
         if (module.Description.Length > 0)
         {
-            var description = Type(module.Description, 13, false, "Shell.TextSecondary");
+            var description = Type(L.Text(module.Description), 13, false, "Shell.TextSecondary");
             description.Margin = new Thickness(0, 10, 0, 0); body.Children.Add(description);
         }
         hero.Children.Add(body); var heroCard = Card(hero, 18); heroCard.Margin = new Thickness(0, 0, 0, 12); _detail.Children.Add(heroCard);
@@ -95,12 +95,12 @@ public sealed partial class GameSystemsTab
         if (used.Length > 0)
         {
             var names = new WrapPanel { Margin = new Thickness(0, 10, 0, 0) };
-            foreach (var league in used.Take(5)) { var badge = Badge(league.Name); badge.Margin = new Thickness(0, 0, 6, 6); names.Children.Add(badge); }
+            foreach (var league in used.Take(5)) { var badge = Badge(league.DisplayName); badge.Margin = new Thickness(0, 0, 6, 6); names.Children.Add(badge); }
             usage.Children.Add(names);
             if (used.Length > 5)
             {
                 var all = new StackPanel { Margin = new Thickness(12, 6, 0, 0) };
-                foreach (var league in used.Skip(5)) { var name = Type(league.Name, 12, false, "Shell.TextSecondary"); name.Margin = new Thickness(0, 3, 0, 3); all.Children.Add(name); }
+                foreach (var league in used.Skip(5)) { var name = Type(league.DisplayName, 12, false, "Shell.TextSecondary"); name.Margin = new Thickness(0, 3, 0, 3); all.Children.Add(name); }
                 usage.Children.Add(new Expander { Header = L.Text("More league definitions ({0})", used.Length - 5), Content = all });
             }
         }

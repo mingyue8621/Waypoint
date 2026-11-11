@@ -5,9 +5,10 @@
     <DockPanel Margin="20,12,20,12">
         <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
             <Button x:Name="GameStatusButton" DockPanel.Dock="Left" Content="{l:Loc 'Game status'}" Click="GameStatus" ToolTip="client_control.py game:status" />
-            <Button DockPanel.Dock="Left" Content="{l:Loc 'Reload commands'}" Click="ReloadCommands" ToolTip="{l:Loc 'GameServer.Gateway commands: the built Gateway\'s list'}" />
+            <Button x:Name="WhoButton" DockPanel.Dock="Left" Content="{l:Loc 'In game'}" Click="WhoClicked" ToolTip="{l:Loc 'The characters a command runs on, and their area (the servers console channel)'}" />
+            <Button DockPanel.Dock="Left" Content="{l:Loc 'Reload commands'}" Click="ReloadCommands" ToolTip="{l:Loc &quot;GameServer.Gateway commands: the built Gateway's list&quot;}" />
             <TextBlock x:Name="State" VerticalAlignment="Center" Margin="6,0,0,6" Foreground="{DynamicResource Shell.TextSecondary}" TextTrimming="CharacterEllipsis"
-                       Text="{l:Loc 'Commands go through the game client (scripts/dev/client_control.py): start the game and enter an area first.'}" />
+                       Text="{l:Loc 'Commands run on the servers when their console channel is there; else through the game client (scripts/dev/client_control.py).'}" />
         </DockPanel>
 
         <!-- The input row: the line, its usage under it, the pinned lines above it. -->
@@ -21,7 +22,7 @@
                 <Button DockPanel.Dock="Right" x:Name="SendButton" Style="{StaticResource Shell.PrimaryButton}" Content="{l:Loc 'Send'}" Click="SendClicked" Margin="6,0,0,0" />
                 <TextBox x:Name="Input" FontFamily="{StaticResource Mono}" FontSize="13" Padding="4,3"
                          PreviewKeyDown="InputKey" TextChanged="InputChanged" LostKeyboardFocus="InputLostFocus"
-                         ToolTip="{l:Loc '/ lists the commands, then each argument\'s values (areas, monsters, items, gems …): ↑↓ choose, Tab or Enter take one. Without a list ↑↓ go through the history. Text without / is a chat line.'}" />
+                         ToolTip="{l:Loc &quot;/ lists the commands, then each argument's values (areas, monsters, items, gems …): ↑↓ choose, Tab or Enter take one. Without a list ↑↓ go through the history. Text without / is a chat line.&quot;}" />
             </DockPanel>
             <TextBlock x:Name="Hint" Margin="2,4,0,0" Foreground="{DynamicResource Shell.TextSecondary}" TextWrapping="Wrap" FontFamily="{StaticResource Mono}" />
             <Popup x:Name="SuggestionPopup" PlacementTarget="{Binding ElementName=Input}" Placement="Top" StaysOpen="True" AllowsTransparency="True">
@@ -57,7 +58,7 @@
                 <ListBox x:Name="CommandList" MouseDoubleClick="CommandPicked">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel ToolTip="{Binding Usage}">
+                            <StackPanel ToolTip="{Binding DisplayUsage}">
                                 <TextBlock Text="{Binding Short}" FontFamily="{StaticResource Mono}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="{Binding Explanation}" Foreground="{DynamicResource Shell.TextSecondary}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>

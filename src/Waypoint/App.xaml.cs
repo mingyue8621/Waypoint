@@ -27,6 +27,10 @@ public partial class App : Application
         // The first start's questions are windows too; closing one must not end the application.
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         Settings = Settings.Load();
+        // The folder the settings name before anything else writes one: the guide saves its own.
+        string? saved = Settings.ServerPath;
+        // Waypoint's own log, from the first moment: the setup guide runs before there is a checkout.
+        SessionLog.Open(SupportReport.LogFolder, $"Waypoint {Updates.Current} · {Environment.OSVersion} · .NET {Environment.Version}");
         // The player's folders and tools, before anything reads a folder or starts a tool.
         Settings.ApplyPaths();
         // Before anything shows, the first start's questions included.
@@ -38,6 +42,16 @@ public partial class App : Application
             var options = AppStartupOptions.Parse(e.Args, Environment.CurrentDirectory);
             if (!options.AllowMultiple && !await BecomePrimary(options)) { Shutdown(0); return; }
             string? root = Repo.Find(options.RepositoryPath ?? Settings.ServerPath, Environment.CurrentDirectory);
+            // The saved folder is not there any more (moved, renamed, a drive not connected). That is not a first start:
+            // Waypoint says so and offers the ways on, and only "Set up again…" leads to the guide below.
+            if (root is null && options.RepositoryPath is null && Settings.ServerPath is { Length: > 0 } gone)
+            {
+                SessionLog.Current?.Write("The saved folder is not there: " + gone);
+                var question = new MissingFolderDialog(gone, [.. FolderList.Read(Settings, "").Where(folder => folder.Kind != FolderKind.Missing)]);
+                if (question.ShowDialog() != true) { Shutdown(0); return; }
+                root = question.Chosen;
+                SessionLog.Current?.Write(root is null ? "Answer: the setup guide" : "Answer: " + root);
+            }
             if (root is null)
             {
                 var guide = new SetupWizard(Settings, null, null);
@@ -51,6 +65,9 @@ public partial class App : Application
                 }
             }
             if (root is null) { Shutdown(0); return; }
+            // A source copy its user went to on purpose (the guide, the chooser, --repo, the folder Waypoint was started
+            // in) is Advanced mode's, with nothing to choose there. Saved at once: the guide has saved its folder already.
+            if (Editions.Arrived(Settings, root, saved)) Settings.Save();
             if (Settings.ServerPath != root && options.RepositoryPath is null)
             {
                 Settings.ServerPath = root;
@@ -59,6 +76,9 @@ public partial class App : Application
             // Every path of the server's tools is relative to its root (its AGENTS.md).
             Environment.CurrentDirectory = root;
             Repo.IsInstall = LocalExileReleases.IsInstall(root);
+            if (Repo.IsInstall) Repo.ClientVersion = LocalExileReleases.Installed(root);
+            SessionLog.Current?.Write("Folder: " + root);
+            foreach (string detail in SupportReport.Details(Editions.Advanced(Settings))) SessionLog.Current?.Write(detail);
             if (options.RepositoryPath is null) Editions.Remember(Settings, root);
             // A Python installed without its PATH option counts, for Waypoint and the scripts it runs.
             await Prerequisites.RefreshToolsAsync();
@@ -66,6 +86,7 @@ public partial class App : Application
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException
             or System.ComponentModel.Win32Exception or System.Security.SecurityException or InvalidOperationException)
         {
+            SessionLog.Current?.Write("Could not open Waypoint: " + ex, "ERROR");
             Dialog.Tell(null, DialogKind.Error, L.Text("Could not open Waypoint"), L.Text(ex.Message));
             ReleaseInstance();
             Shutdown(1);
@@ -166,17 +187,48 @@ public partial class App : Application
         }
     }
 
-    /// <summary>Another checkout: saved in the settings, then Waypoint starts again on it (every section reads from the old
-    /// one). The new copy starts only once this one has exited: closing can still be cancelled.</summary>
-    internal static void SwitchServer(Window owner, Settings settings, string? chosen = null)
+    /// <summary>Another LocalExile folder: Waypoint starts again on it (every section reads from the old one), and no file of
+    /// either folder is moved. Every way of changing folder comes through here. What still runs is stopped first on the
+    /// user's word (<see cref="Editions.ReadyToLeaveAsync"/>; <paramref name="asked"/>: the caller has seen to it), and the
+    /// folder is saved only once nothing can refuse the close: an operation in progress is the one thing that does, and a
+    /// folder saved before a refused close would open at the next start instead. <paramref name="createAccount"/>: the
+    /// next start opens the Create account dialog, noted only with the folder. <paramref name="before"/>: a last question
+    /// of the caller's, asked once what ran has been seen to; false gives the change up. True when Waypoint is starting
+    /// again; false when everything is as it was.</summary>
+    internal static async Task<bool> SwitchServerAsync(Window owner, Shared shared, string? chosen = null, bool asked = false, bool createAccount = false,
+        Func<Task<bool>>? before = null)
     {
-        if ((chosen ?? ChooseServer(owner)) is not { } root || root == settings.ServerPath) return;
-        settings.ServerPath = root;
-        settings.Save();
+        // One change of folder at a time: the first is stopping what runs.
+        if (shared.Leaving) return false;
+        // The folder in use, not the saved one: started with --repo, they differ.
+        if ((chosen ?? ChooseServer(owner)) is not { } root || Editions.SameFolder(root, Environment.CurrentDirectory)) return false;
+        try
+        {
+            if (!asked && !await Editions.ReadyToLeaveAsync(shared, root, (kind, title, message, buttons) => Dialog.Show(owner, kind, title, message, null, buttons))) return false;
+            // Windows is signing its user out, which closed the window during the wait: nothing is saved or started.
+            if (Current is App { IsSessionEnding: true }) return false;
+            if (shared.IsLiveRunning)
+            {
+                Dialog.Tell(owner, DialogKind.Info, L.Text("{0} is still running", shared.BusyWith), L.Text("Wait for the current operation before changing checkout."));
+                return false;
+            }
+            if (before is not null && !await before()) return false;
+            var settings = shared.Settings;
+            shared.Logs.Write($"change of folder: from {Environment.CurrentDirectory} to {root}", Severity.Info);
+            Editions.LeftFor(settings, root, Repo.IsInstall ? null : Environment.CurrentDirectory);
+            FolderList.Add(settings, root);
+            settings.ServerPath = root;
+            if (createAccount) settings.CreateAccountOnStart = true;
+            settings.Save();
+        }
+        // Up to here the window did not close once Waypoint had begun to stop what ran: now it may, or is usable again.
+        finally { shared.Leaving = false; }
         StartAgain(owner);
+        return true;
     }
 
-    /// <summary>Waypoint again, once this one has exited: after a change every section reads anew (its folders, say).</summary>
+    /// <summary>Waypoint again, once this one has exited: after a change every section reads anew (its folders, say). What
+    /// runs is left as it is (<see cref="MainWindow.ExitNow"/>).</summary>
     internal static void StartAgain(Window owner)
     {
         if (Environment.ProcessPath is { } exe)
@@ -191,6 +243,7 @@ public partial class App : Application
 
     static void Crashed(object exception)
     {
+        SessionLog.Current?.Write("Waypoint crashed: " + exception, "ERROR");
         try
         {
             Directory.CreateDirectory(Repo.Logs);
@@ -201,6 +254,7 @@ public partial class App : Application
 
     static void Unhandled(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
+        SessionLog.Current?.Write("Unexpected error: " + e.Exception, "ERROR");
         if (Dialog.Show(Current.MainWindow, DialogKind.Error, L.Text("Unexpected error"),
                 L.Text("Something failed; Waypoint keeps running. The details help a bug report."), e.Exception.ToString(),
                 [L.Text("OK"), L.Text("Copy details")]) == 1)

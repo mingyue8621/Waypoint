@@ -44,10 +44,10 @@
                             <GridViewColumnHeader Content="{l:Loc 'Avg ms'}" ToolTip="{l:Loc 'Total time divided by the calls in the window'}" />
                         </GridViewColumn>
                         <GridViewColumn Width="80" DisplayMemberBinding="{Binding P95, StringFormat=0.###}">
-                            <GridViewColumnHeader Content="{l:Loc 'p95 ms'}" ToolTip="{l:Loc 'The worst second\'s 95th percentile in the window (the server publishes quantiles per second)'}" />
+                            <GridViewColumnHeader Content="{l:Loc 'p95 ms'}" ToolTip="{l:Loc &quot;The worst second's 95th percentile in the window (the server publishes quantiles per second)&quot;}" />
                         </GridViewColumn>
                         <GridViewColumn Width="80" DisplayMemberBinding="{Binding P99, StringFormat=0.###}">
-                            <GridViewColumnHeader Content="{l:Loc 'p99 ms'}" ToolTip="{l:Loc 'The worst second\'s 99th percentile in the window'}" />
+                            <GridViewColumnHeader Content="{l:Loc 'p99 ms'}" ToolTip="{l:Loc &quot;The worst second's 99th percentile in the window&quot;}" />
                         </GridViewColumn>
                         <GridViewColumn Width="90" DisplayMemberBinding="{Binding MsPerSecond, StringFormat=0.##}">
                             <GridViewColumnHeader Content="{l:Loc 'ms/s'}" ToolTip="{l:Loc 'Server time per second, all connections together; waits (queues, gates, locks) count their waiting time'}" />

@@ -23,7 +23,9 @@ public sealed record RepositoryLookupResult(UpstreamHead? Upstream, DiscoveredRe
 
 public static class GitRepositoryProbe
 {
-    public const string UpstreamUrl = "https://github.com/LocalExile/LocalExile.git";
+    /// <summary>The repository the checkout follows: this build's own fork, not the project it was forked from, so the
+    /// Versions section compares and fetches against the place its commits are pushed to.</summary>
+    public const string UpstreamUrl = "https://github.com/mingyue8621/LocalExile.git";
 
     public static UpstreamHead? ParseUpstream(string output)
     {

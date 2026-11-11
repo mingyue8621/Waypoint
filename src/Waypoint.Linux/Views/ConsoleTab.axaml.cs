@@ -9,8 +9,9 @@ namespace Waypoint;
 
 /// <summary>
 /// Dev commands for the character in game. "/" opens the command list (the built Gateway's, with each usage), pinned lines
-/// are buttons, ↑↓ is the history. On Windows a checkout's line goes through the client control bridge, which needs Frida
-/// and does not work under Proton yet, so here every line is copied for the game's chat, as a release's is on Windows.
+/// are buttons, ↑↓ is the history. A line runs on the Gateway's own console channel (data/console.json) and its replies are
+/// shown; a Gateway without that channel leaves it copied for the game's chat. The client control bridge needs Frida and does
+/// not work under Proton yet, so it is not used here.
 /// </summary>
 partial class ConsoleTab : UserControl
 {
@@ -41,16 +42,16 @@ partial class ConsoleTab : UserControl
         ShowLanguage();
     }
 
-    /// <summary>The texts Windows gives through {l:Loc}. A line is copied, for the game's chat.</summary>
+    /// <summary>The texts Windows gives through {l:Loc}. A line runs on the servers, or is copied for the game's chat.</summary>
     void ShowLanguage()
     {
         ReloadButton.Content = L.Text("Reload commands");
         ToolTip.SetTip(ReloadButton, L.Text("GameServer.Gateway commands: the built Gateway's list"));
-        State.Text = L.Text("Copy a command, then paste it into the game's chat with Ctrl+V.");
+        State.Text = L.Text("Commands run on the servers when their console channel is there; otherwise the line is copied for the game's chat.");
         PinnedLabel.Text = L.Text("Pinned:");
         PinButton.Content = L.Text("★ Pin");
         ToolTip.SetTip(PinButton, L.Text("Pin this line as a button (right-click a pinned button to remove it)"));
-        SendButton.Content = L.Text("Copy");
+        SendButton.Content = L.Text("Send");
         ToolTip.SetTip(Input, L.Text("/ lists the commands, then each argument's values (areas, monsters, items, gems …): ↑↓ choose, Tab or Enter take one. Without a list ↑↓ go through the history. Text without / is a chat line."));
         ToolTip.SetTip(CommandFilter, L.Text("Filter the commands by name or description"));
         CommandNote.Text = L.Text("Double-click a command to put it in the line.");
@@ -225,6 +226,14 @@ partial class ConsoleTab : UserControl
         _historyIndex = _shared.Settings.History.Count;
         Input.Clear();
         SuggestionPopup.IsOpen = false;
+        // A command runs on the Gateway itself when it has the console channel (data/console.json): no client, no copy and
+        // paste, and the replies come back as lines.
+        if (text.StartsWith('/') && await ServerConsole.PortAsync() is { } port)
+        {
+            Append($"> {text}");
+            await RunOnServer(port, text);
+            return;
+        }
         if (TopLevel.GetTopLevel(this)?.Clipboard is not { } clipboard)
         {
             Problem(L.Text("The clipboard is not available."));
@@ -236,6 +245,38 @@ partial class ConsoleTab : UserControl
             Append(L.Text("Copied: {0}", text));
         }
         catch (Exception ex) when (ex is InvalidOperationException or TimeoutException or IOException or System.Runtime.InteropServices.ExternalException)
+        {
+            Problem(ex.Message);
+        }
+    }
+
+    /// <summary>Runs the line on the Gateway and shows what it answered.</summary>
+    async Task RunOnServer(int port, string text)
+    {
+        try
+        {
+            var reply = await ServerConsole.RequestAsync(port, new System.Text.Json.Nodes.JsonObject
+            {
+                ["op"] = "run",
+                ["line"] = text,
+            }, TimeSpan.FromSeconds(90));
+            if (reply["ok"]?.GetValue<bool>() != true)
+            {
+                string error = reply["error"]?.GetValue<string>() ?? "";
+                Problem(error switch
+                {
+                    "no_player" => L.Text("no character is in game: log in, enter an area, then send again."),
+                    "not_a_command" => L.Text("the console runs /commands; a chat line goes through the game."),
+                    _ => error,
+                });
+                return;
+            }
+            if (reply["character"]?.GetValue<string>() is { Length: > 0 } character) Append("  " + L.Text("on {0}", character));
+            if (reply["lines"] is not System.Text.Json.Nodes.JsonArray lines || lines.Count == 0) { Append("  " + L.Text("(no reply)")); return; }
+            foreach (var line in lines) Append($"  {line?.GetValue<string>()}");
+        }
+        catch (Exception ex) when (ex is System.Net.Sockets.SocketException or IOException or TimeoutException
+            or System.Text.Json.JsonException or InvalidOperationException or ObjectDisposedException)
         {
             Problem(ex.Message);
         }

@@ -51,7 +51,7 @@ public partial class SetupTab : UserControl
         ToolTip.SetTip(ChangeButton, L.Text("Pick another LocalExile server checkout; Waypoint starts again on it"));
         CheckButton.Content = L.Text("Check again");
         PrepareButton.Content = L.Text("Prepare client");
-        ToolTip.SetTip(PrepareButton, L.Text("Creates the missing login keys and Game.patched.exe in your client copy; existing ones are kept"));
+        ToolTip.SetTip(PrepareButton, L.Text("Checks your client copy and repairs stale executables from a verified original; keeps login keys and backs up replaced files"));
         DependenciesButton.Content = L.Text("Install dependency");
         ToolTip.SetTip(DependenciesButton, L.Text("npm ci in the checkout's Tools/ooz"));
         CreateAccountButton.Content = L.Text("Create account…");
@@ -106,19 +106,29 @@ public partial class SetupTab : UserControl
         if (Busy()) return;
         var owner = Ui.Owner(this);
         string current = Environment.CurrentDirectory;
+        // The folder the settings name: the guide saves its own as it goes.
+        string? saved = _shared.Settings.ServerPath;
         var guide = new SetupWizard(_shared.Settings, owner, current, newCopy, release, newest);
         await _shared.RunExclusiveAsync(L.Text("Setup guide"), () => Ui.ShowAsync(guide, owner));
-        if (guide.Checkout is { } checkout && !checkout.Equals(current, StringComparison.Ordinal))
+        bool elsewhere = false;
+        if (guide.Checkout is { } checkout && !Editions.SameFolder(checkout, current))
         {
-            // The guide has saved its checkout already; SwitchServer acts on a change.
-            _shared.Settings.ServerPath = current;
-            _shared.Settings.CreateAccountOnStart = guide.CreateAccountNext;
-            App.SwitchServer(owner!, _shared.Settings, checkout);
-            return;
+            // The guide has saved its folder already, and the change of folder can still be turned down (the game runs,
+            // say). Until Waypoint starts again on the other folder the settings name the one they named before, and the
+            // account to create is noted only with the change.
+            _shared.Settings.ServerPath = saved;
+            _shared.Settings.Save();
+            if (await App.SwitchServerAsync(owner!, _shared, checkout, createAccount: guide.CreateAccountNext)) return;
+            // The guide's folder is in the sidebar's list from now on, which is the way to it.
+            if (FolderList.Add(_shared.Settings, checkout)) _shared.Settings.Save();
+            Dialog.Tell(owner, DialogKind.Info, L.Text("The folder was not changed"),
+                L.Text("Waypoint stays on this folder. The setup guide's folder, {0}, is in the folder list at the top of the sidebar: choose it there to open it.", checkout));
+            elsewhere = true;
         }
         SetupFinished?.Invoke();
         await _shared.Workspace.RefreshAsync();
-        if (guide.CreateAccountNext) CreateAccountRequested?.Invoke();
+        // An account asked for at the end of the guide is the other folder's.
+        if (guide.CreateAccountNext && !elsewhere) CreateAccountRequested?.Invoke();
     }
 
     async void FindCheckout(object? sender, RoutedEventArgs e)
@@ -127,12 +137,12 @@ public partial class SetupTab : UserControl
         var owner = Ui.Owner(this);
         var dialog = new CheckoutDialog(owner, _shared.Settings.ServerPath);
         await Ui.ShowAsync(dialog, owner);
-        if (dialog.Chosen is not null) App.SwitchServer(owner!, _shared.Settings, dialog.Chosen);
+        if (dialog.Chosen is not null) await App.SwitchServerAsync(owner!, _shared, dialog.Chosen);
     }
 
-    void ChangeCheckout(object? sender, RoutedEventArgs e)
+    async void ChangeCheckout(object? sender, RoutedEventArgs e)
     {
-        if (!Busy()) App.SwitchServer(Ui.Owner(this)!, _shared.Settings);
+        if (!Busy()) await App.SwitchServerAsync(Ui.Owner(this)!, _shared);
     }
 
     bool Busy()

@@ -68,9 +68,11 @@ sealed class StatusLight(Service service, string name, bool optional = false) : 
 
 public partial class MainWindow : Window
 {
-    readonly Shared _shared = new();
+    readonly Shared _shared;
     readonly Tray _tray = new();
-    readonly Section[] _sections;
+    Section[] _sections;
+    /// <summary>Pages reachable through a button but not listed in the sidebar (LocalExileServer.exe's install pages).</summary>
+    FrameworkElement[] _notListed = [];
     readonly StatusLight[] _lights =
     [
         new(Service.Patch, "Patch"), new(Service.Gateway, "Gateway"), new(Service.Auth, "Auth"), new(Service.Client, "Game"),
@@ -84,9 +86,17 @@ public partial class MainWindow : Window
     bool _hiddenForGame;
     string _operation = "";
 
-    public MainWindow()
+    public MainWindow() : this(null) { }
+
+    /// <summary>
+    /// A window of its own (流放之路服务端.exe): every section Waypoint has except the ones that install or update
+    /// LocalExile (Play, Install, Setup, Releases) and without the game's own Play, on the settings the caller loaded.
+    /// Waypoint's own start passes null and shares the App's settings.
+    /// </summary>
+    internal MainWindow(Settings? settings)
     {
         InitializeComponent();
+        _shared = settings is null ? new Shared() : new Shared(settings);
         InitializeWindowFrame();
         Control.Attach(_shared);
         PlayView.Attach(_shared, Control);
@@ -107,11 +117,21 @@ public partial class MainWindow : Window
         ConsoleView.Attach(_shared);
         ToolsView.Attach(_shared);
         SettingsView.Attach(_shared);
+        Folders.Attach(_shared);
         Lights.ItemsSource = _lights;
 
         _tray.ShowRequested += ShowFromTray;
         _tray.StopAllRequested += async () => await _shared.StopAllAsync(_ => { });
         _tray.ExitRequested += () => { ShowFromTray(); _explicitExit = true; Close(); };
+        // Waypoint stops what runs before it leaves this folder (Shared.Leaving): until that has ended the window is not
+        // usable, as when it stops what runs before it closes. A change of folder that does not go on gives it back.
+        string? title = null;
+        _shared.LeavingChanged += () =>
+        {
+            IsEnabled = !_shared.Leaving;
+            if (_shared.Leaving) { title = Title; Title = L.Text("Waypoint: stopping …"); }
+            else if (title is not null) Title = title;
+        };
         _shared.Monitor.Sampled += samples => Dispatcher.BeginInvoke(() =>
         {
             ClientSeen(samples.Any(s => s.Service == Service.Client && s.Running));
@@ -146,33 +166,53 @@ public partial class MainWindow : Window
             new("Tools", PackIconKind.Toolbox, ToolsView),
             new("Settings", PackIconKind.CogOutline, SettingsView),
         ];
+        // LocalExileServer.exe: the servers' sections. The pages that install or update LocalExile, the setup guide and the
+        // game's own Play stay out of the sidebar (LocalExileClient.exe starts the game), but they stay in `_sections`: the
+        // Control section's own buttons open them — a release install's 启动服务器 goes to its Play/Install page, whose
+        // start is LocalExile.exe — and ShowSection looks a view up there.
+        if (settings is not null)
+        {
+            _notListed = [PlayView, InstallView, Setup, ReleasesView];
+            Control.PlayButton.Visibility = Visibility.Collapsed;
+            Control.ChangeServerButton.Visibility = Visibility.Collapsed;
+            Control.GuidedSetupButton.Visibility = Visibility.Collapsed;
+            Control.NewCopyButton.Visibility = Visibility.Collapsed;
+        }
         ShowMode();
         Versions.Switched += CheckoutMoved;
         PlayView.CheckoutChanged += CheckoutMoved;
         PlayView.SetupRequested += Setup.OpenSetupGuide;
         PlayView.DetailsRequested += () => ShowSection(LogsView);
         InstallView.SetupRequested += Setup.OpenSetupGuide;
+        Control.ClientGuideRequested += Setup.OpenSetupGuide;
+        InstallView.OlderReleaseRequested += Setup.SetUpRelease;
+        InstallView.Updated += () =>
+        {
+            _exileRelease = null;
+            ExileUpdateBar.Visibility = Visibility.Collapsed;
+            // The release in this folder is another version now.
+            Folders.ShowCurrent();
+        };
         InstallView.DetailsRequested += () => ShowSection(LogsView);
         ReleasesView.CheckRequested += () => _ = CheckForUpdates(manual: true);
-        PlayView.ChangeFolderRequested += Setup.ChangeFolder;
-        InstallView.ChangeFolderRequested += Setup.ChangeFolder;
         ReleasesView.ChangeFolderRequested += Setup.ChangeFolder;
-        PlayView.NewCopyRequested += Setup.SetUpNewCopy;
-        // Simple mode's Release | Latest switch, when the other side is not set up yet.
-        foreach (var edition in new[] { PlayView.Edition, InstallView.Edition })
+        Folders.NewCopyRequested += Setup.SetUpNewCopy;
+        // The choice page's "Use Advanced mode": this copy is shown in Advanced mode from now on. The choice made on a
+        // release (Developer Mode, Simple or Advanced) is not touched.
+        PlayView.AdvancedRequested += () =>
         {
-            edition.ReleaseSetupRequested += Setup.SetUpRelease;
-            edition.LatestSetupRequested += Setup.SetUpLatest;
-        }
-        InstallView.NewCopyRequested += Setup.SetUpNewCopy;
+            _shared.Settings.SourceChoiceMade = true;
+            _shared.Settings.Save();
+            _shared.Logs.Write("choice on a source copy: Advanced mode", Severity.Info);
+            ShowMode();
+        };
+        // Simple mode's Tools page leads to the two sections its list leaves out.
+        ToolsView.ConsoleRequested += () => ShowSection(ConsoleView);
+        ToolsView.LogsRequested += () => ShowSection(LogsView);
+        // The choice page's "Switch to the release…".
+        PlayView.ReleaseRequested += () => GoTo(release: true);
         ReleasesView.NewCopyRequested += Setup.SetUpNewCopy;
         Control.NewCopyRequested += Setup.SetUpNewCopy;
-        // The crafter needs a source copy: the Latest one Waypoint knows, or a new one through the guide (its tested version).
-        ToolsView.NewCopyRequested += () =>
-        {
-            if (Editions.Folder(_shared.Settings, release: false) is null) Setup.SetUpNewCopy();
-            else InstallView.Edition.Choose(release: false);
-        };
         Control.InstallPlayRequested += () =>
         {
             ShowSection(InstallView);
@@ -239,14 +279,18 @@ public partial class MainWindow : Window
     /// list has it.</summary>
     void ShowMode()
     {
-        bool advanced = _shared.Settings.Advanced;
+        // The mode follows the folder: a release shows its user's choice, a source copy Advanced mode.
+        bool advanced = Editions.Advanced(_shared.Settings);
         // Play and Versions each have a checkout's view and a release install's.
         FrameworkElement[] others = Repo.IsInstall ? [PlayView, Versions] : [InstallView, ReleasesView];
-        var sections = _sections.Where(s => !others.Contains(s.View) && (advanced
+        var sections = _sections.Where(s => !others.Contains(s.View) && !_notListed.Contains(s.View) && (advanced
             ? s.View is GameSystemsTab || s.View is ControlTab or VersionsTab or ReleasesTab or ModsTab or BackupsTab or AccountsTab or PerformanceTab or TimingsTab or LogsTab or ConsoleTab or ToolsTab or SettingsTab
-            : s.View is GameSystemsTab && !Repo.IsInstall || s.View is PlayTab or InstallTab or ModsTab or BackupsTab or AccountsTab or LogsTab or ConsoleTab or ToolsTab or SettingsTab)).ToArray();
-        // Developer Mode (Settings) unlocks the switch.
-        ModeSwitch.Visibility = _shared.Settings.Developer ? Visibility.Visible : Visibility.Collapsed;
+            // Simple mode's one list, Modules and Leagues among it: a release takes their changes too (the adapter's
+            // Get-ContentEnvironment says which). Console and Logs open from Tools: ShowSection shows a section that is
+            // not listed.
+            : s.View is GameSystemsTab || s.View is PlayTab or InstallTab or ModsTab or BackupsTab or AccountsTab or ToolsTab or SettingsTab)).ToArray();
+        // Developer Mode (Settings) unlocks the switch; this launcher's own modes do their hiding with _notListed instead.
+        ModeSwitch.Visibility = !Repo.IsInstall && _shared.Settings.Developer ? Visibility.Visible : Visibility.Collapsed;
         var shown = Sections.SelectedItem as Section;
         Sections.ItemsSource = sections;
         Sections.SelectedItem = sections.Contains(shown) ? shown : sections[0];
@@ -254,14 +298,28 @@ public partial class MainWindow : Window
         BranchChip.Visibility = advanced && !Repo.IsInstall ? Visibility.Visible : Visibility.Collapsed;
         SimpleMode.IsChecked = !advanced;
         AdvancedMode.IsChecked = advanced;
+        ToolsView.ShowMode(simple: !advanced);
         SettingsView.ShowMode();
     }
 
-    /// <summary>The sidebar's switch.</summary>
+    /// <summary>To the release Waypoint remembers, or to its source copy ("Latest"), with the one question of that switch
+    /// (<see cref="Editions.PrepareAsync"/>); the setup guide when there is none yet. The sidebar's list is the everyday
+    /// way between folders: this is for the two places that name a side, not a folder.</summary>
+    async void GoTo(bool release)
+    {
+        var (step, folder) = await Editions.PrepareAsync(_shared, release, (kind, title, message, buttons) => Dialog.Show(this, kind, title, message, null, buttons));
+        if (step == EditionStep.SetUpRelease) Setup.SetUpRelease();
+        else if (step == EditionStep.SetUpLatest) Setup.SetUpLatest();
+        // PrepareAsync has made sure nothing runs.
+        else if (step == EditionStep.Switch) await App.SwitchServerAsync(this, _shared, folder, asked: true);
+    }
+
+    /// <summary>The sidebar's switch, which only a release shows. ShowMode also sets these buttons, on a source copy to
+    /// the mode worked out from the folder: that must never be saved as the choice made on a release.</summary>
     void ModeChosen(object sender, RoutedEventArgs e)
     {
         bool advanced = AdvancedMode.IsChecked == true;
-        if (advanced == _shared.Settings.Advanced) return;
+        if (!Repo.IsInstall || advanced == _shared.Settings.Advanced) return;
         _shared.Settings.AdvancedMode = advanced;
         _shared.Settings.Save();
         ShowMode();
@@ -270,6 +328,7 @@ public partial class MainWindow : Window
     void CheckoutMoved()
     {
         BranchName.Text = Repo.Branch() ?? L.Text("no git checkout");
+        Folders.ShowCurrent();
         _ = Control.RefreshSetup();
         _ = _shared.Workspace.RefreshAsync();
     }
@@ -304,6 +363,9 @@ public partial class MainWindow : Window
     void OpenControlSection(object sender, RoutedEventArgs e) => ShowSection(Control);
 
     void OpenSettingsSection(object sender, RoutedEventArgs e) => ShowSection(SettingsView);
+
+    /// <summary>The header's button, in both modes: the report for whoever asked for the logs.</summary>
+    void ReportProblem(object sender, RoutedEventArgs e) => DiagnosticPreviewDialog.Show(this, _shared);
 
     /// <summary>Ctrl+1 to Ctrl+9 and Ctrl+(Shift+)Tab choose a section, F5 inspects the checkout again, Ctrl+Shift+R restores
     /// the default appearance: the way back from a palette that left the window unreadable.</summary>
@@ -364,10 +426,14 @@ public partial class MainWindow : Window
     /// <summary>An adapter operation failed: what, why, and its log.</summary>
     void ShowFailure(string stage, string message, string? log)
     {
+        bool hasLog = log is not null && File.Exists(log);
+        // Enter stays what it was: the log when there is one, else Close.
         int chosen = Dialog.Show(this, DialogKind.Error, L.Text(stage) + L.Text(" failed: "), L.Describe(message), null,
-            log is not null && File.Exists(log) ? [L.Text("Open log"), L.Text("Close")] : [L.Text("Close")]);
-        if (chosen == 0 && log is not null && File.Exists(log))
-            Process.Start(new ProcessStartInfo("notepad.exe") { ArgumentList = { log }, UseShellExecute = false })?.Dispose();
+            hasLog ? [L.Text("Open log"), L.Text("Diagnostic report"), L.Text("Close")] : [L.Text("Diagnostic report"), L.Text("Close")],
+            hasLog ? 0 : 1);
+        if (hasLog && chosen == 0)
+            Process.Start(new ProcessStartInfo("notepad.exe") { ArgumentList = { log! }, UseShellExecute = false })?.Dispose();
+        else if (chosen == (hasLog ? 1 : 0)) DiagnosticPreviewDialog.Show(this, _shared);
     }
 
     /// <summary>The header's button goes Light, Dark, System and keeps the rest of the appearance.</summary>
@@ -496,6 +562,13 @@ public partial class MainWindow : Window
             Dialog.Tell(this, DialogKind.Info, L.Text("Close the game first"), L.Text("LocalExile can only be updated while the game and its servers are closed. Close the game, wait for the servers to stop, then press Update now again."));
             return;
         }
+        // A release for a newer client than the only one on this PC would leave the player unable to play (ClientUpdate).
+        string clientFolder = Path.Combine(Environment.CurrentDirectory, "Client");
+        if (ClientUpdate.ClientOf(release) is { } needs && Directory.Exists(clientFolder) && ClientLocator.BuildOf(clientFolder) is { } have
+            && ClientLocator.IsOlder(have, needs) && await Task.Run(() => ClientUpdate.FindClient(needs, default)) is null
+            && Dialog.Ask(this, DialogKind.Warning, L.Text("Keep this version?"),
+                L.Text("LocalExile {0} needs the Path of Exile {1} client, and this PC has only {2}. After this update you could not play until you have a {1} client.", release.Version, needs, have),
+                L.Text("Keep this version"), L.Text("Update anyway"))) return;
         if (!Dialog.Ask(this, DialogKind.Question, L.Text("Update LocalExile to {0}?", release.Version),
                 L.Text("Waypoint downloads {0:0} MB, checks it, and puts it over this install. Your characters, keys and game client are kept, and your saves are copied first when Automatic backups is on. The next Play may extract game data again.", release.ZipBytes / 1e6),
                 L.Text("Update"))) return;
@@ -594,9 +667,15 @@ public partial class MainWindow : Window
         if (_deciding) { e.Cancel = true; return; }
         var settings = _shared.Settings;
         bool sessionEnding = Application.Current is App { IsSessionEnding: true };
+        // Waypoint is stopping what runs before it leaves this folder, and closes by itself when that has ended. Nothing
+        // is asked or said meanwhile: a question open when the wait ends would keep the window from closing.
+        if (_shared.Leaving && !sessionEnding) { e.Cancel = true; _explicitExit = false; return; }
         bool anything = _shared.Monitor.Latest.Any(s => s.Running && s.Service.Kind is not ServiceKind.Recorder);
         var action = WindowClosePolicy.Decide(settings.ForBridge, _shared.IsLiveRunning, _explicitExit, sessionEnding);
         _explicitExit = false;
+        // Taken for this close alone: a close that is refused must not leave it for the next one.
+        bool? stopOverride = _stopOverride;
+        _stopOverride = null;
         if (action == WindowCloseAction.Ask && !anything && !settings.CloseToTray && !settings.AlwaysAskOnClose) action = WindowCloseAction.Exit;
         switch (action)
         {
@@ -614,8 +693,7 @@ public partial class MainWindow : Window
                 Dialog.Tell(this, DialogKind.Info, L.Text("{0} is still running", _shared.BusyWith), L.Text("Close Waypoint when it is done."));
                 return;
         }
-        bool stop = _stopOverride ?? settings.StopServicesOnExit;
-        _stopOverride = null;
+        bool stop = stopOverride ?? settings.StopServicesOnExit;
         if (stop && anything && !sessionEnding)
         {
             e.Cancel = true;
@@ -632,10 +710,13 @@ public partial class MainWindow : Window
         await Accounts.CreateAccountAsync();
     }
 
-    /// <summary>A real exit, whatever closing the window is set to do.</summary>
+    /// <summary>A real exit, whatever closing the window is set to do: Waypoint starts again, on another folder say. What
+    /// runs is left as it is, whatever is set for an exit: whoever asked for the change has answered that already
+    /// ("Switch without stopping"), and stopping is not what starting again is for.</summary>
     internal void ExitNow()
     {
         _explicitExit = true;
+        _stopOverride = false;
         Close();
     }
 

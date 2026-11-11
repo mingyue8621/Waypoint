@@ -15,6 +15,7 @@ static class SetupChecks
         await LinksAsync(root, check);
         await SequenceAsync(check);
         await CloneAsync(root, check);
+        ExtractScope(root, check);
         check(Prerequisites.HasSdk("8.0.427 [C:\\sdk]\n10.0.403 [C:\\sdk]\n") && !Prerequisites.HasSdk("9.0.320 [C:\\sdk]\n"), "only a .NET 10 SDK counts");
         check(PythonLookup.VersionOf("Python 3.12.4") == new Version(3, 12, 4) && PythonLookup.VersionOf("Python 3.9.0b1") == new Version(3, 9, 0)
             && PythonLookup.VersionOf("Python was not found; run without arguments to install from the Microsoft Store") is null,
@@ -52,6 +53,23 @@ static class SetupChecks
         return folder;
     }
 
+    /// <summary>Setup extracts only what the servers read when the checkout's extract-data.ps1 takes -Servers.</summary>
+    static void ExtractScope(string root, Action<bool, string> check)
+    {
+        string Checkout(string name, string param)
+        {
+            string folder = Path.Combine(root, name);
+            Directory.CreateDirectory(Path.Combine(folder, "scripts", "dev"));
+            File.WriteAllText(Path.Combine(folder, "scripts", "dev", "extract-data.ps1"), $"# extracts game data\r\nparam({param})\r\n");
+            return folder;
+        }
+        check(SetupSequence.ExtractsForServers(Checkout("split", "[switch]$Force, [string[]]$Only = @(), [switch]$List, [string]$ExportManifest, [switch]$Servers")),
+            "a checkout whose extract-data.ps1 takes -Servers extracts only what the servers read");
+        check(!SetupSequence.ExtractsForServers(Checkout("before-split", "[switch]$Force, [string[]]$Only = @(), [switch]$List, [string]$ServersList")),
+            "a checkout from before the split, or a longer name that starts with Servers, extracts everything");
+        check(!SetupSequence.ExtractsForServers(Path.Combine(root, "no-checkout")), "no extract-data.ps1 extracts everything");
+    }
+
     static void Classify(string root, Action<bool, string> check)
     {
         string standalone = Client(root, "standalone", ("Content.ggpk", 10), ("PathOfExile.exe", 10));
@@ -61,7 +79,7 @@ static class SetupChecks
         check(ClientLocator.Classify(standalone) == ClientKind.Standalone && ClientLocator.Classify(ready) == ClientKind.Ready, "a standalone client and a prepared one are told apart");
         check(ClientLocator.Classify(steam) == ClientKind.Unsupported && ClientLocator.Describe(steam) is { Usable: false }, "a Steam layout is found, and reported as unusable");
         check(ClientLocator.Classify(empty) is null && ClientLocator.Describe(empty) is null, "a folder without a client is not one");
-        check(ClientLocator.IsKnownBuild(standalone) == false && ClientLocator.IsKnownBuild(empty) is null, "an executable of another size is not the 3.29.3b build");
+        check(ClientLocator.IsKnownBuild(standalone) == false && ClientLocator.IsKnownBuild(empty) is null, "an executable of another size is not the build LocalExile needs");
     }
 
     static async Task CopyAsync(string root, Action<bool, string> check)

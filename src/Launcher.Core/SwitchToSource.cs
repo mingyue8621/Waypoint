@@ -4,7 +4,7 @@ namespace Launcher.Core;
 /// <param name="Accounts">The accounts found in the release, negative when they could not be read; <paramref name="Characters"/> the same.</param>
 /// <param name="CopyClientGb">The size of a client copy still to make; 0 when none is.</param>
 public sealed record SwitchChoices(string Copy, string Old, bool Download, bool BringCharacters, int Accounts, int Characters,
-    bool KeepOld, bool TestedVersion, bool GiveItem, bool SharesClient, double CopyClientGb, bool CopyHasSaves, bool OwnSettings = false);
+    bool KeepOld, bool TestedVersion, bool SharesClient, double CopyClientGb, bool CopyHasSaves, bool OwnSettings = false);
 
 /// <summary>A line of "What will happen".</summary>
 public sealed record SwitchLine(string Text, bool Attention = false);
@@ -16,18 +16,19 @@ public sealed record ReleaseToRemove(string Old, string Copy, bool Played = fals
 public sealed record RemovedRelease(bool ClientMoved);
 
 /// <summary>
-/// Moving from a release to a source copy, which has what no release has yet (the item crafter, for one). The release is only
-/// read until the player, having played on the copy, asks for it to be removed. The saves are copied by the adapter
+/// Moving from a release to a source copy, which has LocalExile's source to change and build. The release is only
+/// read until the player, having played on the copy, asks for it to be removed (Control's question). The saves are copied by the adapter
 /// (<c>ImportSaves</c>); never one database for both, because a newer server may write saves an older release cannot read.
 /// </summary>
 public static class SwitchToSource
 {
-    /// <summary>The LocalExile commit this Waypoint was tested with: a release's database opened on it, and an item was given.</summary>
-    public const string TestedCommit = "dfcdc8f3786f2839d7ab0dcfaada796a5ebdf214";
-    /// <summary>A branch of the copy's own at that commit: only a plain copy on the default branch is moved by Play.</summary>
+    /// <summary>The LocalExile commit this Waypoint was tested with (v0.4.2-beta): a release's database opened on it, and an
+    /// item was given through the Waypoint Tools mod, which needs v0.4.0-beta or later (mods reaching what modules reach).</summary>
+    public const string TestedCommit = "a6e3b6a26b752ea53d0f3e94ac1f0d7883fa6637";
+    /// <summary>A branch of the copy's own at that commit, apart from the default branch its user updates from Versions.</summary>
     public const string TestedBranch = "waypoint-tested";
-    /// <summary>What the game's chat box takes, measured: the rest of a longer line is lost. The client control bridge sends
-    /// the same message without it, so Give item needs Frida for all but the smallest items.</summary>
+    /// <summary>What the game's chat box takes, measured: the rest of a longer line is lost, so the item crafter's copied
+    /// command is too long for most items, and Give item goes through the Waypoint Tools mod instead.</summary>
     public const int ChatBoxLimit = 175;
 
     /// <summary>What a release holds besides the player's data, client and mods. Anything else stays.</summary>
@@ -37,15 +38,31 @@ public static class SwitchToSource
     /// <summary>What the adapter writes last, so that the guide run again never copies over newer progress.</summary>
     public static bool SavesBrought(string copy) => File.Exists(Path.Combine(copy, "data", "saves-brought.json"));
 
+    /// <summary>The branch of a copy on the last LocalExile made for an older client (<see cref="ClientLocator.LastVersionFor"/>):
+    /// like <see cref="TestedBranch"/>, a branch of the copy's own.</summary>
+    public static string OlderBranch(string build) => "waypoint-" + build;
+
+    /// <summary>The copy is on a version of its own, which stays until its user moves it from Versions: the tested one, or
+    /// the one for an older client.</summary>
     public static bool OnTestedVersion(string copy)
     {
-        try { return File.ReadAllText(Path.Combine(copy, ".git", "HEAD")).Trim() == $"ref: refs/heads/{TestedBranch}"; }
+        try
+        {
+            string head = File.ReadAllText(Path.Combine(copy, ".git", "HEAD")).Trim();
+            return head == $"ref: refs/heads/{TestedBranch}" || ClientLocator.OlderBuilds.Any(b => head == $"ref: refs/heads/{OlderBranch(b)}");
+        }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException) { return false; }
     }
 
-    public static async Task ChooseTestedVersionAsync(string copy, Action<string> output, CancellationToken stop)
+    /// <summary>A new copy onto the tested version, or with <paramref name="build"/> onto the last LocalExile made for that
+    /// older client.</summary>
+    public static async Task ChooseTestedVersionAsync(string copy, Action<string> output, CancellationToken stop, string? build = null)
     {
-        int code = await ToolProcess.RunAsync("git", ["-C", copy, "switch", "--no-track", "-c", TestedBranch, TestedCommit], null, output, stop);
+        string branch = TestedBranch, commit = TestedCommit;
+        if (build is not null && ClientLocator.LastVersionFor(build) is { } older) (branch, commit) = (OlderBranch(build), older.Commit);
+        // A copy that was on that branch before goes back to it as it is.
+        bool made = await ToolProcess.RunAsync("git", ["-C", copy, "rev-parse", "--verify", "--quiet", "refs/heads/" + branch], null, _ => { }, stop) == 0;
+        int code = await ToolProcess.RunAsync("git", made ? ["-C", copy, "switch", branch] : ["-C", copy, "switch", "--no-track", "-c", branch, commit], null, output, stop);
         if (code != 0) throw new IOException(L.Text("The older version could not be chosen (git exit {0}).", code));
     }
 
@@ -96,9 +113,7 @@ public static class SwitchToSource
             if (c.CopyHasSaves) lines.Add(new(L.Text("The characters already in {0} are backed up and set aside.", c.Copy), true));
         }
         else lines.Add(new(L.Text("Start with no accounts or characters. You create an account at the end.")));
-        lines.Add(c.GiveItem ? new(L.Text("Install Frida, so that Give item works."))
-            : new(L.Text("Leave out Frida. Waypoint offers it again when you press Give item."), true));
-        if (c.Download) lines.Add(c.TestedVersion ? new(L.Text("Keep the older version; it won't update.")) : new(L.Text("Update to the newest changes once a day."), true));
+        if (c.Download) lines.Add(c.TestedVersion ? new(L.Text("Keep the older version; it won't update.")) : new(L.Text("Start on the newest changes. You update the copy yourself from Versions."), true));
         if (c.KeepOld) lines.Add(new(L.Text("Leave your current LocalExile as it is. Each copy keeps its own progress.")));
         else
         {
@@ -113,9 +128,8 @@ public static class SwitchToSource
     {
         var text = new List<string> { L.Text("Your new copy is in {0}. Press Play in Waypoint to start it.", c.Copy) };
         if (c.BringCharacters) text.Add(L.Text("Your characters came with you, so log in as usual. Mods you added yourself did not: they are still in your old folder."));
-        text.Add(L.Text("The item crafter is in Tools."));
-        text.Add(c.KeepOld ? L.Text("To go back to your other LocalExile, use Change folder… on Play and choose {0}.", c.Old)
-            : L.Text("Your old LocalExile is still in {0}. After you have played, Play asks whether to delete it.", c.Old));
+        text.Add(c.KeepOld ? L.Text("To go back to your other LocalExile, use Change… on Control and choose {0}.", c.Old)
+            : L.Text("Your old LocalExile is still in {0}. After you have played, Control asks whether to delete it.", c.Old));
         if (c.SharesClient) text.Add(L.Text("The new copy uses the game files in {0}, so do not delete that folder yourself.", c.Old));
         return string.Join("\n\n", text);
     }

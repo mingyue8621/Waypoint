@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -34,11 +35,31 @@ public sealed record ModSource(string Owner, string Name, string Branch = "main"
     }
 }
 
-/// <summary>One mod of a repository's index.</summary>
+/// <summary>One mod of a repository's index. <paramref name="ClientVersions"/> are the LocalExile versions it declares it
+/// works with (its mod.json's <c>compatibleClientVersions</c>); empty when it declares none.</summary>
 public sealed record ModListing(string Id, string Name, string Description, string Author, string Version, string Kind,
-    bool IsProject, string Path, string[] Depends, bool HasSettings)
+    bool IsProject, string Path, string[] Depends, bool HasSettings, IReadOnlyList<string>? ClientVersions = null)
 {
     public ReleaseVersion? ParsedVersion => ReleaseVersion.Parse(Version);
+}
+
+/// <summary>Which LocalExile versions a mod says it works with: <c>compatibleClientVersions</c> in its mod.json (and the
+/// index), such as <c>["0.2.0-beta"]</c>. A mod that declares none, or a LocalExile whose version is unknown, is not judged.</summary>
+public static class ClientCompatibility
+{
+    public const string Field = "compatibleClientVersions";
+
+    /// <summary>The field's versions; anything that is not a list of text is read as none.</summary>
+    public static string[] Read(JsonElement field) => field.ValueKind == JsonValueKind.Array
+        ? field.EnumerateArray().Where(e => e.ValueKind == JsonValueKind.String).Select(e => e.GetString()!.Trim()).Where(v => v.Length > 0).Take(64).ToArray()
+        : [];
+
+    /// <summary>False only when the mod names its versions and <paramref name="client"/> is none of them.</summary>
+    public static bool Fits(IReadOnlyList<string>? declared, ReleaseVersion? client) =>
+        declared is not { Count: > 0 } || client is null || declared.Any(v => ReleaseVersion.Parse(v) is { } version && version.CompareTo(client) == 0);
+
+    /// <summary>The versions as a mod's row shows them: "0.2.0-beta, 0.3.0"; "" for none.</summary>
+    public static string Text(IReadOnlyList<string>? declared) => declared is { Count: > 0 } ? string.Join(", ", declared) : "";
 }
 
 /// <summary>A mod's published release: its zip and the SHA-256 GitHub records for it (or a ".sha256" file beside it).</summary>
@@ -92,7 +113,8 @@ public static class ModRepository
                 ? d.EnumerateArray().Where(e => e.ValueKind == JsonValueKind.String).Select(e => e.GetString()!).Where(ModCatalog.ValidId).ToArray() : [];
             result.Add(new(id, Text("name") is { Length: > 0 } name ? name : id, Text("description"), Text("author"), Text("version"),
                 Text("kind") is { Length: > 0 } kind ? kind : "feature", Text("type") == "project", path, depends,
-                mod.TryGetProperty("settings", out var s) && s.ValueKind == JsonValueKind.True));
+                mod.TryGetProperty("settings", out var s) && s.ValueKind == JsonValueKind.True,
+                ClientCompatibility.Read(mod.TryGetProperty(ClientCompatibility.Field, out var c) ? c : default)));
         }
         return result;
     }
@@ -147,6 +169,58 @@ public static class ModRepository
         return text.Length > 256 * 1024 ? text[..(256 * 1024)] : text;
     }
 
+    /// <summary>The file in a mod's folder that Waypoint draws in place of the mod's symbol.</summary>
+    public const string IconName = "icon.png";
+    const int MaxIconBytes = 1024 * 1024;
+    const int MaxIconSide = 1024;
+
+    /// <summary>Where Waypoint keeps a repository's icon for a mod, so it shows before the repository is read again.</summary>
+    public static string IconFile(ModSource source, string id) => Path.Combine(SettingsStore.DataDirectory, "mod-icons", source.Owner, source.Name, id + ".png");
+
+    /// <summary>A PNG of a size Waypoint will decode. Any repository can name a file here, and a small PNG can claim to be
+    /// enormous, so the header's size is checked before a decoder sees it.</summary>
+    public static bool IsIcon(ReadOnlySpan<byte> bytes)
+    {
+        ReadOnlySpan<byte> header = [0x89, (byte)'P', (byte)'N', (byte)'G', 13, 10, 26, 10, 0, 0, 0, 13, (byte)'I', (byte)'H', (byte)'D', (byte)'R'];
+        if (bytes.Length < 24 || bytes.Length > MaxIconBytes || !bytes.StartsWith(header)) return false;
+        uint width = BinaryPrimitives.ReadUInt32BigEndian(bytes[16..]), height = BinaryPrimitives.ReadUInt32BigEndian(bytes[20..]);
+        return width is > 0 and <= MaxIconSide && height is > 0 and <= MaxIconSide;
+    }
+
+    /// <summary>Brings <paramref name="file"/> up to date with the mod's icon.png: a mod without one, or with one that is no
+    /// icon, leaves no file. True when the file changed. A failed read throws and leaves the file as it was.</summary>
+    public static async Task<bool> RefreshIconAsync(HttpClient client, ModSource source, ModListing mod, string file, CancellationToken stop = default)
+    {
+        using var response = await client.GetAsync(source.FileUrl($"{mod.Path}/{IconName}"), HttpCompletionOption.ResponseHeadersRead, stop);
+        byte[]? icon = null;
+        if (response.StatusCode != System.Net.HttpStatusCode.NotFound)
+        {
+            response.EnsureSuccessStatusCode();
+            using var bytes = new MemoryStream();
+            await using var input = await response.Content.ReadAsStreamAsync(stop);
+            var buffer = new byte[16 * 1024];
+            int read;
+            while ((read = await input.ReadAsync(buffer, stop)) > 0 && bytes.Length <= MaxIconBytes) bytes.Write(buffer, 0, read);
+            icon = IsIcon(bytes.GetBuffer().AsSpan(0, (int)bytes.Length)) ? bytes.ToArray() : null;
+        }
+        if (icon is null)
+        {
+            if (!File.Exists(file)) return false;
+            File.Delete(file);
+            return true;
+        }
+        if (File.Exists(file) && File.ReadAllBytes(file).AsSpan().SequenceEqual(icon)) return false;
+        Directory.CreateDirectory(Path.GetDirectoryName(file)!);
+        string temporary = $"{file}.{Guid.NewGuid():N}.tmp";
+        try
+        {
+            await File.WriteAllBytesAsync(temporary, icon, stop);
+            File.Move(temporary, file, overwrite: true);
+        }
+        finally { File.Delete(temporary); }
+        return true;
+    }
+
     /// <summary>The repository's index and releases. The index comes from raw.githubusercontent.com; the releases from
     /// GitHub's API, whose hourly limit without an account is low, so a failure there leaves Browse with the index alone.</summary>
     public static async Task<ModRepositoryView> ReadAsync(HttpClient client, ModSource source, CancellationToken stop = default)
@@ -176,7 +250,7 @@ public static class ModRepository
     public static async Task<StagedMod> DownloadReleaseAsync(HttpClient client, ModRelease release, Action<long, long>? progress, CancellationToken stop)
     {
         string? expected = release.Sha256;
-        if (expected is null && release.HashUrl is not null) expected = LocalExileReleases.HashOf(await client.GetStringAsync(release.HashUrl, stop));
+        if (expected is null && release.HashUrl is not null) expected = LocalExileReleases.HashOf(await GitHubDownload.GetStringAsync(client, release.HashUrl, stop));
         if (expected is null) throw new InvalidDataException(L.Text("release {0} has no SHA-256 for {1}; nothing was installed", release.Tag, release.ZipName));
         string work = NewWorkFolder();
         try
@@ -274,7 +348,7 @@ public static class ModRepository
 
     static async Task DownloadAsync(HttpClient client, string url, string path, Action<long, long>? progress, CancellationToken stop)
     {
-        using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, stop);
+        using var response = await GitHubDownload.GetAsync(client, url, stop);
         response.EnsureSuccessStatusCode();
         long total = response.Content.Headers.ContentLength ?? 0;
         if (total > MaxZipBytes) throw new InvalidDataException(L.Text("the download is larger than 64 MB; nothing was installed"));

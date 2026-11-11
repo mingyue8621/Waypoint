@@ -31,6 +31,15 @@ static class ModChecks
         check(ModCatalog.Read(stopped).Single().Fingerprint != alpha.Fingerprint, "changed binaries invalidate cached inventory fingerprints");
         Binary("beta", "{\"depends\":[\"missing\"]}");
         check(ModCatalog.Read(stopped).Single(m => m.Id == "beta").Status == "Dependency blocked", "missing dependencies are visible before launch");
+        // A mod may depend on a module (the Game module), which the Gateway resolves beside the mods: by its exact id.
+        Directory.CreateDirectory(Path.Combine(root, "Modules", "Core", "Game"));
+        File.WriteAllText(Path.Combine(root, "Modules", "Core", "Game", "module.json"), "{\"id\":\"Game\",\"assembly\":\"bin/game.dll\"}");
+        Binary("needsgame", "{\"depends\":[\"Game\"]}");
+        Binary("wrongcase", "{\"depends\":[\"game\"]}");
+        check(ModCatalog.Read(stopped).Single(m => m.Id == "needsgame").Status == "Gateway stopped"
+            && ModCatalog.Read(stopped).Single(m => m.Id == "wrongcase").Status == "Dependency blocked",
+            "a module dependency is met by a module's manifest, by its exact id");
+        foreach (string id in new[] { "needsgame", "wrongcase" }) Directory.Delete(Path.Combine(folder, id), recursive: true);
         Binary("escape", "{\"assembly\":\"../other.dll\"}");
         check(ModCatalog.Read(stopped).Single(m => m.Id == "escape").Status == "Invalid manifest", "manifest DLL paths cannot escape the selected mod folder");
         Binary("wrong", "{\"id\":\"other\"}");
@@ -63,12 +72,27 @@ static class ModChecks
                 SaveDatabase = database, CreatedUtc = "2026-10-30T00:00:00Z", Mods = new { Choices = "", Inventory = new[] { new { Id = "alpha", Manifest = "[]" } } }
             }));
             check(BackupCatalog.Read(database).Single().ModHistory.Contains("enable choice unknown"), "a broken mod manifest does not hide an otherwise readable save backup");
+            // From LocalExile's database split on: characters.db with auth.db, in the backup folder of the saves.db they came from.
+            string characters = Path.Combine(root, "data", "characters.db"), pair = Path.Combine(store, "20261031-000000-5678abcd");
+            Directory.CreateDirectory(pair);
+            File.WriteAllText(Path.Combine(pair, "characters.db"), "characters");
+            File.WriteAllText(Path.Combine(pair, "auth.db"), "auth");
+            File.WriteAllText(Path.Combine(pair, "backup.json"), JsonSerializer.Serialize(new { SaveDatabase = characters, CreatedUtc = "2026-10-31T00:00:00Z" }));
+            var split = stopped with { SaveDatabase = characters, EarlierSaveDatabase = database };
+            var both = BackupCatalog.Read(split);
+            check(BackupCatalog.DirectoryFor(split) == store && both.Length == 2 && both[0].Id == "20261031-000000-5678abcd" && both[0].Bytes == "characters".Length + "auth".Length,
+                "split saves list their own backups, both databases counted, and the older saves.db backups beside them");
+            check(BackupCatalog.Read(database).Length == 1, "an older LocalExile lists only the saves.db backups it can restore");
         }
         finally
         {
             File.Delete(Path.Combine(backup, "backup.json"));
             File.Delete(Path.Combine(backup, "saves.db"));
-            Directory.Delete(backup); Directory.Delete(store);
+            Directory.Delete(backup);
+            string pair = Path.Combine(store, "20261031-000000-5678abcd");
+            if (Directory.Exists(pair)) foreach (string name in new[] { "backup.json", "characters.db", "auth.db" }) File.Delete(Path.Combine(pair, name));
+            if (Directory.Exists(pair)) Directory.Delete(pair);
+            Directory.Delete(store);
         }
     }
 }

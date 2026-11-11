@@ -50,8 +50,10 @@ the selected profile's resolved database before backup or mutation; desktop regi
 binding. A profile/location change while a dialog is open requires another review. It shares the global runtime writer mutex,
 requires stopped/known runtime inventory, makes the configured automatic save backup and checks inventory again.
 `AccountBridge.ps1` invokes `AccountData.py` through a UTF-8 stdin pipe, without transcribing passwords. The helper
-checks known tables/fields/import state, starts an immediate transaction, rechecks the selected account revision,
-validates names/destinations and commits all related row changes together. Unknown layouts are read-only or rejected.
+checks known tables/fields/import state (a split layout opens characters.db with auth.db attached as `auth`, as the
+servers do, and knows both files' tables, `updates` included), starts an immediate transaction, rechecks the selected account revision,
+validates names/destinations and commits all related row changes together (across the two split files, each commits
+on its own: the backup before covers both). Unknown layouts are read-only or rejected.
 Password/copy operations additionally recognize the selected checkout's verifier format. LocalExile source and DLLs
 remain independent of the distributable launcher. Registration retains the upstream temporary-service workflow and
 now follows the same backup and account runtime gates.
@@ -109,6 +111,11 @@ Existing-profile databases must exist; never silently fall back to a new empty d
 
 Only standard local listener, client and archive paths are supported. Custom TLS/CDN settings fail preflight.
 Normal upstream operation uses `data/saves.db`; local-profile operation uses the profile's explicit existing database.
+A LocalExile with `sql/base/characters/` (a checkout or a release from LocalExile/LocalExile#758 on) splits it: accounts in
+`data/auth.db` and the rest in `data/characters.db` (`Game_AUTH_DB`, `Game_CHARACTERS_DB`; without `Game_AUTH_DB`, auth.db
+beside a `characters.db`, else `<name>-auth.db`, as `SaveDatabase.AuthPathFor` does). The snapshot's `SaveDatabase` is then
+characters.db and `AuthDatabase` its auth.db. Its first server start migrates an old `data/saves.db`; until then that file is
+the saves, and the snapshot names it `EarlierSaveDatabase` (only for the default characters.db, the one the servers migrate).
 All production game-data paths remain relative to the selected checkout.
 
 ## Identity, readiness and stopping
@@ -136,7 +143,7 @@ server/watch root. Unknown peers fail closed. It sends Ctrl+C, then exits. The a
 captured server/watch subtree to exit and reports failure without forcing termination.
 The game is closed by its window and checked process identity; service shutdown requires the game to be closed first.
 
-Start runs the upstream extraction script, builds missing selected services when no owned services are running,
+Start runs the upstream extraction script (with `-Servers` when the script declares it, as live.ps1 does), builds missing selected services when no owned services are running,
 then starts only verified missing services using upstream's standard Debug commands, root working directory,
 dedicated cmd consoles and checkout-specific logs. It sets the upstream Gateway-enter, packet-dump, watch-log
 and disabled-walkmaps environment defaults. Old logs for those services are archived without touching live services.
@@ -207,21 +214,29 @@ drive pending/applied/failed status; a successful build is not proof of applicat
 remain separate from historical log events. Auth/Patch, static initializers and extracted data have no generic reload guarantee.
 
 Save backups use Python's SQLite online backup API, including committed WAL pages, then `PRAGMA integrity_check`.
-They are keyed by canonical database path under the launcher's stable local data directory. Metadata records source
+A split layout's characters.db and auth.db are copied in one read transaction, so one backup holds the same moment of
+both; until its servers migrate it, the old saves.db is backed up as it is. Copies are left in rollback-journal mode, one
+file each. They are keyed by canonical database path under the launcher's stable local data directory; a default
+characters.db keeps the key of the `data/saves.db` it came from, so earlier backups stay listed. Metadata records source
 commit/branch at backup, requested source/fresh choice, time, and last Gateway build recorded at a successful launcher
 start. That build hash is not an attestation of later hot edits or external launches. Unknown history remains unknown.
 Automatic backups default on for current/fresh activation, build, Gateway startup/restart, data reload and restore;
-users may disable them in either relevant UI page. Manual backup bypasses that preference. No backup occurs per
+users may disable them in either relevant UI page. Manual backup bypasses that preference, and so does `ImportSaves`,
+which replaces every character of the target: its saves are always backed up first. `ImportSaves` also copies the
+source folder's `mod-state.txt` into a source checkout, and leaves a release's own as it is. No backup occurs per
 externally saved edit or watcher-triggered restart. Backup failure blocks the subsequent requested change.
 
 Restore validates the chosen backup and its save-store association, requires stopped owned runtime, backs up current
 saves when enabled, and replaces only saves. Fresh saves are created only after successful build. Replaced SQLite
 database/WAL/SHM files are moved to operation-local recovery even with automatic copying off. Redirected save/backup
-paths are refused. Deletion accepts only a validated backup ID in the selected store and its two known files; no broad
+paths are refused. A split backup restores both files; a saves.db backup into a split layout goes back as
+`data/saves.db` (its databases set aside) for the servers to migrate; an older LocalExile refuses a split backup or
+another installation's split saves. Deletion accepts only a validated backup ID in the selected store and its known files; no broad
 recursive deletion occurs. Client, keys, source and game-data overrides are outside a save snapshot.
 
-Explicit game-data reload uses upstream's optional native client helper for the owned client and ready Gateway. Only
-that disposable helper has captured streams (never live.ps1). The adapter waits for `Game data reloaded: revision N`
+Explicit game-data reload uses upstream's optional native client helper for the owned client and ready Gateway: it sends
+`/reload` to a split layout (world.db) and `/game_data reload` before it. Only that disposable helper has captured streams
+(never live.ps1). The adapter waits for `Game data reloaded: revision N`
 in the helper's new Gateway replies. A timeout, missing dependency or missing confirmation reports failure/uncertainty;
 the launcher never assumes submission means application. The helper never starts a game for this operation.
 
@@ -290,9 +305,16 @@ colours live solely in Waypoint's settings, scoped by checkout and flag; they ne
 `Content` in an inspection names the selected profile's `Game_MODULES_FOLDER`, `Game_LEAGUES_FOLDER` and
 `Game_LEAGUE_MODULES` paths (default Modules, Leagues and data/league-modules.json). `CanEditSettings` requires the source
 shared settings hook, `CanChoose` the source league-override hook, and `CanCreate` the source league loader for creation and
-visibility editing. Releases advertise none of these: the current release
-predates the downloadable-mod update and remains read-only for the new controls. InstallMod, UninstallMod and
-SaveModSettings are also refused on release installs, in both the adapter and the UI.
+visibility editing. A release has no source to inspect, so its version decides: from v0.2.0-beta on (the releases whose
+servers read `data/league-modules.json`, `data/modules/` and `data/leagues/` from the release's own folder) it has
+`CanChoose`, `CanEditSettings` and `CanCreate`, and an older release, or one with no readable version, has none. A release
+ships its leagues as source with the compiler that builds them, and an update writes only its zip's files, so a new
+league's folder stays. `ShippedLeaguesFixed` is true on a release: the leagues it came with are its own files, which an
+update writes over, so `SetLeagueVisibility` there takes only a league with a `.waypoint-league.json`. `LeagueData.py` runs
+under a release's bundled Python, the embeddable one, which does not look for modules beside a script: it adds its own
+folder to the module path before it imports `AccountData`. InstallMod, UninstallMod and
+SaveModSettings are refused on a release older than v0.2.0-beta (or of no readable version in its `release.json`), in both
+the adapter (`Test-LegacyReleaseMods`) and the UI; v0.2.0-beta and later take downloaded mods.
 
 `SaveContentSettings` takes a staged JSON object, ModId, ModTarget (Modules or Leagues) and ModExpectedHash. It verifies a
 unique physical manifest and declaration before writing only data/modules/<id>.json or data/leagues/<id>.json.
@@ -310,15 +332,15 @@ The helper accepts UTF-8 JSON requests with or without one leading BOM, includin
 Duplicate keys and malformed JSON remain rejected before configuration writes.
 
 `CreateLeague` requires the source league-loader hook (`CanCreate`), a new safe name, an empty marker template and isolated
-Void. The adapter checks stopped save writers before and after the optional backup. `LeagueData.py` opens the selected
-database read-only, verifies the known schema/import state and refuses retained league names in character and stash data.
+Void. It does not wait for save writers to stop: LocalExile reads its leagues once, when a server starts. `LeagueData.py` opens the selected
+database read-only (with a split layout's auth.db attached), verifies the known schema/import state and refuses retained league names in character and stash data.
 It writes only a new physical directory, with independent identity, Void transitions and unchanged template mode flags.
 An exclusive directory reservation and a final no-replace manifest publication prevent partial leagues from being loaded
 or existing leagues from being overwritten. This operation never changes existing league source, saves or runtime state.
 
 `SetLeagueVisibility` takes `league`, boolean `visible`, and `review`. It changes only the top-level `creatable` flag in
 existing definitions, preserving comments and all other fields. Card-link closure prevents orphaned mode options and the
-last playable main card cannot be hidden. Writers must be stopped before and after backup; the source-loader capability
+last playable main card cannot be hidden. Writers need not be stopped; the league-loader capability
 and current review inventory are required. Original definitions are retained, each replacement is atomic, and failures
 roll back only files still matching this operation's output. Ordering keeps intermediate card states valid. No save
 database is read or written for visibility. It is a global creation-list control, never per-account filtering or ending.

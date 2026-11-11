@@ -334,9 +334,20 @@ function Uninstall-Mod($snapshot) {
     }
     Write-Host ("Uninstalled " + ($ids -join ', ') + '.')
 }
+# A release before 0.2.0-beta keeps the mods it shipped with, built for an older mod API; 0.2.0-beta was the first to ship
+# an empty Mods\Binaries for downloaded mods. A release.json without a readable version counts as the older kind.
+function Test-LegacyReleaseMods {
+    if (-not $script:isRelease) { return $false }
+    try { $version = [string](Get-Content -LiteralPath (At 'release.json') -Raw | ConvertFrom-Json).version } catch { return $true }
+    if ($version -notmatch '^[vV]?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+.*)?$') { return $true }
+    $core = [version]"$($Matches[1]).$($Matches[2]).$($Matches[3])"
+    if ($core -ne [version]'0.2.0') { return $core -lt [version]'0.2.0' }
+    # 0.2.0 itself: an alpha came before the beta.
+    return $Matches[4] -and $Matches[4] -like 'alpha*'
+}
 function Invoke-ModOperation($snapshot) {
     if ($Action -in @('InstallMod','SaveModSettings','UninstallMod')) {
-        Require (-not $script:isRelease) 'This release does not declare compatibility with downloadable mods. Use a current source checkout to install or update mods.'
+        Require (-not (Test-LegacyReleaseMods)) 'This release does not declare compatibility with downloadable mods. Use a current source checkout to install or update mods.'
     }
     Require (-not $snapshot.Conflicts.Count) ($snapshot.Conflicts -join "`n")
     $environment = Get-ModEnvironment $snapshot.Services
@@ -368,15 +379,21 @@ function Invoke-ModOperation($snapshot) {
         return
     }
     if ($Action -in @('EnableMod','DisableMod')) {
-        if ($gatewayRunning) {
+        # Live control needs a client in a playable area and the native helper; a release has neither. Without them the
+        # choice is still worth saving: it applies at the Gateway's next start, and refusing it forced players to stop
+        # the servers just to tick a box.
+        $gameRunning = [bool]@($snapshot.Services | Where-Object { $_.Name -eq 'Game' -and $_.ProcessId }).Count
+        $liveCapable = $gatewayRunning -and $gameRunning -and (Test-Path -LiteralPath (At 'scripts/dev/client_control.py'))
+        if ($liveCapable) {
             Backup-Saves $snapshot
             $verb = if ($Action -eq 'EnableMod') { 'enable' } else { 'disable' }
             $report = Invoke-ModClientCommands @("/mod_$verb $ModId", '/mod') $snapshot
             if ($Action -eq 'EnableMod') { Require ($report -match ('(?m)^' + [regex]::Escape($ModId) + ' .+ - (feature|league|script), [0-9]+ hook\(s\)$')) 'The command was sent, but Gateway did not confirm this mod loaded. See Mods for the reason.' }
             else { Require ($report -match ('(?m)^' + [regex]::Escape($ModId) + ' - not loaded, disabled$')) 'Gateway did not confirm this mod disabled. Check /mod before retrying.' }
         } else {
-            Backup-Saves $snapshot
-            Set-Stage 'Saving mod choice' 'Gateway is stopped; the choice takes effect on its next start.'
+            # Saving a text choice touches no save, so it needs no save backup and is safe while the servers run.
+            if ($gatewayRunning) { Set-Stage 'Saving mod choice' 'The servers are running; the choice takes effect when the Gateway starts again.' }
+            else { Backup-Saves $snapshot; Set-Stage 'Saving mod choice' 'Gateway is stopped; the choice takes effect on its next start.' }
             $path = Join-Path (Get-ModFolder) 'mod-state.txt'
             $lines = @()
             if (Test-Path -LiteralPath $path) {

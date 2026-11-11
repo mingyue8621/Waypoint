@@ -12,18 +12,25 @@ public sealed class MapViewerHelper : IDisposable
     public string AssemblyPath => Path.Combine(_folder, "host", "Waypoint.MapViewer.dll");
 
     public static bool IsAvailable(string checkout) =>
+        File.Exists(Path.Combine(checkout, "data", "game-files.zip"))
+        && File.Exists(Path.Combine(checkout, "data", "tables", "WorldAreas.json"))
+        && (IsCheckout(checkout) || HasBuiltLibraries(checkout));
+
+    /// <summary>The checkout's terrain generator, which the helper compiles (a source copy).</summary>
+    static bool IsCheckout(string checkout) =>
         File.Exists(Path.Combine(checkout, "src", "GameServer.Data", "GameServer.Data.csproj"))
         && File.Exists(Path.Combine(checkout, "src", "GameServer.Data", "Terrain", "Generation", "LevelGenerator.cs"))
-        && File.Exists(Path.Combine(checkout, "src", "GameServer.Data", "Terrain", "Generation", "AreaExits.cs"))
-        && File.Exists(Path.Combine(checkout, "data", "game-files.zip"))
-        && File.Exists(Path.Combine(checkout, "data", "tables", "WorldAreas.json"));
+        && File.Exists(Path.Combine(checkout, "src", "GameServer.Data", "Terrain", "Generation", "AreaExits.cs"));
+
+    /// <summary>An install's own libraries (<c>app\</c>), the same ones a checkout would build: no sources are needed.</summary>
+    static bool HasBuiltLibraries(string install) => File.Exists(Path.Combine(install, "app", "GameServer.Data.dll"));
 
     /// <summary>Call while holding the checkout's operation lock. Builds only the data library, never a gameplay server.</summary>
     public static async Task<MapViewerHelper> BuildAsync(string checkout, string dataDirectory, CancellationToken stop = default)
     {
         stop.ThrowIfCancellationRequested();
         checkout = Path.GetFullPath(checkout);
-        if (!IsAvailable(checkout)) throw new NotSupportedException(L.Text("The map viewer needs a source checkout with the terrain generator and extracted game data."));
+        if (!IsAvailable(checkout)) throw new NotSupportedException(L.Text("The map viewer needs the game data (data\\game-files.zip and data\\tables) and either a checkout's terrain generator or an install's libraries."));
         string folder = Path.Combine(Path.GetFullPath(dataDirectory), "map-viewer", Guid.NewGuid().ToString("N"));
         var helper = new MapViewerHelper(folder);
         try
@@ -31,8 +38,17 @@ public sealed class MapViewerHelper : IDisposable
             var head = await GitRepositoryProbe.ReadLocalAsync(checkout, stop);
             string source = Path.GetDirectoryName(BridgeScripts.Extract(dataDirectory))!;
             string generator = Path.Combine(folder, "generator");
-            await Build(Path.Combine(checkout, "src", "GameServer.Data", "GameServer.Data.csproj"),
-                generator, Path.Combine(folder, "generator-artifacts"), []);
+            if (IsCheckout(checkout))
+                await Build(Path.Combine(checkout, "src", "GameServer.Data", "GameServer.Data.csproj"),
+                    generator, Path.Combine(folder, "generator-artifacts"), []);
+            else
+            {
+                // The install's app\ is a self-contained publish: its own copy of the framework beside the server's
+                // assemblies would be referenced beside the SDK's, so only the server's assemblies are taken.
+                Directory.CreateDirectory(generator);
+                foreach (string dll in Directory.GetFiles(Path.Combine(checkout, "app"), "GameServer.*.dll"))
+                    File.Copy(dll, Path.Combine(generator, Path.GetFileName(dll)), overwrite: true);
+            }
             await Build(Path.Combine(source, "MapViewer.csproj"), Path.Combine(folder, "host"),
                 Path.Combine(folder, "host-artifacts"), ["-p:MapGeneratorDirectory=" + generator]);
             var confirmed = await GitRepositoryProbe.ReadLocalAsync(checkout, stop);
@@ -46,7 +62,7 @@ public sealed class MapViewerHelper : IDisposable
             var lines = new List<string>();
             int code = await ToolProcess.RunAsync("dotnet",
                 ["build", project, "-c", "Release", "--artifacts-path", artifacts, "-o", output, "--nologo", "-v", "quiet", "-p:UseSharedCompilation=false", .. extra],
-                checkout, line => { lock (lines) lines.Add(line); }, stop);
+                checkout, line => { lock (lines) lines.Add(line); }, stop, utf8: true);
             if (code != 0) throw new InvalidOperationException(L.Text("Could not prepare the map viewer.\n{0}", string.Join("\n", lines)));
         }
     }

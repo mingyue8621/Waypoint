@@ -30,8 +30,8 @@ public class SwitchToSourceTests : IDisposable
         Directory.Delete(_top, recursive: true);
     }
 
-    static SwitchChoices Choices(bool bring = true, bool keep = true, bool tested = true, bool give = true, bool shares = true, double copyGb = 0, bool hasSaves = false, int accounts = 2, int characters = 5) =>
-        new(@"D:\New", @"D:\Old", true, bring, accounts, characters, keep, tested, give, shares, copyGb, hasSaves);
+    static SwitchChoices Choices(bool bring = true, bool keep = true, bool tested = true, bool shares = true, double copyGb = 0, bool hasSaves = false, int accounts = 2, int characters = 5) =>
+        new(@"D:\New", @"D:\Old", true, bring, accounts, characters, keep, tested, shares, copyGb, hasSaves);
 
     static string[] Lines(SwitchChoices choices) => [.. SwitchToSource.Describe(choices).Select(l => l.Text)];
 
@@ -42,7 +42,6 @@ public class SwitchToSourceTests : IDisposable
             @"Download LocalExile into D:\New and build it.",
             "Use the game client of your current LocalExile, so it takes no extra space.",
             "Copy your accounts and characters. Accounts: 2. Characters: 5.",
-            "Install Frida, so that Give item works.",
             "Keep the older version; it won't update.",
             "Leave your current LocalExile as it is. Each copy keeps its own progress.",
         ], Lines(Choices()));
@@ -51,10 +50,10 @@ public class SwitchToSourceTests : IDisposable
     [Fact]
     public void A_risky_choice_is_marked_and_says_where_things_stay()
     {
-        var lines = SwitchToSource.Describe(Choices(bring: false, keep: false, tested: false, give: false, shares: false, copyGb: 69.5));
+        var lines = SwitchToSource.Describe(Choices(bring: false, keep: false, tested: false, shares: false, copyGb: 69.5));
         Assert.Contains(lines, l => l.Text == "Copy the game client, about 70 GB." && !l.Attention);
         Assert.Contains(lines, l => l.Text == "Start with no accounts or characters. You create an account at the end.");
-        foreach (string attention in new[] { "Leave out Frida. Waypoint offers it again when you press Give item.", "Update to the newest changes once a day.",
+        foreach (string attention in new[] { "Start on the newest changes. You update the copy yourself from Versions.",
                      "After the new copy has worked for you, ask before deleting the old one.", @"Your old characters stay in D:\Old\data until you delete that folder." })
             Assert.Contains(lines, l => l.Text == attention && l.Attention);
     }
@@ -72,6 +71,15 @@ public class SwitchToSourceTests : IDisposable
     {
         Assert.Contains("do not delete that folder yourself", SwitchToSource.Done(Choices()));
         Assert.DoesNotContain("do not delete that folder yourself", SwitchToSource.Done(Choices(shares: false)));
+    }
+
+    [Fact]
+    public void The_last_page_points_to_Control_where_a_source_copy_is_played()
+    {
+        // The new copy opens in Advanced mode, which has no Play page: the way back and the question about the old one are on Control.
+        Assert.Contains(@"use Change… on Control and choose D:\Old.", SwitchToSource.Done(Choices()));
+        Assert.Contains(@"Your old LocalExile is still in D:\Old. After you have played, Control asks whether to delete it.", SwitchToSource.Done(Choices(keep: false)));
+        Assert.DoesNotContain("on Play", SwitchToSource.Done(Choices()) + SwitchToSource.Done(Choices(keep: false)));
     }
 
     [Fact]

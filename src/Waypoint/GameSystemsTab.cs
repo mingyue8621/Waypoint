@@ -53,7 +53,6 @@ public sealed partial class GameSystemsTab : UserControl
     string _settingsHash = "missing", _settingsId = "", _settingsKind = "";
     bool Dirty => _creating || _editor?.Dirty == true || _choicesDirty;
     bool Busy => _refreshing || _applying || _liveRunning;
-    bool WritersStopped => string.IsNullOrEmpty(_shared.Workspace.Latest?.AccountWriteBlockedReason);
     Window? Owner =>
 #if WINDOWS
         Window.GetWindow(this);
@@ -276,7 +275,7 @@ public sealed partial class GameSystemsTab : UserControl
         var badges = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(12, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
         badges.Children.Add(Badge(card.IsFlag ? L.Text("League flag") : L.Text("Not shown"), "Shell.Accent"));
         if (root.Hardcore) { var hc = Badge(L.Text("Hardcore")); hc.Margin = new Thickness(8, 0, 0, 0); badges.Children.Add(hc); }
-        var title = new DockPanel(); DockPanel.SetDock(badges, Dock.Right); title.Children.Add(badges); title.Children.Add(Type(card.Name, 25, true)); body.Children.Add(title);
+        var title = new DockPanel(); DockPanel.SetDock(badges, Dock.Right); title.Children.Add(badges); title.Children.Add(Type(card.DisplayName, 25, true)); body.Children.Add(title);
         var settingsButton = SettingsEditor.Button("⚙", () =>
         {
             if (_leagueSettings is null) return;
@@ -289,7 +288,7 @@ public sealed partial class GameSystemsTab : UserControl
         });
         Named(settingsButton, L.Text("League settings")); settingsButton.Padding = new Thickness(7, 3, 7, 3); settingsButton.Margin = new Thickness(8, 0, 0, 0);
         badges.Children.Add(settingsButton);
-        var description = Type(root.Description.StartsWith('#') ? L.Text("Description uses the game's text key: {0}", root.Description) : root.Description,
+        var description = Type(root.Description.StartsWith('#') ? L.Text("Description uses the game's text key: {0}", root.Description) : L.Text(root.Description),
             13, false, "Shell.TextSecondary"); description.Margin = new Thickness(0, 8, 0, 0); body.Children.Add(description);
         if (_nativeArtwork is null) { var placeholder = Type(L.Text("Game artwork unavailable — placeholder flag shown."), 12, false, "Shell.TextSecondary"); placeholder.Margin = new Thickness(0, 8, 0, 0); body.Children.Add(placeholder); }
         if (!_catalog.ReachableMode(league))
@@ -312,7 +311,7 @@ public sealed partial class GameSystemsTab : UserControl
             var options = new StackPanel { Margin = new Thickness(12, 4, 0, 8) };
             foreach (var variant in links)
             {
-                var path = Type(L.Text("{0}: {1}", _catalog.ModePath(variant), variant.Name)
+                var path = Type(L.Text("{0}: {1}", _catalog.ModePath(variant), variant.DisplayName)
                     + (_catalog.ReachableMode(variant) ? "" : " · " + L.Text("Not shown")), 12, false, "Shell.TextSecondary");
                 path.Margin = new Thickness(0, 6, 0, 6); options.Children.Add(path);
             }
@@ -344,7 +343,7 @@ public sealed partial class GameSystemsTab : UserControl
             _selected = next; RenderSelection(focusMode: true);
         };
         choiceArea.Children.Add(_modeSelector);
-        var selectedProfile = Type(L.Text("Selected league: {0} · {1}", league.Name, _catalog!.Modes(league)), 12, false, "Shell.TextSecondary");
+        var selectedProfile = Type(L.Text("Selected league: {0} · {1}", league.DisplayName, _catalog!.Modes(league)), 12, false, "Shell.TextSecondary");
         selectedProfile.Margin = new Thickness(0); choiceArea.Children.Add(selectedProfile);
         var availability = new StackPanel { Orientation = Orientation.Horizontal };
         var visible = Badge(L.Text(_catalog!.ReachableMode(league) ? "Visible to new characters" : "Not shown at character creation"));
@@ -369,20 +368,20 @@ public sealed partial class GameSystemsTab : UserControl
         AddModuleChoices(_detail, league, _catalog!.Environment.CanChoose && _catalog.Configurable(league));
         _primary = FooterButton(L.Text("Save module choices"), () => _ = SaveChoicesAsync(league), primary: true);
         var details = new StackPanel { Margin = new Thickness(12, 8, 0, 8) };
-        details.Children.Add(SettingsEditor.Note(league.Description));
+        details.Children.Add(SettingsEditor.Note(league.DisplayDescription));
         details.Children.Add(SettingsEditor.Note(L.Text("Modes are fixed for existing characters. Create a separate league to choose another defined mode.")));
         var customize = SettingsEditor.Button(L.Text("Customize as a new league"), () => StartCreate(league));
         bool reusable = !league.Custom && _catalog.Configurable(league) && GameSystems.EmptyTemplate(league.Folder);
         customize.IsEnabled = reusable && _catalog.Environment.CanCreate; details.Children.Add(customize);
         if (!reusable) details.Children.Add(SettingsEditor.Note(L.Text("This league has custom code or no reusable source template. It cannot be safely copied.")));
-        details.Children.Add(SettingsEditor.Note(L.Text("Only combinations defined for this league and mode are allowed. Dedicated gameplay bundles stay together; unknown compatibility is blocked.")));
-        details.Children.Add(SettingsEditor.Label(L.Text("Selected league definition: {0}", league.Name)));
+        details.Children.Add(SettingsEditor.Note(L.Text("Any installed module can be turned on or off here when what it needs is on. Turning off this league's own bundle asks first, a module made for an isolated league stays in isolated leagues, and the rules of a game mode go with that mode's leagues and with leagues made in Waypoint.")));
+        details.Children.Add(SettingsEditor.Label(L.Text("Selected league definition: {0}", league.DisplayName)));
         if (league.EntryOf.Length > 0) details.Children.Add(SettingsEditor.Note(L.Text("Shown as a mode of: {0}", league.EntryOf)));
         if (league.Parent.Length > 0) details.Children.Add(SettingsEditor.Note(L.Text("Parent league: {0}", league.Parent)));
         _detail.Children.Add(new Expander { Header = L.Text("League details and compatibility"), Content = details, IsExpanded = false, Margin = new Thickness(0, 12, 0, 8) });
     }
-    static string ModuleTitle(GameSystem module) => module.Name == module.Id
-        ? module.Id == "Game" ? L.Text("Core game rules") : Regex.Replace(module.Name, @"(?<=[a-z0-9])(?=[A-Z])", " ").Replace("Npc ", "NPC ") : module.Name;
+    static string ModuleTitle(GameSystem module) => L.Text(module.Name == module.Id
+        ? module.Id == "Game" ? L.Text("Core game rules") : Regex.Replace(module.Name, @"(?<=[a-z0-9])(?=[A-Z])", " ").Replace("Npc ", "NPC ") : module.Name);
     TextBox AddModuleChoices(StackPanel panel, GameLeague league, bool editable)
     {
         _checks.Clear();
@@ -399,11 +398,24 @@ public sealed partial class GameSystemsTab : UserControl
         var rows = new List<(AccessibleElement Row, string Text, bool Unavailable)>();
         var unavailable = new StackPanel { Margin = new Thickness(12, 6, 0, 6) };
         var required = _catalog!.RequiredModules(league);
+        var bundle = _catalog.BundleModules(league);
         void Count() => count.Text = L.Text("{0} modules enabled · {1} required", _checks.Count(p => p.Value.IsChecked == true), required.Count);
+        void ChoiceChanged()
+        {
+            _choicesDirty = true;
+            if (_creating) { _draftModules.Clear(); foreach (var path in _checks.Where(p => p.Value.IsChecked == true).Select(p => p.Key)) _draftModules.Add(path); }
+            Count(); UpdateFeedback();
+        }
         foreach (var module in _catalog.Systems)
         {
             bool selected = (_creating ? (IEnumerable<string>)_draftModules : league.Systems).Contains(module.Path, StringComparer.OrdinalIgnoreCase);
-            bool offered = _catalog.ModuleOffered(league, module.Path), locked = required.Contains(module.Path);
+            // Any module goes with any league, but one made for an isolated league in a league that leads to Standard
+            // and one of a game mode where that mode does not fit (GameSystems.ModuleOffered). A league being made is
+            // isolated, and its user's own, whatever its template is.
+            bool offered = _catalog.ModuleOffered(league, module.Path, forNewLeague: _creating), locked = required.Contains(module.Path);
+            // The rules of a game mode, in a league of another mode: on, they are that mode's rules alone.
+            bool ofMode = _catalog.ModeOf(module.Path) is not null, rulesOnly = _catalog.RulesOnly(league, [module.Path]).Count > 0;
+            string whyNot = ofMode ? L.Text("Rules of a game mode") : L.Text("For isolated leagues only");
             string name = ModuleTitle(module);
             var box = Named(new CheckBox { Content = ModuleLabel(module), IsChecked = selected, IsEnabled = editable && !locked && (selected || offered), HorizontalAlignment = HorizontalAlignment.Stretch }, name);
             _checks[module.Path] = box;
@@ -411,7 +423,7 @@ public sealed partial class GameSystemsTab : UserControl
             if (locked || !editable || !offered && !selected)
             {
                 var readOnly = new DockPanel();
-                var state = Badge(locked ? L.Text("Required") : !offered ? L.Text("Not defined for this mode") : selected ? L.Text("Enabled") : L.Text("Disabled"));
+                var state = Badge(locked ? L.Text("Required") : !offered ? whyNot : selected ? L.Text("Enabled") : L.Text("Disabled"));
                 state.Margin = new Thickness(12, 0, 0, 0); DockPanel.SetDock(state, Dock.Right); readOnly.Children.Add(state);
                 var mark = Type(selected ? "✓" : "–", 13, false, "Shell.TextSecondary"); mark.Margin = new Thickness(0, 0, 12, 0);
                 DockPanel.SetDock(mark, Dock.Left); readOnly.Children.Add(mark); readOnly.Children.Add(ModuleLabel(module)); row = readOnly;
@@ -419,8 +431,12 @@ public sealed partial class GameSystemsTab : UserControl
             else row = box;
             var holder = Card(row, 10, "Shell.Background"); holder.Margin = new Thickness(0, 0, 0, 6);
             Named(holder, name + (locked ? " · " + L.Text("Required") : ""));
-            string help = module.Description.Length > 0 ? module.Description : locked ? L.Text("Required by this league's gameplay bundle.") : !offered ? L.Text("Not defined for this mode") : L.Text("Optional module for this mode.");
+            string help = module.Description.Length > 0 ? module.Description : locked ? L.Text("Required by this league's gameplay bundle.") : !offered ? ofMode ? "" : whyNot : L.Text("Optional module for this mode.");
+            if (!offered && ofMode) help += (help.Length > 0 ? "\n" : "") + _catalog.ModeNote(module.Path);
+            if (rulesOnly && (offered || selected)) help += "\n" + L.Text("Here it gives the rules of a game mode only, without that mode's own skills, vendors and quest rewards.");
             if (module.Depends.Length > 0) help += "\n" + L.Text("Dependencies: {0}", string.Join(", ", module.Depends));
+            // The league's own bundle is a box like any other; what turning it off means is said once it is unticked.
+            if (bundle.Contains(module.Path, StringComparer.OrdinalIgnoreCase)) help += "\n" + L.Text("Part of this league's own bundle. Turning it off asks first.");
             A11y.SetHelpText(box, help);
             A11y.SetHelpText(holder, help);
 #if WINDOWS
@@ -428,22 +444,30 @@ public sealed partial class GameSystemsTab : UserControl
 #else
             ToolTip.SetTip(holder, help);
 #endif
-            box.Click += (_, _) =>
-            {
-                _choicesDirty = true;
-                if (_creating) { _draftModules.Clear(); foreach (var path in _checks.Where(p => p.Value.IsChecked == true).Select(p => p.Key)) _draftModules.Add(path); }
-                Count(); UpdateFeedback();
-            };
+            box.Click += (_, _) => ChoiceChanged();
             bool isUnavailable = !selected && !offered && !locked;
             (isUnavailable ? unavailable : panel).Children.Add(holder);
             rows.Add((holder, name + " " + module.Id + " " + module.Description, isUnavailable));
         }
-        foreach (string path in (_creating ? _draftModules : league.Systems.AsEnumerable()).Where(p => !_checks.ContainsKey(p)))
+        foreach (string path in (_creating ? _draftModules : league.Systems.AsEnumerable()).Where(p => !_checks.ContainsKey(p)).ToArray())
         {
-            // Retain unresolved choices in the draft. A missing installation must never silently remove a saved module.
-            _checks[path] = new CheckBox { IsChecked = true, IsEnabled = false };
-            var missing = SettingsEditor.Note(L.Text("Missing module: {0}. Restore it before changing this league.", path));
-            panel.Children.Add(missing); rows.Add((missing, path, false));
+            // A listed module that is not installed (a typo in a hand edit, a module taken away since). LocalExile skips it
+            // and loads the league, so the league stays editable. The entry stays ticked until its user unticks it: a
+            // missing installation never removes a saved module by itself.
+            string label = L.Text("{0} (not installed)", path);
+            string help = L.Text("This league lists a module that is not installed. LocalExile skips it. Untick it to take it off the list.");
+            var box = Named(new CheckBox { Content = Type(label, 13, false), IsChecked = true, IsEnabled = editable, HorizontalAlignment = HorizontalAlignment.Stretch }, label);
+            _checks[path] = box;
+            var holder = Card(box, 10, "Shell.Background"); holder.Margin = new Thickness(0, 0, 0, 6);
+            A11y.SetHelpText(box, help);
+            A11y.SetHelpText(holder, help);
+#if WINDOWS
+            holder.ToolTip = help;
+#else
+            ToolTip.SetTip(holder, help);
+#endif
+            box.Click += (_, _) => ChoiceChanged();
+            panel.Children.Add(holder); rows.Add((holder, label, false));
         }
         Expander? unavailableGroup = null;
         if (unavailable.Children.Count > 0) { unavailableGroup = new Expander { Header = L.Text("Unavailable modules ({0})", unavailable.Children.Count), Content = unavailable, IsExpanded = false }; panel.Children.Add(unavailableGroup); }
@@ -469,7 +493,7 @@ public sealed partial class GameSystemsTab : UserControl
     }
     string[] SelectedModules() => _creating ? _draftModules.ToArray() : _checks.Where(p => p.Value.IsChecked == true).Select(p => p.Key).ToArray();
     ComboBoxItem ModeItem(GameLeague league, IReadOnlyList<GameLeague> variants) => new()
-    { Content = _catalog!.ModePath(league) + (variants.Count(l => _catalog.ModePath(l) == _catalog.ModePath(league)) > 1 ? " (" + league.Name + ")" : "")
+    { Content = _catalog!.ModePath(league) + (variants.Count(l => _catalog.ModePath(l) == _catalog.ModePath(league)) > 1 ? " (" + league.DisplayName + ")" : "")
         + (_catalog.ReachableMode(league) ? "" : " · " + L.Text("Not shown")), Tag = league };
     void UpdateFeedback()
     {
@@ -478,12 +502,17 @@ public sealed partial class GameSystemsTab : UserControl
         else if (_selected is GameLeague league)
         {
             string? error = _catalog.CompositionError(league, SelectedModules());
+            string apart = error is null && _choicesDirty ? Warnings(league) : "";
             _validation.Text = error is not null ? L.Text("Cannot save: {0}", error) : !_catalog.Environment.CanChoose ? L.Text("Read-only module list. Update LocalExile to edit these choices.")
-                : _editor?.Dirty == true ? L.Text("Save league settings before applying module choices.") : _choicesDirty ? L.Text("Unsaved module choices — applies after a server restart.") : L.Text("No unsaved changes.");
+                : _editor?.Dirty == true ? L.Text("Save league settings before applying module choices.")
+                : _choicesDirty ? L.Text("Unsaved module choices — applies after a server restart.") + (apart.Length > 0 ? " " + apart : "") : L.Text("No unsaved changes.");
             if (_primary is not null) _primary.IsEnabled = !Busy && error is null && _catalog.Environment.CanChoose && _catalog.Configurable(league) && _choicesDirty && _editor?.Dirty != true;
-            if (_availabilityAction is not null) _availabilityAction.IsEnabled = !Busy && WritersStopped && _catalog.Environment.CanCreate && !league.Ended && _catalog.Rooted(league);
+            // A release's own leagues are its files, which an update writes over: only a league made here is hidden or shown.
+            bool shipped = _catalog.Environment.ShippedLeaguesFixed && !league.Custom;
+            if (_availabilityAction is not null) _availabilityAction.IsEnabled = !Busy && !shipped && _catalog.Environment.CanCreate && !league.Ended && _catalog.Rooted(league);
             if (_availabilityHint is not null) _availabilityHint.Text = !_catalog.Environment.CanCreate ? L.Text("League availability needs a newer source checkout.")
-                : !WritersStopped ? L.Text("Close the game and stop services to change availability.") : L.Text("Availability changes apply at the next server start.");
+                : shipped ? L.Text("A league that came with this release can't be hidden or shown here: an update of LocalExile would undo it.")
+                : L.Text("Availability changes apply at the next server start.");
         }
         else _validation.Text = _editor?.Dirty == true ? L.Text("Unsaved settings") : L.Text("No unsaved changes.");
         if (_settingsAction is not null) _settingsAction.IsEnabled = !Busy && _editor?.Dirty == true;
@@ -567,13 +596,33 @@ public sealed partial class GameSystemsTab : UserControl
         }
         catch (Exception e) when (e is IOException or InvalidDataException or System.Text.Json.JsonException or InvalidOperationException or UnauthorizedAccessException) { SetStatus(e.Message); }
     }
+    /// <summary>What the ticked boxes leave out of the league's own bundle (<see cref="GameSystems.BundleLeftOut"/>), in
+    /// words: said under the list while it is unsaved, and again in the question before it is saved. Empty when the
+    /// bundle is whole.</summary>
+    string BundleWarning(GameLeague league) => _catalog!.BundleLeftOut(league, SelectedModules()) is { Count: > 0 } left
+        ? L.Text("Without {0}, this league runs without the rules or content it is named for. Its characters stay as they are, and you can turn it back on.", string.Join(", ", left.Select(ModuleTitle))) : "";
+
+    /// <summary>What a module of a game mode means in a league of another mode (<see cref="GameSystems.RulesOnly"/>), said
+    /// when the ticked boxes turn one on: the mode's rules, for every character there, without the rest of the mode.
+    /// Empty when none is being turned on.</summary>
+    string ModeWarning(GameLeague league) => _catalog!.RulesOnly(league, SelectedModules())
+        .Where(m => !league.Systems.Contains(m.Path, StringComparer.OrdinalIgnoreCase)).ToArray() is { Length: > 0 } turnedOn
+        ? L.Text("{0} holds the rules of a game mode. Turned on here, they apply to every character in this league from the next server start, without that mode's own skills, vendors and quest rewards, and the game still shows the league as it is. Untick it to go back.",
+            string.Join(", ", turnedOn.Select(ModuleTitle))) : "";
+
+    /// <summary>Everything the ticked boxes call for a word about before they are saved.</summary>
+    string Warnings(GameLeague league) => string.Join(" ", new[] { BundleWarning(league), ModeWarning(league) }.Where(text => text.Length > 0));
+
     async Task SaveChoicesAsync(GameLeague league)
     {
         if (_catalog is null || Busy) return;
         try
         {
             var values = _catalog.Plan(league, SelectedModules());
-            if (!Dialog.Ask(Owner, DialogKind.Question, L.Text("Save league choices"), L.Text("Save module choices for {0}? They apply after a server restart. Existing characters and other leagues are preserved.", league.Name), L.Text("Save"), L.Text("Cancel"))) return;
+            string apart = Warnings(league);
+            if (!Dialog.Ask(Owner, apart.Length > 0 ? DialogKind.Warning : DialogKind.Question, L.Text("Save league choices"),
+                    L.Text("Save module choices for {0}? They apply after a server restart. Existing characters and other leagues are preserved.", league.Name)
+                    + (apart.Length > 0 ? "\n\n" + apart : ""), L.Text("Save"), L.Text("Cancel"))) return;
             var request = new JsonObject { ["league"] = league.Name, ["choices"] = values, ["review"] = _catalog.Review.DeepClone() };
             var result = await SaveAsync("SaveLeagueModules", request, expected: _catalog.ChoicesHash);
             if (result?.Ok == true) { _choicesDirty = false; await RefreshAsync(); SetStatus(L.Text("League choices saved. Restart servers when you are ready to apply them.")); }

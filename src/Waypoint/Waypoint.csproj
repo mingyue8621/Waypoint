@@ -12,7 +12,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>Waypoint</AssemblyName>
     <RootNamespace>Waypoint</RootNamespace>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Only Release carries win-x64. A Debug build with a RID produces an AMD64 assembly, and the XAML designer's host
+         process is MSIL: it cannot load it, so every type fails to resolve and the designer reports "invalid markup" and
+         unclosed MarkupExtensions on every file. Debug stays AnyCPU so the designer works; releasing still targets win-x64. -->
+    <RuntimeIdentifier Condition="'$(Configuration)' == 'Release'">win-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
@@ -37,6 +40,10 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Waypoint.Tests" />
+    <!-- The two single-purpose launchers (src/ServerLauncher, src/ClientLauncher) reuse this assembly's sections,
+         settings, service monitor and adapter; they carry their own window and entry point. -->
+    <InternalsVisibleTo Include="流放之路服务端" />
+    <InternalsVisibleTo Include="流放之路登录器" />
     <!-- WPF leaves System.IO out of the implicit usings (its Path clashes with System.Windows.Shapes.Path, unused here). -->
     <Using Include="System.IO" />
     <Using Include="Launcher.Core" />

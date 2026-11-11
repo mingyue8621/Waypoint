@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:l="clr-namespace:Waypoint"
-        Title="Waypoint" Icon="app.ico" Width="1280" Height="800" MinWidth="900" MinHeight="560"
+        Title="流放之路" Icon="app.ico" Width="1280" Height="800" MinWidth="900" MinHeight="560"
         WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize"
         Background="{DynamicResource Shell.Background}"
         TextElement.Foreground="{DynamicResource Shell.Text}"
@@ -48,14 +48,16 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- The sidebar: the name and the sections. -->
+        <!-- The sidebar: the name, the folder in use and the sections. -->
         <Border Background="{DynamicResource Shell.Sidebar}">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="14,12,0,10">
                     <!-- The emblem, recoloured with the scheme (Theme.cs). -->
                     <Image Source="{DynamicResource BrandArtwork}" Width="38" Height="38" RenderOptions.BitmapScalingMode="HighQuality" />
-                    <TextBlock Text="Waypoint" FontSize="21" FontWeight="Bold" Foreground="{DynamicResource Shell.SidebarStrong}" Margin="8,0,0,0" VerticalAlignment="Center" />
+                    <TextBlock Text="流放之路" FontSize="21" FontWeight="Bold" Foreground="{DynamicResource Shell.SidebarStrong}" Margin="8,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
+                <!-- The LocalExile folder everything below works on, and the way to the others (FolderPicker). -->
+                <l:FolderPicker x:Name="Folders" DockPanel.Dock="Top" Margin="10,0,10,10" WindowChrome.IsHitTestVisibleInChrome="True" />
                 <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource Shell.SidebarDivider}" Margin="10,0,10,10" />
                 <TextBlock x:Name="Version" DockPanel.Dock="Bottom" Foreground="{DynamicResource Shell.SidebarText}" Opacity="0.6"
                            FontSize="11" Margin="18,0,0,12" />
@@ -139,6 +141,10 @@
                         <Button x:Name="ThemeButton" Style="{StaticResource Shell.IconButton}" Click="CycleTheme">
                             <md:PackIcon x:Name="ThemeIcon" Kind="ThemeLightDark" Width="18" Height="18" />
                         </Button>
+                        <Button Style="{StaticResource Shell.IconButton}" Click="ReportProblem" Margin="4,0,0,0"
+                                ToolTip="{l:Loc 'Report a problem: copy or save your logs for whoever is helping you'}">
+                            <md:PackIcon Kind="Lifebuoy" Width="18" Height="18" />
+                        </Button>
                         <Button Style="{StaticResource Shell.IconButton}" Click="OpenSettingsSection" ToolTip="{l:Loc 'Settings'}" Margin="4,0,0,0">
                             <md:PackIcon Kind="CogOutline" Width="18" Height="18" />
                         </Button>
@@ -221,7 +227,7 @@
                             <TextBlock Text="{l:Loc 'Update now'}" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
-                    <Button Content="{l:Loc 'What\'s new'}" Click="ExilePageClicked" Margin="0,0,8,0" Foreground="{DynamicResource Shell.UpdateText}"
+                    <Button Content="{l:Loc &quot;What's new&quot;}" Click="ExilePageClicked" Margin="0,0,8,0" Foreground="{DynamicResource Shell.UpdateText}"
                             BorderBrush="{DynamicResource Shell.UpdateBorder}" />
                     <Button x:Name="ExileLater" Content="{l:Loc 'Later'}" Click="ExileLaterClicked" Margin="0" Foreground="{DynamicResource Shell.UpdateText}"
                             BorderBrush="{DynamicResource Shell.UpdateBorder}" />
@@ -251,7 +257,7 @@
                             <TextBlock Text="{l:Loc 'Update now'}" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
-                    <Button Content="{l:Loc 'What\'s new'}" Click="ReleasePageClicked" Margin="0,0,8,0" Foreground="{DynamicResource Shell.UpdateText}"
+                    <Button Content="{l:Loc &quot;What's new&quot;}" Click="ReleasePageClicked" Margin="0,0,8,0" Foreground="{DynamicResource Shell.UpdateText}"
                             BorderBrush="{DynamicResource Shell.UpdateBorder}" />
                     <Button Content="{l:Loc 'Later'}" Click="LaterClicked" Margin="0" Foreground="{DynamicResource Shell.UpdateText}"
                             BorderBrush="{DynamicResource Shell.UpdateBorder}" />

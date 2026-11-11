@@ -5,7 +5,7 @@ namespace Waypoint;
 /// operation (a second would fight the first over the same processes and files).</summary>
 sealed class Shared : IDisposable
 {
-    public Settings Settings { get; } = ((App)System.Windows.Application.Current).Settings;
+    public Settings Settings { get; }
     public ServiceMonitor Monitor { get; } = new();
     public Metrics Metrics { get; }
     public LogHub Logs { get; } = new();
@@ -18,12 +18,38 @@ sealed class Shared : IDisposable
     public bool IsLiveRunning => Volatile.Read(ref _running) == 1;
     /// <summary>What holds the checkout while <see cref="IsLiveRunning"/>: "live.ps1", "git" or an operation's name.</summary>
     public string BusyWith { get; private set; } = "live.ps1";
+    bool _leaving;
+    /// <summary>Waypoint is stopping what runs before it leaves this folder for another
+    /// (<see cref="Editions.ReadyToLeaveAsync"/>), until it starts again there or the change is given up. Meanwhile the
+    /// window is not usable and does not close: a close in that time would leave the other folder saved and Waypoint set
+    /// to start again, with its window still open.</summary>
+    public bool Leaving
+    {
+        get => _leaving;
+        set
+        {
+            if (_leaving == value) return;
+            _leaving = value;
+            LeavingChanged?.Invoke();
+        }
+    }
+    /// <summary><see cref="Leaving"/> changed. Raised on the caller's thread.</summary>
+    public event Action? LeavingChanged;
     DateTime _quietUntil;
 
-    public Shared()
+    /// <summary>Waypoint's own window: the settings the App loaded at startup.</summary>
+    public Shared() : this(((App)System.Windows.Application.Current).Settings) { }
+
+    /// <summary>The same for a window of its own (the two small launchers), which loads the settings itself.</summary>
+    public Shared(Settings settings)
     {
+        Settings = settings;
         Metrics = new Metrics(Monitor);
+        // The player's other LocalExile folders: their clients are the first place a move to another client build looks.
+        ClientUpdate.KnownFolders = () => [Settings.ServerPath, Settings.ReleaseFolder, Settings.LatestFolder, .. Settings.KnownFolders];
         Workspace = new Workspace(this);
+        // The log on disk leaves out the account and character names Waypoint comes to know.
+        if (SessionLog.Current is { } disk) disk.PrivateNames = () => Workspace.PrivateNames;
         Monitor.Failed += e => Logs.Write($"service sample failed: {e.Message}", Severity.Error);
         Monitor.Exited += (service, pid) =>
         {
@@ -45,8 +71,9 @@ sealed class Shared : IDisposable
         {
             Logs.Write($"> {request.Describe()}", Severity.Info);
             void Line(string line) { Logs.Write(line); output(line); }
+            var clock = System.Diagnostics.Stopwatch.StartNew();
             int code = await Scripts.RunAsync(request, Line);
-            Logs.Write($"live.ps1 exited with {code}", code == 0 ? Severity.Info : Severity.Error);
+            Logs.Write($"live.ps1 exited with {code} after {SessionLog.Seconds(clock.Elapsed)}", code == 0 ? Severity.Info : Severity.Error);
             return code;
         }
         catch (Exception e) when (e is System.ComponentModel.Win32Exception or InvalidOperationException)

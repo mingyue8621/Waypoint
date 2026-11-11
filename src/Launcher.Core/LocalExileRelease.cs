@@ -59,6 +59,8 @@ public static class LocalExileReleases
     public static string AssetSuffix => OperatingSystem.IsWindows() ? "-win-x64.zip" : "-linux-x64.zip";
     public const string ManifestName = "release.json";
     public const string LatestUrl = "https://api.github.com/repos/LocalExile/LocalExile/releases/latest";
+    /// <summary>The newest release's page, for a player to download it by hand.</summary>
+    public const string ReleasesPage = "https://github.com/LocalExile/LocalExile/releases/latest";
     public const string ListUrl = "https://api.github.com/repos/LocalExile/LocalExile/releases?per_page=30";
     /// <summary>Beside the install's files while a download is checked and extracted; never left behind.</summary>
     const string StagingName = ".waypoint-update";
@@ -80,11 +82,30 @@ public static class LocalExileReleases
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException) { return null; }
     }
 
+    /// <summary>The commit of LocalExile's code an install was built from (release.json's "commit"); null when it names none.</summary>
+    public static string? InstalledCommit(string folder)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(folder, ManifestName)));
+            return document.RootElement.TryGetProperty("commit", out var commit) && commit.ValueKind == JsonValueKind.String
+                && commit.GetString() is { } sha && System.Text.RegularExpressions.Regex.IsMatch(sha, @"\A[0-9a-fA-F]{7,40}\z") ? sha : null;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException) { return null; }
+    }
+
     /// <summary>Whether the install has gone through <c>LocalExile.exe setup</c>: its client is patched, with keys and saves.</summary>
     public static bool IsSetUp(string folder) =>
         File.Exists(Path.Combine(folder, "Client", "Game.patched.exe")) && File.Exists(Path.Combine(folder, "data", "login-keys.json")) && HasSaves(folder);
 
-    public static bool HasSaves(string folder) => File.Exists(Path.Combine(folder, "data", "saves.db"));
+    /// <summary>Whether the install has saves: data\saves.db, or from the database split on data\characters.db (with auth.db).</summary>
+    public static bool HasSaves(string folder) =>
+        File.Exists(Path.Combine(folder, "data", "saves.db")) || File.Exists(Path.Combine(folder, "data", "characters.db"));
+
+    /// <summary>The save databases a release may hold, each with its journal: saves.db before the database split, auth.db and
+    /// characters.db after it, and a saves.db its servers have not yet moved over.</summary>
+    static readonly string[] SaveFiles = ["saves.db", "saves.db-wal", "saves.db-shm", "characters.db", "characters.db-wal", "characters.db-shm",
+        "auth.db", "auth.db-wal", "auth.db-shm"];
 
     /// <summary>GitHub's "latest release" answer; null when its tag is no version.</summary>
     public static LocalExileRelease? ParseRelease(string json)
@@ -121,6 +142,15 @@ public static class LocalExileReleases
             zip.ValueKind == JsonValueKind.Object && zip.TryGetProperty("size", out var size) && size.TryGetInt64(out long bytes) ? bytes : 0,
             root.TryGetProperty("body", out var body) ? body.GetString() ?? "" : "",
             root.TryGetProperty("published_at", out var published) && published.TryGetDateTimeOffset(out var at) ? at : null);
+    }
+
+    /// <summary>One release by its tag (v0.1.0-beta); null when there is none.</summary>
+    public static async Task<LocalExileRelease?> ByTagAsync(HttpClient client, string tag, CancellationToken stop = default)
+    {
+        using var response = await client.GetAsync($"https://api.github.com/repos/LocalExile/LocalExile/releases/tags/{Uri.EscapeDataString(tag)}", stop);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        response.EnsureSuccessStatusCode();
+        return ParseRelease(await response.Content.ReadAsStringAsync(stop));
     }
 
     /// <summary>The latest published release; null when there is none.</summary>
@@ -194,7 +224,7 @@ public static class LocalExileReleases
     public static async Task InstallAsync(HttpClient client, LocalExileRelease release, string folder, Action<long, long> progress, Action extracting, CancellationToken stop)
     {
         if (release.ZipUrl is null || release.HashUrl is null) throw new InvalidOperationException(L.Text("release {0} has no {1} with its .sha256", release.Tag, "LocalExile-*" + AssetSuffix));
-        string expected = HashOf(await client.GetStringAsync(release.HashUrl, stop)) ?? throw new InvalidOperationException(L.Text("the release's .sha256 holds no SHA-256"));
+        string expected = HashOf(await GitHubDownload.GetStringAsync(client, release.HashUrl, stop)) ?? throw new InvalidOperationException(L.Text("the release's .sha256 holds no SHA-256"));
         Directory.CreateDirectory(folder);
         string staging = Path.Combine(folder, StagingName);
         DeleteStaging(staging);
@@ -202,7 +232,7 @@ public static class LocalExileReleases
         try
         {
             string zip = Path.Combine(staging, "release.zip");
-            using (var response = await client.GetAsync(release.ZipUrl, HttpCompletionOption.ResponseHeadersRead, stop))
+            using (var response = await GitHubDownload.GetAsync(client, release.ZipUrl, stop))
             {
                 response.EnsureSuccessStatusCode();
                 long total = response.Content.Headers.ContentLength ?? release.ZipBytes;
@@ -234,11 +264,10 @@ public static class LocalExileReleases
     /// the zip brings no way back. Null when there are no saves yet.</summary>
     public static string? BackUpSaves(string folder, ReleaseVersion? from, DateTime now)
     {
-        string[] files = ["saves.db", "saves.db-wal", "saves.db-shm"];
         if (!HasSaves(folder)) return null;
         string target = Path.Combine(folder, "backups", $"before-update-{from?.ToString() ?? "unknown"}-{now:yyyyMMdd-HHmmss}");
         Directory.CreateDirectory(target);
-        foreach (string name in files)
+        foreach (string name in SaveFiles)
             if (Path.Combine(folder, "data", name) is var source && File.Exists(source)) File.Copy(source, Path.Combine(target, name));
         return target;
     }

@@ -1,13 +1,14 @@
 # Public module/league files only. No server code is imported or executed.
 function Invoke-LeagueData($environment, $request, [string]$action, [string]$phase) {
-    Assert-Physical $script:savePath
+    $databases = @(Get-AccountDatabases)
+    foreach ($database in $databases) { Assert-Physical $database }
     $python = Get-Python
     $OutputEncoding = [Text.UTF8Encoding]::new($false)
     $oldEncoding = $env:PYTHONIOENCODING
     try {
         $env:PYTHONIOENCODING = 'utf-8'
         $history = Join-Path (Get-WaypointData) 'config-history'
-        $raw = ($request | ConvertTo-Json -Depth 30 -Compress) | & $python (Join-Path $PSScriptRoot 'LeagueData.py') $environment.Modules $environment.Leagues $environment.Choices $script:savePath $history $action $phase
+        $raw = ($request | ConvertTo-Json -Depth 30 -Compress) | & $python (Join-Path $PSScriptRoot 'LeagueData.py') $environment.Modules $environment.Leagues $environment.Choices $databases[0] $history $action $phase @($databases | Select-Object -Skip 1)
         $code = $LASTEXITCODE
         try { $reply = ($raw -join "`n") | ConvertFrom-Json } catch { throw 'The league helper did not return a valid result. Nothing can be confirmed.' }
         Require ($code -eq 0 -and $reply.Ok) $(if ($reply.Message) { [string]$reply.Message } else { 'League validation failed.' })
@@ -15,7 +16,9 @@ function Invoke-LeagueData($environment, $request, [string]$action, [string]$pha
     } finally { $env:PYTHONIOENCODING = $oldEncoding }
 }
 function Save-ContentFile($snapshot) {
-    Require (-not $script:isRelease) 'This release does not declare support for module and league editing. Use a current source checkout.'
+    # A release older than 0.2.0-beta does not read these files (Get-ContentEnvironment); what a newer one takes is checked
+    # below, by what the environment allows.
+    Require (-not (Test-LegacyReleaseMods)) 'This release is older than module and league editing. Update LocalExile to edit them.'
     Require (-not $snapshot.Conflicts.Count) ($snapshot.Conflicts -join "`n")
     $environment = Get-ContentEnvironment
     $staged = Get-StagedModPath $ModStaged -File
@@ -24,14 +27,20 @@ function Save-ContentFile($snapshot) {
     $parsed = $json | ConvertFrom-Json
     Require ($parsed -is [Management.Automation.PSCustomObject]) 'Settings must be a JSON object.'
     if ($Action -in @('CreateLeague','SaveLeagueModules','SetLeagueVisibility')) {
+        # Nothing here waits for the servers to stop: LocalExile reads its leagues and their module lists once, when a
+        # server starts, so a change made while one runs is what its next start reads, as for module choices. The save
+        # database is only read (for a new league's name), and backed up as before every change.
         if ($Action -in @('CreateLeague','SetLeagueVisibility')) {
             Require $environment.CanCreate 'This checkout has no supported league definition editing contract.'
-            Assert-AccountsStopped $snapshot
+            if ($Action -eq 'SetLeagueVisibility' -and $environment.ShippedLeaguesFixed) {
+                # A release's own leagues are its files, which an update writes over. One made in Waypoint is its user's.
+                $name = [string]$parsed.league
+                Require ($name -and $name.Length -le 128 -and $name -notin @('.','..') -and $name -notmatch '[\\/:*?"<>|\x00-\x1F]') 'Select a league with a safe name.'
+                Require (Test-Path -LiteralPath (Join-Path (Join-Path $environment.Leagues $name) '.waypoint-league.json') -PathType Leaf) 'A league that came with this release cannot be hidden or shown here: an update of LocalExile would undo it.'
+            }
         } else { Require $environment.CanChoose 'This server has no supported league system overrides.' }
         $null = Invoke-LeagueData $environment $parsed $Action 'check'
         Backup-Saves $snapshot
-        # Inventory and definitions are checked again after backup; creation never stops any process itself.
-        if ($Action -in @('CreateLeague','SetLeagueVisibility')) { Assert-AccountsStopped (Get-Snapshot) }
         Set-Stage 'Saving league configuration' 'Validating compatibility and preserving existing characters and league definitions.'
         $null = Invoke-LeagueData $environment $parsed $Action 'apply'
         Remove-Item -LiteralPath $staged -Force
