@@ -68,11 +68,9 @@ sealed class StatusLight(Service service, string name, bool optional = false) : 
 
 public partial class MainWindow : Window
 {
-    readonly Shared _shared;
+    readonly Shared _shared = new();
     readonly Tray _tray = new();
-    Section[] _sections;
-    /// <summary>Pages reachable through a button but not listed in the sidebar (LocalExileServer.exe's install pages).</summary>
-    FrameworkElement[] _notListed = [];
+    readonly Section[] _sections;
     readonly StatusLight[] _lights =
     [
         new(Service.Patch, "Patch"), new(Service.Gateway, "Gateway"), new(Service.Auth, "Auth"), new(Service.Client, "Game"),
@@ -86,17 +84,9 @@ public partial class MainWindow : Window
     bool _hiddenForGame;
     string _operation = "";
 
-    public MainWindow() : this(null) { }
-
-    /// <summary>
-    /// A window of its own (流放之路服务端.exe): every section Waypoint has except the ones that install or update
-    /// LocalExile (Play, Install, Setup, Releases) and without the game's own Play, on the settings the caller loaded.
-    /// Waypoint's own start passes null and shares the App's settings.
-    /// </summary>
-    internal MainWindow(Settings? settings)
+    public MainWindow()
     {
         InitializeComponent();
-        _shared = settings is null ? new Shared() : new Shared(settings);
         InitializeWindowFrame();
         Control.Attach(_shared);
         PlayView.Attach(_shared, Control);
@@ -166,18 +156,6 @@ public partial class MainWindow : Window
             new("Tools", PackIconKind.Toolbox, ToolsView),
             new("Settings", PackIconKind.CogOutline, SettingsView),
         ];
-        // LocalExileServer.exe: the servers' sections. The pages that install or update LocalExile, the setup guide and the
-        // game's own Play stay out of the sidebar (LocalExileClient.exe starts the game), but they stay in `_sections`: the
-        // Control section's own buttons open them — a release install's 启动服务器 goes to its Play/Install page, whose
-        // start is LocalExile.exe — and ShowSection looks a view up there.
-        if (settings is not null)
-        {
-            _notListed = [PlayView, InstallView, Setup, ReleasesView];
-            Control.PlayButton.Visibility = Visibility.Collapsed;
-            Control.ChangeServerButton.Visibility = Visibility.Collapsed;
-            Control.GuidedSetupButton.Visibility = Visibility.Collapsed;
-            Control.NewCopyButton.Visibility = Visibility.Collapsed;
-        }
         ShowMode();
         Versions.Switched += CheckoutMoved;
         PlayView.CheckoutChanged += CheckoutMoved;
@@ -283,14 +261,14 @@ public partial class MainWindow : Window
         bool advanced = Editions.Advanced(_shared.Settings);
         // Play and Versions each have a checkout's view and a release install's.
         FrameworkElement[] others = Repo.IsInstall ? [PlayView, Versions] : [InstallView, ReleasesView];
-        var sections = _sections.Where(s => !others.Contains(s.View) && !_notListed.Contains(s.View) && (advanced
+        var sections = _sections.Where(s => !others.Contains(s.View) && (advanced
             ? s.View is GameSystemsTab || s.View is ControlTab or VersionsTab or ReleasesTab or ModsTab or BackupsTab or AccountsTab or PerformanceTab or TimingsTab or LogsTab or ConsoleTab or ToolsTab or SettingsTab
             // Simple mode's one list, Modules and Leagues among it: a release takes their changes too (the adapter's
             // Get-ContentEnvironment says which). Console and Logs open from Tools: ShowSection shows a section that is
             // not listed.
             : s.View is GameSystemsTab || s.View is PlayTab or InstallTab or ModsTab or BackupsTab or AccountsTab or ToolsTab or SettingsTab)).ToArray();
-        // Developer Mode (Settings) unlocks the switch; this launcher's own modes do their hiding with _notListed instead.
-        ModeSwitch.Visibility = !Repo.IsInstall && _shared.Settings.Developer ? Visibility.Visible : Visibility.Collapsed;
+        // Developer Mode (Settings) unlocks the switch, on a release: a source copy has no Simple mode to switch to.
+        ModeSwitch.Visibility = Repo.IsInstall && _shared.Settings.Developer ? Visibility.Visible : Visibility.Collapsed;
         var shown = Sections.SelectedItem as Section;
         Sections.ItemsSource = sections;
         Sections.SelectedItem = sections.Contains(shown) ? shown : sections[0];

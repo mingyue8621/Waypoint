@@ -37,8 +37,9 @@ sealed class Shared : IDisposable
     public event Action? LeavingChanged;
     DateTime _quietUntil;
 
-    /// <summary>Waypoint's own window: the settings the App loaded at startup.</summary>
-    public Shared() : this(((App)System.Windows.Application.Current).Settings) { }
+    /// <summary>Waypoint's own window: the settings the App loaded at startup, or the ones a host executable handed over
+    /// (<see cref="HostSettings"/>; its App belongs to another assembly and the cast below would throw).</summary>
+    public Shared() : this(HostSettings.Current ?? ((App)System.Windows.Application.Current).Settings) { }
 
     /// <summary>The same for a window of its own (the two small launchers), which loads the settings itself.</summary>
     public Shared(Settings settings)

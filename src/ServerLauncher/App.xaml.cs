@@ -48,7 +48,9 @@ public partial class App : Application
             // The tools' own probe (python, node, git) only fills in paths; the window may open while it runs, or a slow
             // PATH costs the player a blank screen at startup.
             _ = Prerequisites.RefreshToolsAsync();
-            var window = new MainWindow(Settings);
+            // The sections are Waypoint's, their settings this host's: Waypoint's own App is not the running one.
+            HostSettings.Current = Settings;
+            var window = new MainWindow();
             MainWindow = window;
             ShutdownMode = ShutdownMode.OnMainWindowClose;
             window.Show();

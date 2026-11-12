@@ -275,7 +275,7 @@ public sealed partial class GameSystemsTab : UserControl
         var badges = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(12, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
         badges.Children.Add(Badge(card.IsFlag ? L.Text("League flag") : L.Text("Not shown"), "Shell.Accent"));
         if (root.Hardcore) { var hc = Badge(L.Text("Hardcore")); hc.Margin = new Thickness(8, 0, 0, 0); badges.Children.Add(hc); }
-        var title = new DockPanel(); DockPanel.SetDock(badges, Dock.Right); title.Children.Add(badges); title.Children.Add(Type(card.DisplayName, 25, true)); body.Children.Add(title);
+        var title = new DockPanel(); DockPanel.SetDock(badges, Dock.Right); title.Children.Add(badges); title.Children.Add(Type(card.Name, 25, true)); body.Children.Add(title);
         var settingsButton = SettingsEditor.Button("⚙", () =>
         {
             if (_leagueSettings is null) return;
@@ -288,7 +288,7 @@ public sealed partial class GameSystemsTab : UserControl
         });
         Named(settingsButton, L.Text("League settings")); settingsButton.Padding = new Thickness(7, 3, 7, 3); settingsButton.Margin = new Thickness(8, 0, 0, 0);
         badges.Children.Add(settingsButton);
-        var description = Type(root.Description.StartsWith('#') ? L.Text("Description uses the game's text key: {0}", root.Description) : L.Text(root.Description),
+        var description = Type(root.Description.StartsWith('#') ? L.Text("Description uses the game's text key: {0}", root.Description) : root.Description,
             13, false, "Shell.TextSecondary"); description.Margin = new Thickness(0, 8, 0, 0); body.Children.Add(description);
         if (_nativeArtwork is null) { var placeholder = Type(L.Text("Game artwork unavailable — placeholder flag shown."), 12, false, "Shell.TextSecondary"); placeholder.Margin = new Thickness(0, 8, 0, 0); body.Children.Add(placeholder); }
         if (!_catalog.ReachableMode(league))
@@ -311,7 +311,7 @@ public sealed partial class GameSystemsTab : UserControl
             var options = new StackPanel { Margin = new Thickness(12, 4, 0, 8) };
             foreach (var variant in links)
             {
-                var path = Type(L.Text("{0}: {1}", _catalog.ModePath(variant), variant.DisplayName)
+                var path = Type(L.Text("{0}: {1}", _catalog.ModePath(variant), variant.Name)
                     + (_catalog.ReachableMode(variant) ? "" : " · " + L.Text("Not shown")), 12, false, "Shell.TextSecondary");
                 path.Margin = new Thickness(0, 6, 0, 6); options.Children.Add(path);
             }
@@ -343,7 +343,7 @@ public sealed partial class GameSystemsTab : UserControl
             _selected = next; RenderSelection(focusMode: true);
         };
         choiceArea.Children.Add(_modeSelector);
-        var selectedProfile = Type(L.Text("Selected league: {0} · {1}", league.DisplayName, _catalog!.Modes(league)), 12, false, "Shell.TextSecondary");
+        var selectedProfile = Type(L.Text("Selected league: {0} · {1}", league.Name, _catalog!.Modes(league)), 12, false, "Shell.TextSecondary");
         selectedProfile.Margin = new Thickness(0); choiceArea.Children.Add(selectedProfile);
         var availability = new StackPanel { Orientation = Orientation.Horizontal };
         var visible = Badge(L.Text(_catalog!.ReachableMode(league) ? "Visible to new characters" : "Not shown at character creation"));
@@ -368,20 +368,20 @@ public sealed partial class GameSystemsTab : UserControl
         AddModuleChoices(_detail, league, _catalog!.Environment.CanChoose && _catalog.Configurable(league));
         _primary = FooterButton(L.Text("Save module choices"), () => _ = SaveChoicesAsync(league), primary: true);
         var details = new StackPanel { Margin = new Thickness(12, 8, 0, 8) };
-        details.Children.Add(SettingsEditor.Note(league.DisplayDescription));
+        details.Children.Add(SettingsEditor.Note(league.Description));
         details.Children.Add(SettingsEditor.Note(L.Text("Modes are fixed for existing characters. Create a separate league to choose another defined mode.")));
         var customize = SettingsEditor.Button(L.Text("Customize as a new league"), () => StartCreate(league));
         bool reusable = !league.Custom && _catalog.Configurable(league) && GameSystems.EmptyTemplate(league.Folder);
         customize.IsEnabled = reusable && _catalog.Environment.CanCreate; details.Children.Add(customize);
         if (!reusable) details.Children.Add(SettingsEditor.Note(L.Text("This league has custom code or no reusable source template. It cannot be safely copied.")));
         details.Children.Add(SettingsEditor.Note(L.Text("Any installed module can be turned on or off here when what it needs is on. Turning off this league's own bundle asks first, a module made for an isolated league stays in isolated leagues, and the rules of a game mode go with that mode's leagues and with leagues made in Waypoint.")));
-        details.Children.Add(SettingsEditor.Label(L.Text("Selected league definition: {0}", league.DisplayName)));
+        details.Children.Add(SettingsEditor.Label(L.Text("Selected league definition: {0}", league.Name)));
         if (league.EntryOf.Length > 0) details.Children.Add(SettingsEditor.Note(L.Text("Shown as a mode of: {0}", league.EntryOf)));
         if (league.Parent.Length > 0) details.Children.Add(SettingsEditor.Note(L.Text("Parent league: {0}", league.Parent)));
         _detail.Children.Add(new Expander { Header = L.Text("League details and compatibility"), Content = details, IsExpanded = false, Margin = new Thickness(0, 12, 0, 8) });
     }
-    static string ModuleTitle(GameSystem module) => L.Text(module.Name == module.Id
-        ? module.Id == "Game" ? L.Text("Core game rules") : Regex.Replace(module.Name, @"(?<=[a-z0-9])(?=[A-Z])", " ").Replace("Npc ", "NPC ") : module.Name);
+    static string ModuleTitle(GameSystem module) => module.Name == module.Id
+        ? module.Id == "Game" ? L.Text("Core game rules") : Regex.Replace(module.Name, @"(?<=[a-z0-9])(?=[A-Z])", " ").Replace("Npc ", "NPC ") : module.Name;
     TextBox AddModuleChoices(StackPanel panel, GameLeague league, bool editable)
     {
         _checks.Clear();
@@ -493,7 +493,7 @@ public sealed partial class GameSystemsTab : UserControl
     }
     string[] SelectedModules() => _creating ? _draftModules.ToArray() : _checks.Where(p => p.Value.IsChecked == true).Select(p => p.Key).ToArray();
     ComboBoxItem ModeItem(GameLeague league, IReadOnlyList<GameLeague> variants) => new()
-    { Content = _catalog!.ModePath(league) + (variants.Count(l => _catalog.ModePath(l) == _catalog.ModePath(league)) > 1 ? " (" + league.DisplayName + ")" : "")
+    { Content = _catalog!.ModePath(league) + (variants.Count(l => _catalog.ModePath(l) == _catalog.ModePath(league)) > 1 ? " (" + league.Name + ")" : "")
         + (_catalog.ReachableMode(league) ? "" : " · " + L.Text("Not shown")), Tag = league };
     void UpdateFeedback()
     {

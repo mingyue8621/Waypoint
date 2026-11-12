@@ -98,7 +98,7 @@ public sealed partial class GameSystemsTab
     {
         _nameFeedback = null;
         var title = Type(L.Text("2 of 2 · Modules and review"), 20, true); title.Margin = new Thickness(0, 0, 0, 6); _detail.Children.Add(title);
-        _detail.Children.Add(SettingsEditor.Label(_draftName!.Text + " · " + _catalog!.FlagOf(_draftTemplate!)!.DisplayName + " · " + _catalog.Modes(_draftTemplate!)));
+        _detail.Children.Add(SettingsEditor.Label(_draftName!.Text + " · " + _catalog!.FlagOf(_draftTemplate!)!.Name + " · " + _catalog.Modes(_draftTemplate!)));
         _detail.Children.Add(SettingsEditor.Note(L.Text("Creates one separate flag named {0}. Its chosen mode is fixed; no mode checkboxes are added.", _draftName.Text ?? "")));
         _detail.Children.Add(SettingsEditor.Note(_draftTemplate!.Hardcore ? L.Text("This league stays separate from Standard. Hardcore death is permanent.")
             : L.Text("This league has its own characters and stash. Nothing will migrate into Standard.")));
@@ -117,7 +117,7 @@ public sealed partial class GameSystemsTab
     }
     /// <summary>What the draft leaves out of the bundle of the league it starts from; empty when that bundle is whole.</summary>
     string DraftBundleWarning() => _catalog is not null && _draftTemplate is not null && _catalog.BundleLeftOut(_draftTemplate, _draftModules) is { Count: > 0 } left
-        ? L.Text("Without {0}, the new league has the mode of {1} but not its rules or content.", string.Join(", ", left.Select(ModuleTitle)), _draftTemplate.DisplayName) : "";
+        ? L.Text("Without {0}, the new league has the mode of {1} but not its rules or content.", string.Join(", ", left.Select(ModuleTitle)), _draftTemplate.Name) : "";
 
     /// <summary>What a module of a game mode means in a new league of another mode: the rules without the rest of the
     /// mode, and where the whole mode is to be had. Empty when the draft has none.</summary>
