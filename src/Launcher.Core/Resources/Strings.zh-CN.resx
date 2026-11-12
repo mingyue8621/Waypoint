@@ -10123,4 +10123,19 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
   <data name="Text_ab51004e9d71" xml:space="preserve">
     <value>天</value>
   </data>
+  <data name="Text_509c517ede79" xml:space="preserve">
+    <value>视角缩放</value>
+  </data>
+  <data name="Text_b0631061689f" xml:space="preserve">
+    <value>正常游玩时视距更远：镜头站得更靠后，用 /zoom 调整远近。</value>
+  </data>
+  <data name="Text_ad0d74f84ab0" xml:space="preserve">
+    <value>没有用 /zoom 自己设过的角色，镜头默认退多远。1 是游戏原本的视角。</value>
+  </data>
+  <data name="Text_8e6a6cca7aae" xml:space="preserve">
+    <value>步进</value>
+  </data>
+  <data name="Text_ada7233c9a41" xml:space="preserve">
+    <value>/zoom out 与 /zoom in 每次改变的级数。</value>
+  </data>
 </root>
