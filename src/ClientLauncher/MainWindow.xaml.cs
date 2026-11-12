@@ -117,9 +117,36 @@ public partial class MainWindow : Window
              !string.IsNullOrEmpty(dir); dir = Path.GetDirectoryName(dir)) yield return dir;
     }
 
-    /// <summary>The played client: the folder beside this executable first, as a package handed to a player is laid out.</summary>
+    /// <summary>The client folder the server itself patches: <c>Client.Folder</c> in Config\localexile.conf beside this
+    /// executable, absolute or relative to it. Null when the file names none.</summary>
+    static string? ConfiguredClient()
+    {
+        string conf = Path.Combine(AppContext.BaseDirectory, "Config", "localexile.conf");
+        if (!File.Exists(conf)) return null;
+        try
+        {
+            foreach (string line in File.ReadLines(conf))
+            {
+                string text = line.Trim();
+                if (text.Length == 0 || text[0] == '#') continue;
+                int equals = text.IndexOf('=');
+                if (equals < 0 || !text[..equals].Trim().Equals("Client.Folder", StringComparison.OrdinalIgnoreCase)) continue;
+                string value = text[(equals + 1)..].Trim().Trim('"');
+                if (value.Length == 0) return null;
+                return Path.IsPathRooted(value) ? value : Path.Combine(AppContext.BaseDirectory, value);
+            }
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+        return null;
+    }
+
+    /// <summary>The played client: the folder the server patches first (Client.Folder may keep the client outside the
+    /// install), then the folder beside this executable, as a package handed to a player is laid out.</summary>
     string? FindClient()
     {
+        if (ConfiguredClient() is { } configured && File.Exists(Path.Combine(configured, ClientExe)))
+            return Path.Combine(configured, ClientExe);
         foreach (string dir in Candidates())
         {
             string path = Path.Combine(dir, ClientFolder, ClientExe);
