@@ -111,10 +111,36 @@ public partial class MainWindow : Window
 
     static IEnumerable<string> Candidates()
     {
+        // A launcher kept inside the client folder still reads the server's mods, modules and change log: server.json's
+        // "install" names that folder.
+        if (ConfiguredInstall() is { } install) yield return install;
         yield return AppContext.BaseDirectory;
         yield return Environment.CurrentDirectory;
         for (string? dir = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
              !string.IsNullOrEmpty(dir); dir = Path.GetDirectoryName(dir)) yield return dir;
+    }
+
+    /// <summary>The server's folder when this launcher is not in it: <c>install</c> in server.json beside the launcher,
+    /// absolute or relative to it. Null when it names nothing that is there.</summary>
+    static string? ConfiguredInstall()
+    {
+        string file = Path.Combine(AppContext.BaseDirectory, "server.json");
+        if (!File.Exists(file)) return null;
+        try
+        {
+            using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(file));
+            if (!document.RootElement.TryGetProperty("install", out var field)
+                || field.ValueKind != System.Text.Json.JsonValueKind.String) return null;
+            string named = field.GetString()?.Trim() ?? "";
+            if (named.Length == 0) return null;
+            string full = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, named));
+            return Directory.Exists(full) ? full : null;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException
+            or ArgumentException or NotSupportedException)
+        {
+            return null;
+        }
     }
 
     /// <summary>The client folder the server itself patches: <c>Client.Folder</c> in Config\localexile.conf beside this
@@ -142,11 +168,14 @@ public partial class MainWindow : Window
     }
 
     /// <summary>The played client: the folder the server patches first (Client.Folder may keep the client outside the
-    /// install), then the folder beside this executable, as a package handed to a player is laid out.</summary>
+    /// install), then this launcher's own folder — a player keeps the launcher beside the game it starts, inside the
+    /// client folder, where the game is not in a Client\ folder of its own — then a Client\ beside it.</summary>
     string? FindClient()
     {
         if (ConfiguredClient() is { } configured && File.Exists(Path.Combine(configured, ClientExe)))
             return Path.Combine(configured, ClientExe);
+        string beside = Path.Combine(AppContext.BaseDirectory, ClientExe);
+        if (File.Exists(beside)) return beside;
         foreach (string dir in Candidates())
         {
             string path = Path.Combine(dir, ClientFolder, ClientExe);
@@ -284,7 +313,7 @@ public partial class MainWindow : Window
         string? client = FindClient();
         if (client is null)
         {
-            Tell($"没找到 Client\\{ClientExe}：请把登录器放在客户端文件夹旁边（客户端文件夹里要有 {ClientFolder}\\{ClientExe}）。", bad: true);
+            Tell($"没找到 {ClientExe}：把登录器放进客户端文件夹（和 {ClientExe} 同级），或者放进服务端文件夹（客户端在 {ClientFolder}\\ 里）。", bad: true);
             return;
         }
         string clientFolder = Path.GetDirectoryName(client)!;
@@ -308,21 +337,21 @@ public partial class MainWindow : Window
                 return;
             }
 
-            // The host's own copy.
-            if (_entry is not { } entry) { Tell(NoEntry, bad: true); return; }
-            string install = Path.GetDirectoryName(entry)!;
-            if (await AccountApi.CountAsync(_server) is 0)
-            {
-                Tell("服务器上还没有账号：先点「注册账号」建一个，再进入游戏。", bad: true);
-                return;
-            }
+            // The host's own copy. LocalExile.exe is optional: a player keeps the launcher inside the client folder, with no
+            // server install above it, and a server that is already up needs nothing from Disk but its ports.
+            string? install = _entry is { } besideServer ? Path.GetDirectoryName(besideServer) : null;
             if (Listening(6112))
             {
-                int patch = PatchPort(install);
+                int patch = install is null ? _server.PatchPort : PatchPort(install);
                 if (!Listening(patch))
                 {
                     Tell("补丁服务没有在运行：这样启动客户端，它会去连官方服务器并显示官方更新。" +
                         "请先在服务端启动器里把 Patch 启动起来。", bad: true);
+                    return;
+                }
+                if (await AccountApi.CountAsync(_server) is 0)
+                {
+                    Tell("服务器上还没有账号：先点「注册账号」建一个，再进入游戏。", bad: true);
                     return;
                 }
                 Start(client, $"--patching-server 127.0.0.1:{patch}", clientFolder,
@@ -333,7 +362,8 @@ public partial class MainWindow : Window
 
             // Nothing is up: LocalExile.exe prepares the client and the data, starts the servers, then the client — hidden,
             // so the player never sees a console window (its progress is watched by Poll).
-            StartServers(entry, install);
+            if (_entry is not { } entry) { Tell(NoServers, bad: true); return; }
+            StartServers(entry, install!);
         }
         finally
         {
@@ -479,7 +509,7 @@ public partial class MainWindow : Window
         { return null; }
     }
 
-    const string NoEntry = "未找到 LocalExile.exe：请把登录器与服务端的 LocalExile.exe 放在同一个文件夹里（发给玩家的包不需要它）。";
+    const string NoServers = "服务端没在运行，这个文件夹里也没有 LocalExile.exe：先在服务端启动器里启动服务端，再点「开始游戏」；或者把登录器放回服务端文件夹。";
 
     void Tell(string message, bool bad)
     {
