@@ -58,10 +58,13 @@ public static class LocalExileReleases
     /// <summary>The end of the name of this system's zip among a release's files.</summary>
     public static string AssetSuffix => OperatingSystem.IsWindows() ? "-win-x64.zip" : "-linux-x64.zip";
     public const string ManifestName = "release.json";
-    public const string LatestUrl = "https://api.github.com/repos/LocalExile/LocalExile/releases/latest";
+    /// <summary>Where this build's releases are published (owner/name). The project it was forked from keeps its own
+    /// releases; a fork's players need the fork's, or "check for updates" offers a version that is not this server's.</summary>
+    public const string Repository = "mingyue8621/LocalExile";
+    public const string LatestUrl = "https://api.github.com/repos/" + Repository + "/releases/latest";
     /// <summary>The newest release's page, for a player to download it by hand.</summary>
-    public const string ReleasesPage = "https://github.com/LocalExile/LocalExile/releases/latest";
-    public const string ListUrl = "https://api.github.com/repos/LocalExile/LocalExile/releases?per_page=30";
+    public const string ReleasesPage = "https://github.com/" + Repository + "/releases/latest";
+    public const string ListUrl = "https://api.github.com/repos/" + Repository + "/releases?per_page=30";
     /// <summary>Beside the install's files while a download is checked and extracted; never left behind.</summary>
     const string StagingName = ".waypoint-update";
     const string ZipRoot = "LocalExile/";
@@ -147,7 +150,7 @@ public static class LocalExileReleases
     /// <summary>One release by its tag (v0.1.0-beta); null when there is none.</summary>
     public static async Task<LocalExileRelease?> ByTagAsync(HttpClient client, string tag, CancellationToken stop = default)
     {
-        using var response = await client.GetAsync($"https://api.github.com/repos/LocalExile/LocalExile/releases/tags/{Uri.EscapeDataString(tag)}", stop);
+        using var response = await client.GetAsync($"https://api.github.com/repos/{Repository}/releases/tags/{Uri.EscapeDataString(tag)}", stop);
         if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
         response.EnsureSuccessStatusCode();
         return ParseRelease(await response.Content.ReadAsStringAsync(stop));

@@ -18,8 +18,9 @@ sealed record Release(Version Version, string Tag, string Page, string Notes, st
 /// </summary>
 static class Updates
 {
-    /// <summary>Where the releases are published (owner/name).</summary>
-    public const string Repository = "LocalExile/Waypoint";
+    /// <summary>Where the releases are published (owner/name): this build's own repository, not the project it was forked
+    /// from, so an update offers this launcher's releases.</summary>
+    public const string Repository = "mingyue8621/Waypoint";
     public const string ExeName = "Waypoint.exe";
 
     /// <summary>This build's version: the release's, 0.0.0 for a build from source.</summary>

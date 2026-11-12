@@ -31,8 +31,9 @@ static class Git
     public const string PullRequestPrefix = "pr/";
     /// <summary>How the launcher's stashes begin, so it finds its own and leaves the player's alone.</summary>
     public const string StashPrefix = "launcher: ";
-    /// <summary>The server's own repository (owner/name): its branches and its open pull requests are the ones Versions shows.</summary>
-    public const string UpstreamRepository = "LocalExile/LocalExile";
+    /// <summary>The server's own repository (owner/name): its branches and its open pull requests are the ones Versions shows.
+    /// This build's fork, which is where the commits are pushed, not the project it was forked from.</summary>
+    public const string UpstreamRepository = Launcher.Core.LocalExileReleases.Repository;
     /// <summary>Where the branches of <see cref="UpstreamRepository"/> are kept beside an origin that is a fork.</summary>
     const string UpstreamRefs = "launcher/upstream";
 
