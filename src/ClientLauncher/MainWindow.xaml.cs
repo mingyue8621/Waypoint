@@ -56,6 +56,7 @@ public partial class MainWindow : Window
         _poll.Tick += (_, _) => Poll();
         LoadArtwork();
         LoadFacts();
+        RecordClientFolder();
         ServerLabel.Text = _server.IsLocal ? "本地服务器" : "远程服务器";
         Loaded += (_, _) =>
         {
@@ -141,6 +142,22 @@ public partial class MainWindow : Window
         {
             return null;
         }
+    }
+
+    /// <summary>Tells the server where this launcher runs when it runs beside the game: with <c>Client.Folder = auto</c>
+    /// the server then patches and extracts from the client's own folder, so no path is written down in the config and a
+    /// copy moved to another drive keeps working.</summary>
+    void RecordClientFolder()
+    {
+        if (!File.Exists(Path.Combine(AppContext.BaseDirectory, ClientExe))) return;
+        if (ConfiguredInstall() is not { } install) return;
+        try
+        {
+            string data = Path.Combine(install, "data");
+            Directory.CreateDirectory(data);
+            File.WriteAllText(Path.Combine(data, "client-folder.txt"), AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
 
     /// <summary>The client folder the server itself patches: <c>Client.Folder</c> in Config\localexile.conf beside this
