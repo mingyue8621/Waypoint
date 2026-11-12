@@ -288,7 +288,7 @@ sealed class SettingsEditor : StackPanel
         "list" or "choices" => new JsonArray(), "map" or "group" => new JsonObject(),
         "choice" when setting.Options.Count > 0 => setting.Options[0].Value.DeepClone(), _ => JsonValue.Create(""),
     };
-    static string Heading(ModSetting s) => s.Title + (s.Format == "percent" ? " (%)" : s.Format == "duration" ? " (" + L.Text("seconds") + ")" : s.Format == "multiplier" ? " (×)" : s.Unit.Length > 0 ? " (" + s.Unit + ")" : "");
+    static string Heading(ModSetting s) => s.Title + (s.Format == "percent" ? " (%)" : s.Format == "duration" ? " (" + L.Text("seconds") + ")" : s.Format == "multiplier" ? " (×)" : s.Unit.Length > 0 ? " (" + L.Text(s.Unit) + ")" : "");
     static void Description(StackPanel panel, ModSetting s)
     {
         void Add(string text)

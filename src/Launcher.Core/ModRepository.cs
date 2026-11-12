@@ -54,9 +54,12 @@ public static class ClientCompatibility
         ? field.EnumerateArray().Where(e => e.ValueKind == JsonValueKind.String).Select(e => e.GetString()!.Trim()).Where(v => v.Length > 0).Take(64).ToArray()
         : [];
 
-    /// <summary>False only when the mod names its versions and <paramref name="client"/> is none of them.</summary>
+    /// <summary>False only when the mod asks for a newer LocalExile than this one. The field names the builds a mod was
+    /// made for, and a copy running a later build loads it too: the catalogue's own mods declare the first release that
+    /// carries the API they use ("0.5.0-beta"), so exact matching warned on every later build of this line.</summary>
     public static bool Fits(IReadOnlyList<string>? declared, ReleaseVersion? client) =>
-        declared is not { Count: > 0 } || client is null || declared.Any(v => ReleaseVersion.Parse(v) is { } version && version.CompareTo(client) == 0);
+        declared is not { Count: > 0 } || client is null
+        || declared.Any(v => ReleaseVersion.Parse(v) is { } version && version.CompareTo(client) <= 0);
 
     /// <summary>The versions as a mod's row shows them: "0.2.0-beta, 0.3.0"; "" for none.</summary>
     public static string Text(IReadOnlyList<string>? declared) => declared is { Count: > 0 } ? string.Join(", ", declared) : "";
