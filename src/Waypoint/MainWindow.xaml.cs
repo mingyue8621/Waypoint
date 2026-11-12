@@ -274,7 +274,8 @@ public partial class MainWindow : Window
             // not listed.
             : s.View is GameSystemsTab || s.View is PlayTab or InstallTab or ModsTab or BackupsTab or AccountsTab or ToolsTab or SettingsTab)).ToArray();
         // Developer Mode (Settings) unlocks the switch, on a release: a source copy has no Simple mode to switch to.
-        ModeSwitch.Visibility = Repo.IsInstall && _shared.Settings.Developer ? Visibility.Visible : Visibility.Collapsed;
+        // 流放之路服务端.exe has one mode: the servers. The switch would take it to Simple mode's Play and Install list.
+        ModeSwitch.Visibility = !HostSettings.ServersOnly && Repo.IsInstall && _shared.Settings.Developer ? Visibility.Visible : Visibility.Collapsed;
         var shown = Sections.SelectedItem as Section;
         Sections.ItemsSource = sections;
         Sections.SelectedItem = sections.Contains(shown) ? shown : sections[0];
