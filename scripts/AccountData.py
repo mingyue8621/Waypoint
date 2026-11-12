@@ -38,6 +38,12 @@ SPLIT = {"main": {**{t: c for t, c in SCHEMA.items() if t != "accounts"}, "accou
 KEYS = {"accounts": {"id": 1}, "account_characters": {"id": 1}, "characters": {"name": 1}, "stashes": {"account": 1},
         "stash_tabs": {"account": 1, "tab": 2}, "meta": {"key": 1}, "account_friends": {"owner": 1, "friend": 2}, "updates": {"name": 1}}
 INTEGERS = {"tab", "speed_ms"}
+# From the relational save move (sql/updates/characters/2026_11_11_181109_relational_saves.sql) a character's list entry
+# is columns rather than a JSON record, and its save is a row in character_saves with its child tables. The JSON tables
+# (account_characters_json, characters, deleted_characters, stashes, stash_tabs) stay beside them as a backup.
+RELATIONAL_CHARACTERS = ("id", "account_id", "name", "class", "level", "league", "created_utc", "last_played_utc")
+RELATIONAL_SAVES = ("id", "name", "deleted_utc")
+RELATIONAL_CHARACTER_COLUMNS = RELATIONAL_CHARACTERS + ("area_id", "last_town", "portrait", "portrait_frame")
 ACCOUNT_FIELDS = {"Id", "Name", "PasswordHash", "PasswordSalt", "CreatedUtc", "ClientDigestHash"}
 CHARACTER_FIELDS = {"Id", "AccountId", "Name", "Class", "Level", "League", "AreaId", "CreatedUtc",
                     "LastPlayedUtc", "LastTown", "Portrait", "HardcoreDeath", "PortraitFrame"}
@@ -111,6 +117,32 @@ def open_saves(path, auth=None, write=False):
     return db
 
 
+def relational(db):
+    """True for the relational save layout: a character's save is a row in character_saves, and its list entry is columns."""
+    tables = {r[0] for r in db.execute("SELECT name FROM main.sqlite_master WHERE type='table'")}
+    if "character_saves" not in tables:
+        return False
+    return "character" not in {r[1] for r in db.execute('PRAGMA main.table_info("account_characters")')}
+
+
+def character_record(row):
+    """A character list entry as the record the JSON column held, rebuilt from its columns."""
+    return {"Id": row["id"], "AccountId": row["account_id"], "Name": row["name"], "Class": row["class"],
+            "Level": row["level"], "League": row["league"], "AreaId": row["area_id"],
+            "CreatedUtc": row["created_utc"], "LastPlayedUtc": row["last_played_utc"], "LastTown": row["last_town"],
+            "Portrait": row["portrait"], "PortraitFrame": row["portrait_frame"]}
+
+
+def ascendancy_progress(db, save):
+    """The ascendancy a save picked, in the shape the catalog reads from a save's MainAscendancy."""
+    try:
+        row = db.execute("SELECT family, ascendancy FROM character_ascendancies WHERE save=? AND ascendancy IS NOT NULL",
+                         (save,)).fetchone()
+    except sqlite3.Error:
+        return {}
+    return {"MainAscendancy": {"Selection": {"Id": row[1], "Family": row[0]}}} if row else {}
+
+
 def inspect_schema(db, check_import=True):
     layout = SPLIT if split(db) else {"main": SCHEMA}
     tables = {schema: {r[0] for r in db.execute('SELECT name FROM "' + schema + '".sqlite_master WHERE type=\'table\' AND name NOT LIKE \'sqlite_%\'')}
@@ -119,6 +151,13 @@ def inspect_schema(db, check_import=True):
             "This database has no supported account tables. Use Create account to initialize LocalExile's account store.")
     # Unqualified names must find the accounts in auth.db: the characters database has none of its own.
     require("auth" not in layout or ("accounts" in tables["auth"] and "accounts" not in tables["main"]), "The account storage layout is not supported.")
+    if relational(db):
+        columns = {table: {r[1] for r in db.execute('PRAGMA main.table_info("' + table + '")')}
+                   for table in ("account_characters", "character_saves")}
+        require(set(RELATIONAL_CHARACTER_COLUMNS) <= columns["account_characters"] and set(RELATIONAL_SAVES) <= columns["character_saves"],
+                "The account storage layout is not supported.")
+        imported = "meta" in tables["main"] and db.execute("SELECT 1 FROM main.meta WHERE key='accounts_imported'").fetchone()
+        return bool(imported) or not check_import
     compatible = all(tables[schema] == set(expected) for schema, expected in layout.items())
     for schema, expected_tables in layout.items():
         for table, expected in expected_tables.items():
@@ -138,9 +177,14 @@ def inspect_schema(db, check_import=True):
 
 def snapshot(db):
     writable = inspect_schema(db)
+    relation = relational(db)
     accounts = [dict(r) for r in db.execute("SELECT id,name,account FROM accounts ORDER BY name COLLATE NOCASE,id LIMIT 2001")]
     require(len(accounts) <= 2000, "Too many accounts for this version of the account manager.")
-    chars = [dict(r) for r in db.execute("SELECT id,account_id,name,created_utc,character FROM account_characters ORDER BY created_utc,id LIMIT 48001")]
+    if relation:
+        chars = [dict(r) for r in db.execute("SELECT " + ",".join(RELATIONAL_CHARACTER_COLUMNS) + " FROM account_characters"
+                                            " ORDER BY created_utc,id LIMIT 48001")]
+    else:
+        chars = [dict(r) for r in db.execute("SELECT id,account_id,name,created_utc,character FROM account_characters ORDER BY created_utc,id LIMIT 48001")]
     require(len(chars) <= 48000, "Too many characters for this version of the account manager.")
     owners = {identity(a["id"]): a for a in accounts}
     by_name = {fold(a["name"]): a for a in accounts}
@@ -155,13 +199,23 @@ def snapshot(db):
     for ch in chars:
         identity(ch["id"])
         require(ch["account_id"] in owners, "A character points to an account that is missing.")
-        ch["data"] = record(ch["character"])
+        if relation:
+            ch["character"] = encode(character_record(ch))
+            ch["data"] = character_record(ch)
+        else:
+            ch["data"] = record(ch["character"])
         require(ch["data"].get("Id") == ch["id"] and ch["data"].get("AccountId") == ch["account_id"]
                 and ch["data"].get("Name") == ch["name"], "Character identity columns and JSON disagree.")
         writable &= set(ch["data"]) <= CHARACTER_FIELDS
-        saved = db.execute("SELECT save FROM characters WHERE name=?", (ch["name"],)).fetchone()
-        ch["save"] = saved[0] if saved else None
-        ch["progress"] = record(ch["save"]) if ch["save"] is not None else {}
+        if relation:
+            # HasProgress, and the ascendancy the list shows: the save is a row, not a JSON document in characters.save.
+            saved = db.execute("SELECT id FROM character_saves WHERE name=? AND deleted_utc IS NULL", (ch["name"],)).fetchone()
+            ch["save"] = "1" if saved else None
+            ch["progress"] = ascendancy_progress(db, saved[0]) if saved else {}
+        else:
+            saved = db.execute("SELECT save FROM characters WHERE name=?", (ch["name"],)).fetchone()
+            ch["save"] = saved[0] if saved else None
+            ch["progress"] = record(ch["save"]) if ch["save"] is not None else {}
         owners[ch["account_id"]]["characters"].append(ch)
     tables = {r[0] for r in db.execute("SELECT name FROM main.sqlite_master WHERE type='table'")}
     for table, collection in (("stashes", "stashes"), ("stash_tabs", "tabs")):
@@ -286,20 +340,35 @@ def change(db, accounts, request, root):
         db.execute("UPDATE accounts SET account=? WHERE id=?", (encode(data), a["id"]))
     elif action == "Delete":
         require(request.get("Name") == old, "Enter the exact account name to confirm deletion.")
+        relation = relational(db)
         for ch in a["characters"]:
-            if ch["save"] is not None:
-                db.execute("INSERT INTO deleted_characters VALUES(?,?,?)", (ch["name"], now, ch["save"]))
-            db.execute("DELETE FROM characters WHERE name=?", (ch["name"],))
+            if relation:
+                # The relational layout sets a deleted character's save aside with deleted_utc, as Auth does; nothing moves
+                # into the JSON backup table.
+                db.execute("UPDATE character_saves SET deleted_utc=? WHERE name=? AND deleted_utc IS NULL", (now, ch["name"]))
+            else:
+                if ch["save"] is not None:
+                    db.execute("INSERT INTO deleted_characters VALUES(?,?,?)", (ch["name"], now, ch["save"]))
+                db.execute("DELETE FROM characters WHERE name=?", (ch["name"],))
         db.execute("DELETE FROM account_characters WHERE account_id=?", (a["id"],))
         if db.execute("SELECT 1 FROM main.sqlite_master WHERE type='table' AND name='account_friends'").fetchone():
             db.execute("DELETE FROM account_friends WHERE owner=? OR friend=?", (a["id"], a["id"]))
         for key in {r["account"] for r in a["stashes"] + a["tabs"]}:
             db.execute("DELETE FROM stashes WHERE account=?", (key,))
             db.execute("DELETE FROM stash_tabs WHERE account=?", (key,))
+            if relation:
+                for row in db.execute("SELECT id FROM stash_saves WHERE account=?", (key,)).fetchall():
+                    db.execute("DELETE FROM items WHERE stash=?", (row["id"],))
+                    db.execute("DELETE FROM stash_tab_headers WHERE stash=?", (row["id"],))
+                    db.execute("DELETE FROM stash_module_data WHERE stash=?", (row["id"],))
+                    db.execute("DELETE FROM stash_saves WHERE id=?", (row["id"],))
         db.execute("DELETE FROM accounts WHERE id=?", (a["id"],))
     else:
         cloning = action == "Duplicate"
         include_characters = cloning and request.get("IncludeCharacters") is True
+        require(not (include_characters and relational(db)),
+                "This layout keeps a character's progress across many tables, so a copy cannot carry its characters. "
+                "Copy the account without characters, or create them in LocalExile.")
         include_stash = not cloning or request.get("IncludeStash") is True
         mapping = request.get("CharacterNames") or {}
         if include_characters:
