@@ -39,6 +39,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- DepotDownloader's official release, unchanged, for the game client from Steam (DepotTool.Bundled). It is not in the
+         repository: tools\Get-DepotDownloader.ps1 fetches it and checks its hash, and the release workflow runs that
+         before it publishes. A build made without it works too, and fetches the same release when it is first needed. -->
+    <EmbeddedResource Include="..\..\tools\bundled\DepotDownloader-windows-x64.zip" LogicalName="Bundled/DepotDownloader.zip"
+                      Condition="Exists('..\..\tools\bundled\DepotDownloader-windows-x64.zip')" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="Waypoint.Tests" />
     <!-- The two single-purpose launchers (src/ServerLauncher, src/ClientLauncher) reuse this assembly's sections,
          settings, service monitor and adapter; they carry their own window and entry point. -->
