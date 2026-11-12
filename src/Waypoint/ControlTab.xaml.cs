@@ -135,7 +135,20 @@ public partial class ControlTab : UserControl
         HotReload.IsChecked = shared.Settings.HotReload;
         ServerFolder.Text = Environment.CurrentDirectory;
         ServerFolder.ToolTip = Environment.CurrentDirectory;
-        ServiceList.ItemsSource = Repo.IsInstall ? _rows.Where(r => r.Service.Kind is ServiceKind.Server or ServiceKind.Client).ToList() : _rows;
+        // 流放之路服务端.exe: the servers only. Play (the game is the login launcher's job) and the two buttons that set
+        // up another copy or its client are left out, and the game's own row goes with them; the servers stay startable.
+        if (HostSettings.ServersOnly)
+        {
+            PlayButton.Visibility = Visibility.Collapsed;
+            GuidedSetupButton.Visibility = Visibility.Collapsed;
+            NewCopyButton.Visibility = Visibility.Collapsed;
+            // Switching the folder restarts the launcher through Waypoint's own App (App.StartAgain), which is not the
+            // one running here: it throws InvalidCastException (live 2026-11-08, localexile-server-crash.txt). This tool
+            // lives in its server folder and starts that one, so the picker goes with the rest of the install screens.
+            ChangeServerButton.Visibility = Visibility.Collapsed;
+        }
+        IEnumerable<ServiceRow> rows = HostSettings.ServersOnly ? _rows.Where(r => r.Service.Kind != ServiceKind.Client) : _rows;
+        ServiceList.ItemsSource = Repo.IsInstall ? rows.Where(r => r.Service.Kind is ServiceKind.Server or ServiceKind.Client).ToList() : rows.ToList();
         if (Repo.IsInstall)
             foreach (var element in new FrameworkElement[] { StopServersButton, RunOptions, CheckAgainButton, GameDataButton }) element.Visibility = Visibility.Collapsed;
         shared.Monitor.Sampled += samples => Dispatcher.BeginInvoke(() => ShowServices(samples));
@@ -204,12 +217,17 @@ public partial class ControlTab : UserControl
 
     Task<int?> Run(LiveRequest request, bool fridaReady = false) => Run(request, _shared.RunLiveAsync, fridaReady);
 
-    /// <summary>A run that starts a Gateway gets a backup of the saves first. Without one it goes on only if the player says
-    /// so.</summary>
+    /// <summary>A run that starts a Gateway gets a backup of the saves first — and only when the server's code changed
+    /// since that backup (a repository update or a version switch). Restarting the same version used to copy every save
+    /// database again on each start, which filled the Backups section with identical copies. Without a backup it goes on
+    /// only if the player says so.</summary>
     async Task<bool> BackUp(LiveRequest request)
     {
         if (!request.StartsGateway || !_shared.Settings.AutomaticBackups) return true;
+        string commit = _shared.Workspace.Latest?.SourceCommit ?? "";
+        if (commit.Length > 0 && string.Equals(commit, _shared.Settings.LastBackupCommit, StringComparison.OrdinalIgnoreCase)) return true;
         var result = await _shared.Workspace.OperateAsync("Backup", L.Text("Back up now"), quiet: true);
+        if (result is { Ok: true } && commit.Length > 0) { _shared.Settings.LastBackupCommit = commit; _shared.Settings.Save(); }
         return result is { Ok: true } || Dialog.Ask(Window.GetWindow(this), DialogKind.Warning, L.Text("Start without a backup?"),
             L.Text("The saves could not be backed up. Automatic backups can be turned off on the Backups section."), L.Text("Start anyway"), cancelByDefault: true);
     }
@@ -407,6 +425,9 @@ public partial class ControlTab : UserControl
         if (Repo.IsInstall) InstallServersRequested?.Invoke();
         else await Run(Request(LiveMode.Servers));
     }
+
+    /// <summary>The servers and never the game: what 流放之路服务端.exe starts from the Versions section's switch.</summary>
+    internal Task StartServersOnlyAsync() => Run(Request(LiveMode.Servers));
 
     /// <summary>The client, the recorder, the servers and the dev host.</summary>
     async void StopAll(object sender, RoutedEventArgs e)

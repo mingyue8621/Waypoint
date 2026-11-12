@@ -89,6 +89,10 @@ sealed class Settings
     public string Language { get; set; } = "";
     /// <summary>Back the saves up before a server start, a checkout switch or an account change.</summary>
     public bool AutomaticBackups { get; set; } = true;
+    /// <summary>The server code (a checkout's commit, or the release's) the last automatic backup was made for. A start on
+    /// the same one does not back the saves up again: only a repository update or a version switch does. Empty until the
+    /// first backup. "Back up now" on the Backups section ignores it.</summary>
+    public string LastBackupCommit { get; set; } = "";
     /// <summary>Use the checkout's scripts/dev/live.local.ps1 where it has one (its config/runtime.local.ps1 included).</summary>
     public bool UseLocalProfile { get; set; } = true;
     /// <summary>Closing the window hides it in the tray instead of exiting.</summary>

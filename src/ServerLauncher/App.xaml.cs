@@ -42,6 +42,9 @@ public partial class App : Application
             L.Current.SetLanguage(Settings.Language);
             Theme.Apply(Settings.Appearance);
             Repo.UseLocalProfile = Settings.UseLocalProfile;
+            // This window carries the servers and nothing else: no Play button, no install, no game client (see
+            // HostSettings.ServersOnly and ControlTab.Attach).
+            HostSettings.ServersOnly = true;
             if (Settings.ServerPath != root) { Settings.ServerPath = root; Settings.Save(); }
             Environment.CurrentDirectory = root;
             Repo.IsInstall = LocalExileReleases.IsInstall(root);

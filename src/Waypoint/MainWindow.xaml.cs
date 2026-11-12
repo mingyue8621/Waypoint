@@ -204,7 +204,11 @@ public partial class MainWindow : Window
         Versions.PlayRequested += () =>
         {
             ShowSection(Control);
-            _ = Control.PlayAsync();
+            // 流放之路服务端.exe starts the servers and never the game (HostSettings.ServersOnly): a release install runs
+            // LocalExile.exe with --no-client, a checkout live.ps1 -NoClient.
+            if (!HostSettings.ServersOnly) { _ = Control.PlayAsync(); return; }
+            if (Repo.IsInstall) _ = InstallView.StartServersAsync();
+            else _ = Control.StartServersOnlyAsync();
         };
         Control.ShowLogRequested += source =>
         {

@@ -366,8 +366,11 @@ public partial class VersionsTab : UserControl
                 L.Text("You stashed changes when you left {0}. Restore them now?", _current), L.Text("Restore"), L.Text("Not now")))
             await RestoreAsync(back);
 
+        // 流放之路服务端.exe has no game: its switch offers the servers alone.
+        bool serversOnly = HostSettings.ServersOnly;
         if (Dialog.Ask(owner, DialogKind.Info, update ? L.Text("{0} updated", label) : L.Text("Switched to {0}", label),
-                L.Text("Build it and start the servers and the game now?"), L.Text("Play"), L.Text("Later")))
+                serversOnly ? L.Text("Build and start the servers now?") : L.Text("Build it and start the servers and the game now?"),
+                L.Text(serversOnly ? "Start servers" : "Play"), L.Text("Later")))
             PlayRequested?.Invoke();
     }
 

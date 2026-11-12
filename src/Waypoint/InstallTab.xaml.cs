@@ -302,13 +302,17 @@ public partial class InstallTab : UserControl
         return false;
     }
 
-    /// <summary>As on the Control section: a start gets a backup of the saves first, or the player's word to go on without.</summary>
+    /// <summary>As on the Control section: a start gets a backup of the saves first, and only when this release is not the
+    /// one the last backup was made for. Restarting the same version no longer copies the saves every time.</summary>
     async Task<bool> BackUp()
     {
         if (!_shared.Settings.AutomaticBackups || !LocalExileReleases.HasSaves(Folder)) return true;
+        string commit = LocalExileReleases.InstalledCommit(Folder) ?? "";
+        if (commit.Length > 0 && string.Equals(commit, _shared.Settings.LastBackupCommit, StringComparison.OrdinalIgnoreCase)) return true;
         _headline = () => L.Text("Backing up your saves");
         Show();
         var result = await _shared.Workspace.OperateAsync("Backup", L.Text("Back up now"), quiet: true);
+        if (result is { Ok: true } && commit.Length > 0) { _shared.Settings.LastBackupCommit = commit; _shared.Settings.Save(); }
         _headline = null;
         Show();
         return result is { Ok: true } || Dialog.Ask(Window.GetWindow(this), DialogKind.Warning, L.Text("Start without a backup?"),

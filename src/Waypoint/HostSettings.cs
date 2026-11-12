@@ -11,4 +11,8 @@ namespace Waypoint;
 static class HostSettings
 {
     internal static Settings? Current { get; set; }
+
+    /// <summary>Set by 流放之路服务端.exe: this window runs the servers and nothing else. No Play (the game is
+    /// 流放之路登录器.exe's job), no install or setup of a copy, and nothing that asks for the game client.</summary>
+    internal static bool ServersOnly { get; set; }
 }

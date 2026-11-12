@@ -82,7 +82,7 @@
     <value>关闭窗口会完全退出 Waypoint。</value>
   </data>
   <data name="Text_01fc520500a2" xml:space="preserve">
-    <value>此操作会删除此账号、其所有角色和进度，以及其在所有联盟中的个人仓库和公会仓库。其他账号不受影响。</value>
+    <value>此操作会删除此账号、其所有角色和进度，以及其在所有联赛中的个人仓库和公会仓库。其他账号不受影响。</value>
   </data>
   <data name="Text_020b463b53f2" xml:space="preserve">
     <value>旧的 LocalExile 已删除。你的旧存档仍在 {0} 中。</value>
@@ -610,7 +610,7 @@
     <value>配色方案</value>
   </data>
   <data name="Text_110ca02d1eab" xml:space="preserve">
-    <value>保存联盟选择</value>
+    <value>保存联赛选择</value>
   </data>
   <data name="Text_112d64cc9b85" xml:space="preserve">
     <value>正在获取…</value>
@@ -1124,7 +1124,7 @@
     <value>游戏设置：</value>
   </data>
   <data name="Text_2116693c448c" xml:space="preserve">
-    <value>此联盟已结束或不允许创建新角色。模块选择为只读。</value>
+    <value>此联赛已结束或不允许创建新角色。模块选择为只读。</value>
   </data>
   <data name="Text_2125db5eddda" xml:space="preserve">
     <value>LocalExile 已就绪</value>
@@ -1232,7 +1232,7 @@
     <value>密码只能使用英文字母、数字和常用符号。</value>
   </data>
   <data name="Text_241b991ef5b7" xml:space="preserve">
-    <value>联盟卡片预览</value>
+    <value>联赛卡片预览</value>
   </data>
   <data name="Text_241cc97b1195" xml:space="preserve">
     <value>检查客户端副本，并使用经过验证的原始文件修复过时的可执行文件；保留登录密钥并备份被替换的文件</value>
@@ -1554,7 +1554,7 @@
     <value>最小化按钮仍会最小化到任务栏。隐藏后，点击时钟旁的 Waypoint 图标即可返回。该图标可能位于隐藏图标箭头下。</value>
   </data>
   <data name="Text_2b5ee1db6952" xml:space="preserve">
-    <value>模块提供游戏系统。使用同一模块的所有联盟共用其设置。</value>
+    <value>模块提供游戏系统。使用同一模块的所有联赛共用其设置。</value>
   </data>
   <data name="Text_2b69057ec9ef" xml:space="preserve">
     <value>密码必须至少包含 4 个字符。</value>
@@ -1695,7 +1695,7 @@
     <value>退出 Waypoint</value>
   </data>
   <data name="Text_2f6a2e837148" xml:space="preserve">
-    <value>从源码构建</value>
+    <value>服务端启动器（明月-QQ：425986131）</value>
   </data>
   <data name="Text_2f77668a9dfb" xml:space="preserve">
     <value>消息</value>
@@ -1873,10 +1873,10 @@
     <value>{0:0.0} / {1:0.0} GB · {2:0} MB/s · {3}</value>
   </data>
   <data name="Text_348e16b56997" xml:space="preserve">
-    <value>Waypoint（从源码构建）</value>
+    <value>服务端启动器（明月-QQ：425986131）</value>
   </data>
   <data name="Text_3497ee23c710" xml:space="preserve">
-    <value>缺少模块：{0}。更改此联盟前请先恢复该模块。</value>
+    <value>缺少模块：{0}。更改此联赛前请先恢复该模块。</value>
   </data>
   <data name="Text_349999ba0325" xml:space="preserve">
     <value>不可选：已隐藏、已结束、未加载或无法通过有效模式关联到达。请先检查此定义，再启用显示。</value>
@@ -1981,7 +1981,7 @@
     <value>正在提取数据</value>
   </data>
   <data name="Text_3829bf0ef80f" xml:space="preserve">
-    <value>此安装中未找到模块或联盟。</value>
+    <value>此安装中未找到模块或联赛。</value>
   </data>
   <data name="Text_3864a7129335" xml:space="preserve">
     <value>打开相邻区域</value>
@@ -2183,7 +2183,7 @@
     <value> · 已跟踪的文件无修改</value>
   </data>
   <data name="Text_3d502d9e88cc" xml:space="preserve">
-    <value>在标准联盟中创建；其他联盟可在游戏自带的角色创建界面中选择</value>
+    <value>在标准联赛中创建；其他联赛可在游戏自带的角色创建界面中选择</value>
   </data>
   <data name="Text_3da865c1058e" xml:space="preserve">
     <value>从源码设置第二个 LocalExile，你可以自行修改和构建它。你可以带上你的角色。</value>
@@ -2366,7 +2366,7 @@
     <value>{0} 的副本名称：</value>
   </data>
   <data name="Text_4426efcaf970" xml:space="preserve">
-    <value>请刷新工作区以查看模块和联盟。</value>
+    <value>请刷新工作区以查看模块和联赛。</value>
   </data>
   <data name="Text_442aded87a55" xml:space="preserve">
     <value>性能</value>
@@ -2684,7 +2684,7 @@
     <value>放弃此草稿中的模块选择并使用所选配置吗？</value>
   </data>
   <data name="Text_4d68e465fa3f" xml:space="preserve">
-    <value>此服务器不支持覆盖联盟模块选择。请更新 LocalExile 后再编辑。</value>
+    <value>此服务器不支持覆盖联赛模块选择。请更新 LocalExile 后再编辑。</value>
   </data>
   <data name="Text_4d7056f0e9be" xml:space="preserve">
     <value>色调</value>
@@ -3103,7 +3103,7 @@
     <value>Steam 和 Epic 版本没有 Content.ggpk，无法使用。请选择独立版安装。</value>
   </data>
   <data name="Text_5a56864947f6" xml:space="preserve">
-    <value>无联盟</value>
+    <value>无联赛</value>
   </data>
   <data name="Text_5a624ed29811" xml:space="preserve">
     <value>加载 / 刷新列表</value>
@@ -3148,7 +3148,7 @@
     <value>你可以自己删除该文件夹：{0}</value>
   </data>
   <data name="Text_5c4902df399e" xml:space="preserve">
-    <value>模块选择尚未保存。离开此联盟前请先保存。</value>
+    <value>模块选择尚未保存。离开此联赛前请先保存。</value>
   </data>
   <data name="Text_5c520be69184" xml:space="preserve">
     <value>选择本地分支、已获取的远程分支或上游 PR。切换时会停止所属的服务器、备份存档并构建该修订版本。请先关闭游戏，之后再点击“开始游戏”。</value>
@@ -3883,7 +3883,7 @@
     <value>添加仓库…</value>
   </data>
   <data name="Text_730840dd1dd4" xml:space="preserve">
-    <value>共用设置：更改会影响使用此模块的所有联盟。</value>
+    <value>共用设置：更改会影响使用此模块的所有联赛。</value>
   </data>
   <data name="Text_735373328df6" xml:space="preserve">
     <value>此账号没有可复制的角色。</value>
@@ -4267,7 +4267,7 @@
     <value>开始游戏、日志和设置。</value>
   </data>
   <data name="Text_7f06ea4f0831" xml:space="preserve">
-    <value>联盟</value>
+    <value>联赛</value>
   </data>
   <data name="Text_7f1aa82e323e" xml:space="preserve">
     <value>停止服务器后执行 dotnet build GameServer.slnx</value>
@@ -4396,7 +4396,7 @@
     <value>此提交</value>
   </data>
   <data name="Text_83cfb8ea3107" xml:space="preserve">
-    <value>从源码构建</value>
+    <value>服务端启动器（明月-QQ：425986131）</value>
   </data>
   <data name="Text_83e5d63b7b18" xml:space="preserve">
     <value>创建模式变体</value>
@@ -4618,7 +4618,7 @@
     <value>随机种子</value>
   </data>
   <data name="Text_8ad2eaa716dc" xml:space="preserve">
-    <value>可游玩的联盟必须包含 Game 模块。</value>
+    <value>可游玩的联赛必须包含 Game 模块。</value>
   </data>
   <data name="Text_8ad920a3b55b" xml:space="preserve">
     <value>塑界者</value>
@@ -5079,7 +5079,7 @@
     <value>更多模组工具</value>
   </data>
   <data name="Text_984c29f084d4" xml:space="preserve">
-    <value>从源码构建</value>
+    <value>服务端启动器（明月-QQ：425986131）</value>
   </data>
   <data name="Text_984f80d3f5cd" xml:space="preserve">
     <value>Waypoint 只会将文件移动到空文件夹。你可以按原样使用这个文件夹及其内容；{0} 中的文件会保留在原处。</value>
@@ -5106,7 +5106,7 @@
     <value>模组设置</value>
   </data>
   <data name="Text_98d234d4a19d" xml:space="preserve">
-    <value>保存的选择将在下次重启服务器后生效。现有角色仍留在原联盟。</value>
+    <value>保存的选择将在下次重启服务器后生效。现有角色仍留在原联赛。</value>
   </data>
   <data name="Text_98d3dd871595" xml:space="preserve">
     <value>最新 {0}</value>
@@ -5485,7 +5485,7 @@
     <value>状态</value>
   </data>
   <data name="Text_a3b950ea7195" xml:space="preserve">
-    <value>无发布：从源码构建</value>
+    <value>无发布：服务端启动器（明月-QQ：425986131）</value>
   </data>
   <data name="Text_a3b98f7ed11c" xml:space="preserve">
     <value>请输入有效的账号名：3–32 个字母、数字、下划线或连字符。</value>
@@ -5917,7 +5917,7 @@
     <value>Waypoint Tools 已安装。正在运行的游戏会在一秒内加载它：用角色进入一个区域，然后再次发放物品。</value>
   </data>
   <data name="Text_afe3c1947d3b" xml:space="preserve">
-    <value>联盟</value>
+    <value>联赛</value>
   </data>
   <data name="Text_b00ef4aaae35" xml:space="preserve">
     <value>{0} 中的副本包含你自己对 LocalExile 代码的更改，因此其中的角色可能不适用于此发布版。</value>
@@ -6073,7 +6073,7 @@
     <value>增加服务器、分支和拉取请求、备份、性能、日志和控制台。此后 Waypoint 不会再自行更新 LocalExile。</value>
   </data>
   <data name="Text_b4bc18631d5c" xml:space="preserve">
-    <value>联盟选择已保存。准备应用时请重启服务器。</value>
+    <value>联赛选择已保存。准备应用时请重启服务器。</value>
   </data>
   <data name="Text_b4c474e219cb" xml:space="preserve">
     <value>已保存的选项：{0}</value>
@@ -6367,7 +6367,7 @@
     <value>构建</value>
   </data>
   <data name="Text_be330ee79b3c" xml:space="preserve">
-    <value>联盟</value>
+    <value>联赛</value>
   </data>
   <data name="Text_be3ff8326226" xml:space="preserve">
     <value>你的游戏客户端</value>
@@ -6505,7 +6505,7 @@
     <value>{0}：{1}。显示服务详情。</value>
   </data>
   <data name="Text_c2e0c347e274" xml:space="preserve">
-    <value>联盟模组</value>
+    <value>联赛模组</value>
   </data>
   <data name="Text_c2e3a381a34a" xml:space="preserve">
     <value>{0:N0} KB</value>
@@ -7035,7 +7035,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>此处已安装 LocalExile {0}。</value>
   </data>
   <data name="Text_d3d8d0a92084" xml:space="preserve">
-    <value>联盟设置</value>
+    <value>联赛设置</value>
   </data>
   <data name="Text_d40afb35e5e4" xml:space="preserve">
     <value>属于此联赛自身的模块组。停用前会先询问。</value>
@@ -7365,7 +7365,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>这个游戏客户端与其他 LocalExile 副本共用，它们也会使用 {0}。</value>
   </data>
   <data name="Text_de6933c6727c" xml:space="preserve">
-    <value>更改模块选择前，请先保存或放弃联盟设置更改。</value>
+    <value>更改模块选择前，请先保存或放弃联赛设置更改。</value>
   </data>
   <data name="Text_de737b22972b" xml:space="preserve">
     <value>已保存启用：{0}</value>
@@ -7567,7 +7567,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>火山</value>
   </data>
   <data name="Text_e3a640bd65b5" xml:space="preserve">
-    <value>选择各联盟使用的模块。模块选择更改需要重启服务器。</value>
+    <value>选择各联赛使用的模块。模块选择更改需要重启服务器。</value>
   </data>
   <data name="Text_e3aaf711bc78" xml:space="preserve">
     <value>你的其他 LocalExile 文件夹</value>
@@ -7660,7 +7660,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>Steam 安装版没有 Content.ggpk</value>
   </data>
   <data name="Text_e6acd5da3a93" xml:space="preserve">
-    <value>显示为以下联盟的模式：{0}</value>
+    <value>显示为以下联赛的模式：{0}</value>
   </data>
   <data name="Text_e6b997d9bc50" xml:space="preserve">
     <value>此锚点没有匹配的怪物群数据。</value>
@@ -7777,7 +7777,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>进入可游玩区域以使用实时控制，或停止 Gateway 以保存启用设置。</value>
   </data>
   <data name="Text_e9ff4eed6056" xml:space="preserve">
-    <value>父联盟：{0}</value>
+    <value>父联赛：{0}</value>
   </data>
   <data name="Text_ea044783b897" xml:space="preserve">
     <value>怪物群：{0}</value>
@@ -8369,7 +8369,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>隐藏到托盘</value>
   </data>
   <data name="Text_fac527da85f5" xml:space="preserve">
-    <value>选择使用此模块的联盟</value>
+    <value>选择使用此模块的联赛</value>
   </data>
   <data name="Text_fac63f370862" xml:space="preserve">
     <value>{0} 中没有游戏设置。</value>
@@ -8643,7 +8643,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>传送门外观：商城效果会替换基础传送门的视觉</value>
   </data>
   <data name="Text_1ddc894c4c46" xml:space="preserve">
-    <value>把浮士德的通货交易所做成实时市场：采用官方 Path of Exile 联盟的价格，含价差、深度与会随时间成交的订单。</value>
+    <value>把浮士德的通货交易所做成实时市场：采用官方 Path of Exile 联赛的价格，含价差、深度与会随时间成交的订单。</value>
   </data>
   <data name="Text_2200fbfe3efb" xml:space="preserve">
     <value>默认：最后生成的那一个</value>
@@ -8682,7 +8682,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>全焰</value>
   </data>
   <data name="Text_2eb515aacf07" xml:space="preserve">
-    <value>显示死亡界面；默认按当前联盟；2 表示隐藏</value>
+    <value>显示死亡界面；默认按当前联赛；2 表示隐藏</value>
   </data>
   <data name="Text_2f0c74977b99" xml:space="preserve">
     <value>服务端不会应答这条命令：它的 Gateway 没有控制台通道（用这个启动器的版本启动一次即可）。</value>
@@ -8871,7 +8871,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>没有角色在游戏中</value>
   </data>
   <data name="Text_5b1a8c5b3e21" xml:space="preserve">
-    <value>打捞沉没的宝藏，驾驭全焰之力。硬核·全焰中死亡的角色会转入全焰联盟。</value>
+    <value>打捞沉没的宝藏，驾驭全焰之力。硬核·全焰中死亡的角色会转入全焰联赛。</value>
   </data>
   <data name="Text_5c0ded9bef04" xml:space="preserve">
     <value>放入背包，例如 /item Small Life Flask 2、/item Iron Ring rare</value>
@@ -9254,7 +9254,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>幸存者</value>
   </data>
   <data name="Text_dd1c36e6ced4" xml:space="preserve">
-    <value>幸存者联盟</value>
+    <value>幸存者联赛</value>
   </data>
   <data name="Text_ded9ea0a0a08" xml:space="preserve">
     <value>开发：升华试炼环形陷阱同一波中两个尖刺的间隔时间（下波起生效）</value>
@@ -9302,7 +9302,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>默认游戏模式。独狼：不能交易或组队。</value>
   </data>
   <data name="Text_e852aef86be8" xml:space="preserve">
-    <value>在标准（Standard）联盟；其它联盟由游戏自带的角色创建界面提供</value>
+    <value>在标准（Standard）联赛；其它联赛由游戏自带的角色创建界面提供</value>
   </data>
   <data name="Text_e8857091f9bb" xml:space="preserve">
     <value>配置“发放物品”（推荐）</value>
@@ -9335,13 +9335,13 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>开发：查看持有的充能、上限、下限与剩余时间；可设置、获得或清空</value>
   </data>
   <data name="Text_f4bb385af267" xml:space="preserve">
-    <value>硬核模式中死亡的角色会转入标准联盟。</value>
+    <value>硬核模式中死亡的角色会转入标准联赛。</value>
   </data>
   <data name="Text_faff88ba75c3" xml:space="preserve">
     <value>安装 Frida，以便使用“发放物品”。</value>
   </data>
   <data name="Text_fbaa340c6cfc" xml:space="preserve">
-    <value>开发：按客户端 id 列出、设置或清除联盟任务旗标（按联盟保存）</value>
+    <value>开发：按客户端 id 列出、设置或清除联赛任务旗标（按联赛保存）</value>
   </data>
   <data name="Text_fc34d7eee5c0" xml:space="preserve">
     <value>开发：应用「马卡努伊之旅」，可随机或指定</value>
@@ -9431,7 +9431,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>标准赛季的定价</value>
   </data>
   <data name="Text_e8a8e34dd63a" xml:space="preserve">
-    <value>本服的标准联赛按哪个官方 Path of Exile 联盟的价格交易。</value>
+    <value>本服的标准联赛按哪个官方 Path of Exile 联赛的价格交易。</value>
   </data>
   <data name="Text_b85409369ff1" xml:space="preserve">
     <value>当前赛季</value>
@@ -9440,7 +9440,7 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
     <value>其它赛季的定价</value>
   </data>
   <data name="Text_cfdbaf444ec1" xml:space="preserve">
-    <value>本服其它联赛（含硬核）按哪个官方 Path of Exile 联盟的价格交易。</value>
+    <value>本服其它联赛（含硬核）按哪个官方 Path of Exile 联赛的价格交易。</value>
   </data>
   <data name="Text_b11fb1f593a8" xml:space="preserve">
     <value>价差</value>

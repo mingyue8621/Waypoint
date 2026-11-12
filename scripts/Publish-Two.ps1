@@ -16,7 +16,14 @@ New-Item -ItemType Directory -Force $Out | Out-Null
 Set-Location $repo
 foreach ($project in 'src\ServerLauncher', 'src\ClientLauncher') {
     Write-Host "[$(Get-Date -Format 'HH:mm:ss')] publishing $project ..."
-    dotnet publish $project -c Release -o $Out --nologo -v q
+    # 流放之路服务端.exe is handed to other PCs on its own: self-contained, so no .NET Desktop Runtime has to be installed
+    # there first (it is ~150 MB instead of ~23 MB for that reason). The switch has to be a global property, because a
+    # self-contained executable may not reference the framework-dependent Waypoint.exe (NETSDK1150), so the whole
+    # reference chain is built self-contained for this project only. The login launcher stays as it was: it lives inside
+    # the client folder, next to everything else.
+    $carry = @()
+    if ($project -eq 'src\ServerLauncher') { $carry = @('-p:SelfContained=true') }
+    dotnet publish $project -c Release -o $Out --nologo -v q @carry
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish $project failed (exit $LASTEXITCODE)" }
 }
 # Their names are the projects' assembly names, so list whatever landed rather than spelling them out here.

@@ -12,7 +12,11 @@
     <Version>0.0.0-dev</Version>
     <ApplicationIcon>..\..\branding\app.ico</ApplicationIcon>
     <SatelliteResourceLanguages>en;zh-CN</SatelliteResourceLanguages>
-    <RuntimeIdentifier Condition="'$(Configuration)' == 'Release'">win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Publish-Two.ps1 passes -p:SelfContained=true for this project, so the .exe carries its own .NET runtime: copy it
+         to another Windows PC and it runs, with no .NET Desktop Runtime to install first. It cannot be set here alone —
+         a self-contained executable may not reference the framework-dependent Waypoint.exe (NETSDK1150) — so the switch
+         is a global property that makes the whole reference chain self-contained for this one publish. -->
     <SelfContained>false</SelfContained>
     <!-- One file, as Waypoint.exe is: the bundle unpacks Waypoint's resources for the XAML to find them. -->
     <PublishSingleFile>true</PublishSingleFile>

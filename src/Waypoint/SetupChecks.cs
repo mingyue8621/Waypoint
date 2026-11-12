@@ -6,7 +6,39 @@ namespace Waypoint;
 /// without (✗), and what it starts without but plays worse (!).</summary>
 static class SetupChecks
 {
-    public static List<SetupCheck> Run()
+    public static List<SetupCheck> Run() => HostSettings.ServersOnly ? RunServers() : RunAll();
+
+    /// <summary>流放之路服务端.exe: what the servers themselves need, and nothing about the game. The client, the game
+    /// settings and Frida belong to the login launcher and the game, and asking for them here is what made this tool look
+    /// like it needed a client installed.</summary>
+    static List<SetupCheck> RunServers()
+    {
+        var checks = new List<SetupCheck>();
+        if (Repo.IsInstall)
+        {
+            checks.Add(System.IO.File.Exists("LocalExile.exe")
+                ? new(true, L.Text("release install: LocalExile.exe is here"))
+                : new(false, L.Text("LocalExile.exe is not in this folder"),
+                    L.Text("Put 流放之路服务端.exe in the folder that holds LocalExile.exe and release.json.")));
+            checks.Add(System.IO.File.Exists("release.json")
+                ? new(true, L.Text("release install: release.json is here"))
+                : new(false, L.Text("release.json is not in this folder: the version is unknown")));
+            return checks;
+        }
+        bool live = System.IO.File.Exists(Repo.LiveScript);
+        checks.Add(live
+            ? new(true, L.Text("server checkout: live.ps1 drives the servers"))
+            : new(false, L.Text("live.ps1 is not in this folder: it is not the server checkout")));
+        if (live) checks.Add(ServerHooks());
+#if WINDOWS
+        checks.Add(OnPath("dotnet.exe") ? new(true, ".NET SDK") : new(false, L.Text(".NET SDK not found (dotnet)"), "https://dotnet.microsoft.com/download"));
+#else
+        checks.Add(OnPath("dotnet") ? new(true, ".NET SDK") : new(false, L.Text(".NET SDK not found (dotnet)"), "https://dotnet.microsoft.com/download"));
+#endif
+        return checks;
+    }
+
+    static List<SetupCheck> RunAll()
     {
         var checks = new List<SetupCheck>
         {

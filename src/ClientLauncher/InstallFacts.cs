@@ -171,7 +171,7 @@ public static class InstallFacts
         ["10 times the chance of magic, rare and unique equipment."] = "魔法、稀有与传奇装备的概率 ×10（倍率可在服务端启动器的「模组」页调整）。",
         ["Live Economy"] = "实时经济",
         ["Faustus's Currency Exchange as a live market: the official Path of Exile leagues' prices, a spread, depth, and orders that fill with time."] =
-            "把浮士德的通货交易所做成实时市场：采用官方 Path of Exile 联盟的价格，含价差、深度与会随时间成交的订单。",
+            "把浮士德的通货交易所做成实时市场：采用官方 Path of Exile 联赛的价格，含价差、深度与会随时间成交的订单。",
         ["POB"] = "POB 构筑导入",
         ["Preview and import a character build through a configured external PoB converter."] =
             "通过配置好的外部 PoB 转换器预览并导入角色构筑。",
