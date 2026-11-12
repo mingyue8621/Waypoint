@@ -12,8 +12,10 @@ enum ServiceKind { Server, DevHost, Client, Recorder }
 sealed partial record Service(string Name, ServiceKind Kind, int[] Ports, string Match)
 {
     static int Port(string variable, int fallback) => int.TryParse(Environment.GetEnvironmentVariable(variable), out int p) ? p : fallback;
+    // 8090, not 8080: Steam's steamwebhelper holds 8080 (--remote-debugging-port) whenever the client is open, and the
+    // patch web server then cannot bind at all.
     static int PatchWebPort => Environment.GetEnvironmentVariable("Game_PATCH_URL") is { } url
-        && Uri.TryCreate(url, UriKind.Absolute, out var u) ? u.Port : 8080;
+        && Uri.TryCreate(url, UriKind.Absolute, out var u) ? u.Port : 8090;
 
     public static Service Patch { get; } = new("Patch", ServiceKind.Server, [Port("Game_PATCH_TCP_PORT", 12995), PatchWebPort], "GameServer.Patch.dll");
     public static Service Auth { get; } = new("Auth", ServiceKind.Server, [Port("Game_LOGIN_PORT", 20493)], "GameServer.Auth.dll");

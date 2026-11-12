@@ -37,7 +37,7 @@ $hasLock = $false
 $script:accountData = $null
 $script:stage = 'Checking setup'
 $names = @('Patch','Gateway','Auth')
-$portMap = @{ Patch = @(12995,8080); Gateway = @(6112); Auth = @(20493,20495) }
+$portMap = @{ Patch = @(12995,8090); Gateway = @(6112); Auth = @(20493,20495) }
 
 function Write-Result($value) {
     $value | ConvertTo-Json -Depth 9 | Set-Content -LiteralPath $ResultPath -Encoding UTF8
@@ -81,7 +81,7 @@ function Import-RuntimeProfile {
     }
     foreach ($entry in @{
         Game_BIND='127.0.0.1'; Game_LOGIN_PORT='20493'; Game_GATEWAY_PORT='6112'; Game_AUTH_CONTROL_PORT='20495';
-        Game_PATCH_TCP_PORT='12995'; Game_PATCH_URL='http://127.0.0.1:8080/'; Game_CLIENT_EXE='Client/Game.exe'; Game_GGPK='Client/Content.ggpk'
+        Game_PATCH_TCP_PORT='12995'; Game_PATCH_URL='http://127.0.0.1:8090/'; Game_CLIENT_EXE='Client/Game.exe'; Game_GGPK='Client/Content.ggpk'
     }.GetEnumerator()) {
         $value = [Environment]::GetEnvironmentVariable($entry.Key)
         Require (-not $value -or $value -ieq $entry.Value) "Adapter v1 requires the standard local value for $($entry.Key)."
