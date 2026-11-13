@@ -10138,4 +10138,40 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
   <data name="Text_ada7233c9a41" xml:space="preserve">
     <value>/zoom out 与 /zoom in 每次改变的级数。</value>
   </data>
+  <data name="Text_8fe8781e5cbe" xml:space="preserve">
+    <value>通货掉落</value>
+  </data>
+  <data name="Text_81cef8c2d130" xml:space="preserve">
+    <value>控制每次击杀掉哪些通货、掉多少：按物品单独设置，可限定生效的怪物，也能决定是否保留服务端原本的掉落。</value>
+  </data>
+  <data name="Text_3a90aeafe602" xml:space="preserve">
+    <value>掉落模式</value>
+  </data>
+  <data name="Text_b75d243f1e7b" xml:space="preserve">
+    <value>「取代」会取消服务端原本的掉落（装备、宝石、药剂和它自己的通货），只掉下面列出的物品。</value>
+  </data>
+  <data name="Text_faf76ce0da06" xml:space="preserve">
+    <value>在原本掉落之外追加</value>
+  </data>
+  <data name="Text_33091a15ab11" xml:space="preserve">
+    <value>取代原本掉落</value>
+  </data>
+  <data name="Text_b8b4d860c6b0" xml:space="preserve">
+    <value>怪物稀有度</value>
+  </data>
+  <data name="Text_bbe7512ae714" xml:space="preserve">
+    <value>哪些稀有度的怪物会掉下面这些物品。全不选表示所有怪物。</value>
+  </data>
+  <data name="Text_b8c179065ca8" xml:space="preserve">
+    <value>每次击杀件数</value>
+  </data>
+  <data name="Text_7c00983adf10" xml:space="preserve">
+    <value>物品名或 metadata id：每次击杀掉多少。小数表示多掉一件的概率（0.05 = 5%，2.5 = 两件半）。填 0 即不掉。</value>
+  </data>
+  <data name="Text_135e9a39cae9" xml:space="preserve">
+    <value>仅限这些怪物</value>
+  </data>
+  <data name="Text_964d477da108" xml:space="preserve">
+    <value>留空表示所有怪物。否则怪物的种类 id 或名字需包含其中一项（不区分大小写），例如 Doedre 或 AtlasBosses。</value>
+  </data>
 </root>
