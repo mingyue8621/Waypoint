@@ -24,14 +24,28 @@ public partial class AccountsTab : UserControl
         // These go through the dev host, which a release does not have; Create account… works there through LocalExile.exe.
         if (Repo.IsInstall) StopHost.Visibility = HostState.Visibility = HostTools.Visibility = Visibility.Collapsed;
         ForAccount.Text = L.Text("(select an account above)");
-        shared.Monitor.Sampled += samples => Dispatcher.BeginInvoke(() =>
+        bool refreshing = false;
+        shared.Monitor.Sampled += samples => Dispatcher.BeginInvoke(async () =>
         {
             bool up = samples.FirstOrDefault(s => s.Service == Service.DevHost)?.Running == true;
             HostState.Text = up ? L.Text("Dev host running on port {0}", Service.DevHost.PortList) : L.Text("Dev host stopped (registering starts it)");
             StopHost.IsEnabled = up;
+            // The buttons read the last inspection, and the ones a run wrote still say the servers run: check again after
+            // they stop, so account changes come back without leaving the section or touching Reload.
+            if (!refreshing && !shared.IsLiveRunning && _shared.Workspace.Latest is { HasServers: true } && !samples.Any(s => s.Running))
+            {
+                refreshing = true;
+                try { await _shared.Workspace.RefreshAsync(); }
+                finally { refreshing = false; }
+            }
+            ShowAccess();
         });
         shared.Workspace.Changed += () => Dispatcher.BeginInvoke(ShowAccess);
-        shared.LiveRunning += running => Dispatcher.BeginInvoke(ShowAccess);
+        shared.LiveRunning += running => Dispatcher.BeginInvoke(async () =>
+        {
+            if (!running) await _shared.Workspace.RefreshAsync();
+            ShowAccess();
+        });
         L.Current.PropertyChanged += (_, _) => { AccountGrid.Items.Refresh(); CharacterGrid.Items.Refresh(); ShowAccess(); };
         // Showing the section reads the list: the adapter needs no server for that.
         IsVisibleChanged += async (_, e) => { if ((bool)e.NewValue) await Load(); };
