@@ -255,7 +255,14 @@ sealed class SettingsEditor : StackPanel
                     keys.SelectedItem = keys.Items.OfType<ComboBoxItem>().FirstOrDefault(i => (string?)i.Tag == key);
                     row.Children.Add(keys); keys.SelectionChanged += (_, _) => Change(); readKey = () => (keys.SelectedItem as ComboBoxItem)?.Tag as string ?? "";
                 }
-                else { var keyBox = new TextBox { Text = key }; row.Children.Add(keyBox); keyBox.TextChanged += (_, _) => Change(); readKey = () => keyBox.Text ?? ""; }
+                else
+                {
+                    // A key is the mod's own data (an item name, a monster id): it stays English in the file and only reads
+                    // translated here, so the text box shows the catalog's text and hands the source back when saved.
+                    var keyBox = new TextBox { Text = key.Length > 0 ? L.Text(key) : key, Tag = key };
+                    row.Children.Add(keyBox); keyBox.TextChanged += (_, _) => Change();
+                    readKey = () => L.Source(keyBox.Text ?? "", keyBox.Tag as string ?? "");
+                }
             }
             var read = Field(row, item, current);
             var remove = Button(L.Text("Remove"), () => { rows.Children.Remove(row); entries.RemoveAll(e => e.Row == row); Change(); });

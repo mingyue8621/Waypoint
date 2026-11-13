@@ -8951,4 +8951,52 @@ This replaces the saved choices only. Mod DLLs and saves are not restored. The c
   <data name="Text_ffd7f7c8013d" xml:space="preserve">
     <value>{0} commit(s) ahead of LocalExile</value>
   </data>
+  <data name="Text_7fb7c720c0fb" xml:space="preserve">
+    <value>Chaos Orb</value>
+  </data>
+  <data name="Text_773365508f09" xml:space="preserve">
+    <value>Orb of Annulment</value>
+  </data>
+  <data name="Text_1bbbab1ce267" xml:space="preserve">
+    <value>Exalted Orb</value>
+  </data>
+  <data name="Text_839e88e8238a" xml:space="preserve">
+    <value>Divine Orb</value>
+  </data>
+  <data name="Text_112ec78ad03d" xml:space="preserve">
+    <value>Sacred Orb</value>
+  </data>
+  <data name="Text_cdc36893b924" xml:space="preserve">
+    <value>Veiled Chaos Orb</value>
+  </data>
+  <data name="Text_280831956465" xml:space="preserve">
+    <value>Ancient Orb</value>
+  </data>
+  <data name="Text_575cbeca56f3" xml:space="preserve">
+    <value>Awakened Sextant</value>
+  </data>
+  <data name="Text_4ac7c0534db1" xml:space="preserve">
+    <value>Fracturing Orb</value>
+  </data>
+  <data name="Text_9a2f128f7f18" xml:space="preserve">
+    <value>Hinekora's Lock</value>
+  </data>
+  <data name="Text_c0074e738438" xml:space="preserve">
+    <value>Mirror of Kalandra</value>
+  </data>
+  <data name="Text_317b32c14369" xml:space="preserve">
+    <value>normal</value>
+  </data>
+  <data name="Text_3be7a505483c" xml:space="preserve">
+    <value>magic</value>
+  </data>
+  <data name="Text_50270c12c086" xml:space="preserve">
+    <value>rare</value>
+  </data>
+  <data name="Text_c2720445a452" xml:space="preserve">
+    <value>unique</value>
+  </data>
+  <data name="Text_3a7275307918" xml:space="preserve">
+    <value>Unique</value>
+  </data>
 </root>

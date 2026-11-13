@@ -39,6 +39,27 @@ public sealed class L : INotifyPropertyChanged
         string format = Resources.GetString(ResourceKey(source), Current.Culture) ?? source;
         return arguments.Length == 0 ? format : string.Format(Current.Culture, format, arguments);
     }
+    /// <summary>The English source text behind shown text. A mod's own data (an item name in the settings file, a monster
+    /// id) is only shown translated, so what a text box holds has to come back to the data unchanged.</summary>
+    public static string Source(string shown, string source = "")
+    {
+        if (shown == source) return source;
+        if (source.Length > 0 && shown == Text(source)) return source;
+        return Shown.TryGetValue(shown, out var original) ? original : shown;
+    }
+    /// <summary>Shown text to its English source, every catalog entry with the language shown now. Rebuilt when the language
+    /// changes (<see cref="SetLanguage"/>).</summary>
+    static Dictionary<string, string>? shownCache;
+    static Dictionary<string, string> Shown => shownCache ??= BuildShown();
+    static Dictionary<string, string> BuildShown()
+    {
+        var found = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (Resources.GetResourceSet(CultureInfo.InvariantCulture, true, false) is not { } english) return found;
+        foreach (System.Collections.DictionaryEntry entry in english)
+            if (entry.Key is string name && entry.Value is string source && Resources.GetString(name, Current.Culture) is { } shown)
+                found.TryAdd(shown, source);
+        return found;
+    }
     // These are presentation wrappers around the adapter's stable English contract. Captured
     // paths, process IDs, mod IDs and raw compiler/runtime diagnostics are never rewritten.
     static readonly (string Pattern, string Format)[] Descriptions =
@@ -99,6 +120,7 @@ public sealed class L : INotifyPropertyChanged
         CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture = Culture;
         if (Language == selected) return;
         Language = selected;
+        shownCache = null;
         PropertyChanged?.Invoke(this, new("Item[]"));
         PropertyChanged?.Invoke(this, new(nameof(Language)));
     }

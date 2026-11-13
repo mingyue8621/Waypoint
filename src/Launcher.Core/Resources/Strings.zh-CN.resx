@@ -10174,4 +10174,52 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
   <data name="Text_964d477da108" xml:space="preserve">
     <value>留空表示所有怪物。否则怪物的种类 id 或名字需包含其中一项（不区分大小写），例如 Doedre 或 AtlasBosses。</value>
   </data>
+  <data name="Text_7fb7c720c0fb" xml:space="preserve">
+    <value>混沌石</value>
+  </data>
+  <data name="Text_773365508f09" xml:space="preserve">
+    <value>剥离石</value>
+  </data>
+  <data name="Text_1bbbab1ce267" xml:space="preserve">
+    <value>崇高石</value>
+  </data>
+  <data name="Text_839e88e8238a" xml:space="preserve">
+    <value>神圣石</value>
+  </data>
+  <data name="Text_112ec78ad03d" xml:space="preserve">
+    <value>崇神石</value>
+  </data>
+  <data name="Text_cdc36893b924" xml:space="preserve">
+    <value>加密混沌石</value>
+  </data>
+  <data name="Text_280831956465" xml:space="preserve">
+    <value>远古石</value>
+  </data>
+  <data name="Text_575cbeca56f3" xml:space="preserve">
+    <value>觉醒六分仪</value>
+  </data>
+  <data name="Text_4ac7c0534db1" xml:space="preserve">
+    <value>破溃宝珠</value>
+  </data>
+  <data name="Text_9a2f128f7f18" xml:space="preserve">
+    <value>悉妮蔻拉之锁</value>
+  </data>
+  <data name="Text_c0074e738438" xml:space="preserve">
+    <value>卡兰德的魔镜</value>
+  </data>
+  <data name="Text_317b32c14369" xml:space="preserve">
+    <value>普通</value>
+  </data>
+  <data name="Text_3be7a505483c" xml:space="preserve">
+    <value>魔法</value>
+  </data>
+  <data name="Text_50270c12c086" xml:space="preserve">
+    <value>稀有</value>
+  </data>
+  <data name="Text_c2720445a452" xml:space="preserve">
+    <value>传奇</value>
+  </data>
+  <data name="Text_3a7275307918" xml:space="preserve">
+    <value>传奇</value>
+  </data>
 </root>
