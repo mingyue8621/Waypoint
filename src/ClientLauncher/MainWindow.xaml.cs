@@ -77,7 +77,7 @@ public partial class MainWindow : Window
     {
         bool up = !_server.IsLocal || Listening(6112);
         ServerDot.Fill = (System.Windows.Media.Brush)FindResource(up ? "Good" : "Muted");
-        ServerDot.ToolTip = up ? "服务端正在运行" : "服务端没有开启";
+        ServerDot.ToolTip = up ? "服务器已开启" : "服务器未开启";
     }
 
     /// <summary>
@@ -406,12 +406,9 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>登录器不启动服务端：服务端由「流放之路服务端.exe」负责，这里只说它开没开。
-    /// 以前这里会用 LocalExile.exe 把服务端拉起来（黑窗口藏起来、要等一分钟），玩家点「开始游戏」只看到
-    /// 底下一行字，以为卡死了。</summary>
-    void ServersNotRunning() =>
-        Tell(_entry is null ? NoServers
-            : "服务端没有开启：先打开「流放之路服务端.exe」把服务端启动起来，再点「开始游戏」。", bad: true);
+    /// <summary>服务器没开：这是给玩家看的界面，不出现服务端程序的名字或任何运维说法，只说现在进不去、
+    /// 什么时候能进（底栏那颗点变绿）。</summary>
+    void ServersNotRunning() => Tell("服务器还没有开启，请稍后再试。", bad: true);
 
     /// <summary>
     /// Follows a launch: the servers coming up (their ports), the client's process, and then that process ending. The
@@ -517,8 +514,6 @@ public partial class MainWindow : Window
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException)
         { return null; }
     }
-
-    const string NoServers = "服务端没在运行，这个文件夹里也没有 LocalExile.exe：先在服务端启动器里启动服务端，再点「开始游戏」；或者把登录器放回服务端文件夹。";
 
     void Tell(string message, bool bad)
     {
