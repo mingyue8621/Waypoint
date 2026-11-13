@@ -318,7 +318,7 @@
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                             <Border Background="#1B2029" CornerRadius="15" Padding="14,7" Margin="0,0,14,0" BorderBrush="{StaticResource Hair}" BorderThickness="1">
                                 <StackPanel Orientation="Horizontal">
-                                    <Ellipse Width="7" Height="7" Fill="{StaticResource Good}" VerticalAlignment="Center" />
+                                    <Ellipse x:Name="ServerDot" Width="7" Height="7" Fill="{StaticResource Muted}" VerticalAlignment="Center" ToolTip="服务端没有开启" />
                                     <TextBlock x:Name="ServerLabel" Text="本地服务器" Foreground="#D6CFBF" FontSize="12.5" Margin="8,0,0,0" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Border>

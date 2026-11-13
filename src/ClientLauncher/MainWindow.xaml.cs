@@ -33,9 +33,10 @@ public partial class MainWindow : Window
     const string ClientExe = "Game.patched.exe";
 
     readonly DispatcherTimer _poll = new() { Interval = TimeSpan.FromSeconds(1.5) };
+    // 只看服务端在不在：底栏那颗点要跟着它变色，和启动了游戏之后的 _poll 无关。
+    readonly DispatcherTimer _serverPoll = new() { Interval = TimeSpan.FromSeconds(1) };
     readonly ServerTarget _server;
     string? _entry;
-    Process? _starting;
     bool _busy;
     // The client's process was seen: the launcher is put away until that process ends.
     bool _watchingGame;
@@ -58,10 +59,25 @@ public partial class MainWindow : Window
         LoadFacts();
         RecordClientFolder();
         ServerLabel.Text = _server.IsLocal ? "本地服务器" : "远程服务器";
+        // 底栏那颗点：服务端一开一关就跟着变，不等玩家点开始游戏。
+        _serverPoll.Tick += (_, _) => ShowServerState();
+        _serverPoll.Start();
+        ShowServerState();
         Loaded += (_, _) =>
         {
             if (!_server.IsLocal) StatusText.Text = "进入游戏会连接服务器；登录在游戏窗口里完成。";
         };
+    }
+
+    /// <summary>
+    /// 底栏那颗点与它旁边的字：服务端在跑（网关的 6112 在监听）是绿的，没开是灰的。远程服务器的
+    /// 地址是别人那边的，这里不探测，按可用显示。
+    /// </summary>
+    void ShowServerState()
+    {
+        bool up = !_server.IsLocal || Listening(6112);
+        ServerDot.Fill = (System.Windows.Media.Brush)FindResource(up ? "Good" : "Muted");
+        ServerDot.ToolTip = up ? "服务端正在运行" : "服务端没有开启";
     }
 
     /// <summary>
@@ -377,10 +393,11 @@ public partial class MainWindow : Window
                 return;
             }
 
-            // Nothing is up: LocalExile.exe prepares the client and the data, starts the servers, then the client — hidden,
-            // so the player never sees a console window (its progress is watched by Poll).
-            if (_entry is not { } entry) { Tell(NoServers, bad: true); return; }
-            StartServers(entry, install!);
+            // 服务端没开就不进游戏：以前这里会自己用 LocalExile.exe 把服务端拉起来，玩家点了"开始游戏"只看到
+            // 底下一行字、要等一分钟，以为卡死了。现在直接说清楚该先做什么（live 2026-11-13）。
+            // 服务端没开就不进游戏：登录器只负责启动游戏，服务端归「流放之路服务端.exe」。
+            ShowServerState();
+            ServersNotRunning();
         }
         finally
         {
@@ -389,28 +406,12 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>Starts the release's own launcher with no console window of its own: it is a console program, and a black
-    /// window is not what a launcher should show a player.</summary>
-    void StartServers(string entry, string install)
-    {
-        try
-        {
-            var start = new ProcessStartInfo(entry)
-            {
-                WorkingDirectory = install,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
-            _starting = Process.Start(start);
-            Tell("服务端还没启动：正在准备并启动（第一次约一分钟）…", bad: false);
-            WatchGame();
-        }
-        catch (Exception ex) when (ex is Win32Exception or InvalidOperationException or IOException)
-        {
-            Tell($"启动失败：{ex.Message}", bad: true);
-            _starting = null;
-        }
-    }
+    /// <summary>登录器不启动服务端：服务端由「流放之路服务端.exe」负责，这里只说它开没开。
+    /// 以前这里会用 LocalExile.exe 把服务端拉起来（黑窗口藏起来、要等一分钟），玩家点「开始游戏」只看到
+    /// 底下一行字，以为卡死了。</summary>
+    void ServersNotRunning() =>
+        Tell(_entry is null ? NoServers
+            : "服务端没有开启：先打开「流放之路服务端.exe」把服务端启动起来，再点「开始游戏」。", bad: true);
 
     /// <summary>
     /// Follows a launch: the servers coming up (their ports), the client's process, and then that process ending. The
@@ -423,7 +424,6 @@ public partial class MainWindow : Window
         {
             if (_watchingGame) return;
             _watchingGame = true;
-            _starting = null;
             // Nothing left to watch for but the exit: a slower poll is enough while the game runs.
             _poll.Interval = TimeSpan.FromSeconds(2);
             Tell("客户端已启动，登录在游戏窗口里完成；游戏关掉后这个窗口会自己回来。", bad: false);
@@ -435,14 +435,6 @@ public partial class MainWindow : Window
             _watchingGame = false;
             _poll.Stop();
             ComeBack();
-            return;
-        }
-        if (_starting is { HasExited: true })
-        {
-            int code = _starting.ExitCode;
-            _poll.Stop();
-            _starting = null;
-            Tell($"启动失败：LocalExile 已退出（代码 {code}）。看游戏目录 logs\\ 里的日志。", bad: true);
             return;
         }
         if (Listening(6112)) Tell("服务端已就绪，正在启动客户端…", bad: false);
