@@ -61,9 +61,9 @@ public static class LauncherPages
         int on = mods.Count(m => m.Enabled);
         ContentWindow.Show(owner, $"赛季特色 · 已启用 {on} / {mods.Count} 个模组", body =>
         {
-            Lead(body, "这些是服务端当前安装的模组，启用状态直接读服务端的 `Mods\\Binaries\\mod-state.txt`。要开关或改倍率，在「流放之路服务端.exe」的「模组」页操作，改完重启服务端生效。");
+            Lead(body, "这个服当前装了这些玩法改动，勾选表示已启用。");
             foreach (var mod in mods) ModCard(body, mod);
-        }, "数据来源：Mods\\Binaries");
+        }, "");
     }
 
     /// <summary>Only what changes drops: the quantity and rarity mods, plus fast campaign's experience.</summary>
@@ -72,17 +72,10 @@ public static class LauncherPages
         var shown = mods.Where(m => m.Id is "itemquantity" or "itemrarity" or "fastcampaign").ToList();
         ContentWindow.Show(owner, "掉落调整", body =>
         {
-            Lead(body, "影响掉落与收益的模组。每条后面是它当前是否启用：");
+            Lead(body, "影响掉落与收益的玩法改动。每条后面是它当前是否启用：");
             if (shown.Count == 0) { Para(body, NoModsText); }
             foreach (var mod in shown) ModCard(body, mod);
-            Section(body, "倍率怎么改");
-            Para(body, "「物品数量」与「物品稀有度」的倍率是可选的下拉框（×2 / ×4 / ×6 / ×8 / ×10），不再是写死的 ×10：");
-            Steps(body,
-                "打开「流放之路服务端.exe」，进「模组」页。",
-                "点开「物品数量」或「物品稀有度」，右侧设置里选一个倍率，点保存。",
-                "确认这一行左边的勾选框是勾上的 —— 没勾就不会生效。",
-                "服务端在跑的话会自己重载该模组；没在跑就在下次启动时生效。");
-        }, "数据来源：Mods\\Binaries\\mod-state.txt 与各模组的 settings.json");
+        }, "");
     }
 
     /// <summary>The bot module, with the settings its own declarations carry.</summary>
@@ -94,7 +87,7 @@ public static class LauncherPages
         {
             if (bots is null)
             {
-                Para(body, "这个服务端没有安装「玩家机器人」模块（`Modules\\Custom\\PlayerBots`）。");
+                Para(body, "这个服没有开「玩家机器人」这个玩法。");
                 return;
             }
             Lead(body, bots.Description.Length > 0 ? bots.Description : "在城镇里生成玩家机器人，陪人一起刷图。");
@@ -106,14 +99,8 @@ public static class LauncherPages
                     Card(body, label, description, value.Length > 0 ? $"默认 {value}" : "");
                 }
             }
-            Section(body, "怎么开");
-            Steps(body,
-                "机器人是「模块」，不是「模组」：它的开关跟着联赛走。",
-                "在「流放之路服务端.exe」进「联赛」页，选中你要玩的联赛，把 PlayerBots 勾上并保存。",
-                "回到「模块」页，选中 PlayerBots，即可在这里列出的各项上改数值。",
-                "改完重启服务端；机器人会按「首个机器人延迟」「新建机器人间隔」陆续出现。");
-            Note(body, "当前这个服务端的联赛配置里没有勾选 PlayerBots，所以即使改了设置也不会生成机器人 —— 先按上面第 2 步勾上。");
-        }, "数据来源：Modules\\Custom\\PlayerBots");
+            Note(body, "这个服的联赛配置里目前没有勾选 PlayerBots，所以暂时不会生成机器人。");
+        }, "");
     }
 
     /// <summary>The change log tab: the same file, opened at the top.</summary>
@@ -129,14 +116,8 @@ public static class LauncherPages
                 "底栏那颗点变成绿色，才表示服务器已经就绪，这时再点「开始游戏」。还是灰的就说明服务器还没开：稍等一会儿再试，或者问一下开服的人。");
             Qa(body, "提示「连不上服务器」？",
                 "服务器没开，或者网络不通。稍后重试；一直连不上就问一下开服的人。");
-            Qa(body, "怎么开掉落 ×10、快速通关这些？",
-                "在「流放之路服务端.exe」的「模组」页勾选，改完重进游戏才生效。掉落数量/稀有度的倍率可以在那里选 ×2 到 ×10。");
-            Qa(body, "模块页为什么大部分改不了？",
-                "模块是玩法系统，只有声明了设置项的模块才有东西可改；模块的开与关由「联赛」页决定，不在模块页。");
-            Qa(body, "存档在哪？会不会被覆盖？",
-                "存档是服务端目录下的 `data\\saves.db`。服务端启动器的「备份」页可以备份和还原；升级前建议先备一份。");
             Qa(body, "每次更新改了什么，在哪看？",
-                "主界面公告栏就是服务端的更新说明，点任意一条看那一版的详情，点「更多」看全部历史。");
+                "主界面公告栏就是本服的更新说明，点任意一条看那一版的详情，点「更多」看全部历史。");
         }, "");
     }
 
@@ -147,40 +128,29 @@ public static class LauncherPages
             Lead(body, local
                 ? "这是一个跑在本机的离线服务端：服务端、客户端、存档都在同一台机器上，不删档，随时下线随时接着玩。"
                 : $"这是一个远程服务端：进入游戏后连接 {server}，登录在游戏窗口里完成。");
-            Section(body, "文件都在哪");
-            Bullet(body, "流放之路服务端.exe", "控制、模组、模块、联赛、备份、账号、性能、日志、控制台、工具、设置。");
-            Bullet(body, "Game.patched.exe", "游戏客户端本体，就在登录器旁边（登录器放进服务端目录时它在 Client\\ 里），点「开始游戏」拉起来的就是它。");
-            Bullet(body, "data\\saves.db", "账号与角色存档。别删；升级前先在启动器里备份。");
-            Bullet(body, "logs\\", "服务端与客户端的日志，出问题时先看这里。");
-            Bullet(body, UpdateNotes.FileName, "服务端更新说明，就是本窗口公告栏读取的那份文件。");
+            Section(body, "登录器旁边的文件");
+            Bullet(body, "Game.patched.exe", "游戏本体，点「开始游戏」拉起来的就是它。");
+            Bullet(body, UpdateNotes.FileName, "本服的更新说明，就是这个窗口公告栏读取的那份文件。");
             Section(body, "这份说明怎么更新");
-            Para(body, "服务端每发一版，把仓库里的 `更新说明.md` 复制到登录器旁边即可（登录器在客户端目录里时，就放在客户端目录），登录器每次启动都会重新读取。");
+            Para(body, "每次发版时把仓库里的 `更新说明.md` 复制到登录器旁边即可，登录器每次启动都会重新读取。");
         }, "");
     }
 
-    public static void Tools(Window owner, IReadOnlyList<ModFact> mods)
+    public static void Tools(Window owner)
     {
-        var gm = mods.FirstOrDefault(m => m.Id is "gm-commands" or "waypoint-tools");
         ContentWindow.Show(owner, "精选攻略与常用工具", body =>
         {
-            Section(body, "服务端启动器里能做的事");
-            Bullet(body, "控制", "逐个启停 Patch / Gateway / Auth，看服务是否就绪。");
-            Bullet(body, "模组", "开关模组、改模组设置（掉落倍率、快速通关倍率、实时经济参数）。");
-            Bullet(body, "模块 / 联赛", "看玩法模块；在联赛里勾选某个联赛要启用哪些模块。");
-            Bullet(body, "备份 / 账号", "备份与还原存档；管理服务器上的账号。");
-            Bullet(body, "性能 / 服务器耗时 / 日志 / 控制台", "看负载、看每次请求的耗时、看日志、直接发命令。");
-            foreach (var mod in mods.Where(m => m.Id is "gm-commands" or "waypoint-tools"))
-            {
-                Section(body, mod.Name);
-                Para(body, mod.Description);
-            }
-            if (gm is null) Para(body, "这个服务端没有安装「管理员命令」模组。");
+            Section(body, "开始游戏之前");
+            Bullet(body, "服务器状态", "主界面底栏那颗圆点：绿色表示服务器已经就绪，灰色表示还没开。灰的时候点「开始游戏」不会进去。");
+            Bullet(body, "注册账号", "第一次玩先点「注册账号」，账号建在服务器上，注册好就能直接登录。");
+            Bullet(body, "更新公告", "主界面右侧公告栏是这个服的更新说明，点任意一条看那一版改了什么，点「更多」看全部历史。");
             Section(body, "游戏内常用");
-            Para(body, "聊天框里输入 `/help` 看可用命令；装了「管理员命令」模组的话，传送、发物品、加经验这些都在里面。");
+            Para(body, "聊天框里输入 `/help` 可以看到这个服开放的命令。");
+            Para(body, "城镇里的传送点是换图的主要方式：点一下打开地图，选要去的地方。");
         }, "");
     }
 
-    const string NoModsText = "没找到模组目录（`Mods\\Binaries`）。请把登录器放在服务端目录旁边。";
+    const string NoModsText = "没有读到这个服的玩法改动列表。";
 
     // ---- drawing -----------------------------------------------------------------------------------------------------
 

@@ -293,7 +293,7 @@ public partial class MainWindow : Window
 
     void ChangeLogClicked(object sender, RoutedEventArgs e) => LauncherPages.ChangeLog(this, _notesPath, _notes.Count);
 
-    void ToolsClicked(object sender, RoutedEventArgs e) => LauncherPages.Tools(this, _mods);
+    void ToolsClicked(object sender, RoutedEventArgs e) => LauncherPages.Tools(this);
 
     /// <summary>A banner tab: it lights up while its page is open, then the row goes back to 赛季特色.</summary>
     void BannerTabClicked(object sender, RoutedEventArgs e)
