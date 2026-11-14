@@ -10,6 +10,12 @@ sealed record CraftStat(string Id, int Min, int Max);
 sealed record CraftMod(string Id, string Name, int Generation, int Domain, int Level, IReadOnlyList<int> Families,
     IReadOnlyList<string> Tags, IReadOnlyList<CraftStat> Stats)
 {
+    /// <summary>The client's Chinese name for the modifier ("野蛮之"), or "" when its tables have none.</summary>
+    public string Display { get; init; } = "";
+
+    /// <summary>What to show: the Chinese name when there is one, the Gateway's English name otherwise.</summary>
+    public string ShowName => Display.Length > 0 ? Display : Name;
+
     public bool Prefix => Generation == 1;
     public bool Suffix => Generation == 2;
     /// <summary>Tiers of one modifier share it: the same kind, families and stats.</summary>
@@ -19,13 +25,27 @@ sealed record CraftMod(string Id, string Name, int Generation, int Domain, int L
 /// <param name="Pools">"pool" (prefixes and suffixes), "crafted", "corrupted", "eldritch", and "shaper" … "warlord" (what
 /// an influence adds).</param>
 sealed record CraftBase(string Id, string Name, string Class, int Width, int Height, int DropLevel, IReadOnlyList<int> Requirements,
-    int Sockets, bool Quality, IReadOnlyList<string> Implicits, IReadOnlyDictionary<string, int> Pools);
+    int Sockets, bool Quality, IReadOnlyList<string> Implicits, IReadOnlyDictionary<string, int> Pools)
+{
+    /// <summary>The client's Chinese name for the base ("锻铁戒指"), or "" when its tables have none.</summary>
+    public string Display { get; init; } = "";
+
+    /// <summary>What to show: the Chinese name when there is one, the Gateway's English name otherwise.</summary>
+    public string ShowName => Display.Length > 0 ? Display : Name;
+}
 
 sealed record DescriptionVariant(IReadOnlyList<string> When, string Text, IReadOnlyList<(string Name, int Stat)> Handlers);
 
 sealed record StatDescription(IReadOnlyList<string> Stats, IReadOnlyList<DescriptionVariant> Variants);
 
-sealed record RareWord(int List, uint Key, string Text);
+sealed record RareWord(int List, uint Key, string Text)
+{
+    /// <summary>The client's Chinese word ("不祥"), or "" when its tables have none.</summary>
+    public string Display { get; init; } = "";
+
+    /// <summary>What to show; a rare's name itself is made of the keys, so only the list reads in Chinese.</summary>
+    public string ShowName => Display.Length > 0 ? Display : Text.Trim();
+}
 
 /// <summary>
 /// What the item crafter offers, from the Gateway itself (<c>GameServer.Gateway crafter</c>, the server's
@@ -70,7 +90,7 @@ sealed class CrafterCatalog
         // came with the hook, moved to the gm-commands mod in v0.4.0-beta, so `commands` no longer lists it everywhere.
         if (!HasCrafter(GatewayAssembly(dll))) throw new InvalidOperationException(NoCrafter);
         string output = await CommandCatalog.AskGateway(TimeSpan.FromSeconds(90), dll, "crafter");
-        var catalog = Parse(output);
+        var catalog = Parse(output, CrafterZh.Current);
         if (catalog.Bases.Count == 0) throw new InvalidOperationException(NoCrafter);
         catalog.Built = built;
         return _loaded = catalog;
@@ -104,8 +124,11 @@ sealed class CrafterCatalog
     }
 
     /// <summary>The `crafter` mode's JSON lines; other lines (the Gateway's own log) are skipped.</summary>
-    internal static CrafterCatalog Parse(string jsonLines)
+    /// <param name="chinese">The client's Chinese words to show instead of the Gateway's English; null keeps the English
+    /// (the tests read the raw catalog).</param>
+    internal static CrafterCatalog Parse(string jsonLines, CrafterZh? chinese = null)
     {
+        chinese ??= CrafterZh.Empty;
         var classes = new Dictionary<string, string>(StringComparer.Ordinal);
         var bases = new List<CraftBase>();
         var mods = new Dictionary<string, CraftMod>(StringComparer.Ordinal);
@@ -120,7 +143,7 @@ sealed class CrafterCatalog
             switch (e.GetProperty("type").GetString())
             {
                 case "class":
-                    classes[Str(e, "id")] = Str(e, "name");
+                    classes[Str(e, "id")] = chinese.Class(Str(e, "id"), Str(e, "name"));
                     break;
                 case "pool":
                     poolIds[e.GetProperty("id").GetInt32()] = [.. e.GetProperty("mods").EnumerateArray().Select(m => m.GetString()!)];
@@ -129,7 +152,8 @@ sealed class CrafterCatalog
                     var mod = new CraftMod(Str(e, "id"), Str(e, "name"), Int(e, "generation"), Int(e, "domain"), Int(e, "level"),
                         [.. e.GetProperty("families").EnumerateArray().Select(f => f.GetInt32())],
                         [.. e.GetProperty("tags").EnumerateArray().Select(t => t.GetString()!)],
-                        [.. e.GetProperty("stats").EnumerateArray().Select(s => new CraftStat(Str(s, "id"), Int(s, "min"), Int(s, "max")))]);
+                        [.. e.GetProperty("stats").EnumerateArray().Select(s => new CraftStat(Str(s, "id"), Int(s, "min"), Int(s, "max")))])
+                    { Display = chinese.Mod(Str(e, "id"), "") };
                     mods[mod.Id] = mod;
                     break;
                 case "base":
@@ -140,17 +164,23 @@ sealed class CrafterCatalog
                         foreach (var i in influence.EnumerateObject()) pools[i.Name] = i.Value.GetInt32();
                     bases.Add(new CraftBase(Str(e, "id"), Str(e, "name"), Str(e, "class"), Int(e, "width"), Int(e, "height"),
                         Int(e, "dropLevel"), [.. e.GetProperty("requirements").EnumerateArray().Select(r => r.GetInt32())], Int(e, "sockets"),
-                        e.GetProperty("quality").GetBoolean(), [.. e.GetProperty("implicits").EnumerateArray().Select(m => m.GetString()!)], pools));
+                        e.GetProperty("quality").GetBoolean(), [.. e.GetProperty("implicits").EnumerateArray().Select(m => m.GetString()!)], pools)
+                    { Display = chinese.Base(Str(e, "id"), "") });
                     break;
                 case "desc":
                     var description = new StatDescription([.. e.GetProperty("stats").EnumerateArray().Select(s => s.GetString()!)],
                         [.. e.GetProperty("variants").EnumerateArray().Select(v => new DescriptionVariant(
                             [.. v.GetProperty("when").EnumerateArray().Select(w => w.GetString()!)], Str(v, "text"),
                             [.. v.GetProperty("handlers").EnumerateArray().Select(h => (h[0].GetString()!, h[1].GetInt32()))]))]);
+                    // The client's own Chinese wording of the same stats, laid over the English structure.
+                    if (chinese.Description(description.Stats) is { } translated)
+                        description = Align(description, translated);
                     foreach (string stat in description.Stats) descriptions.TryAdd(stat, description);
                     break;
                 case "word":
-                    words.Add(new RareWord(Int(e, "list"), e.GetProperty("key").GetUInt32(), Str(e, "text")));
+                    int list = Int(e, "list");
+                    uint wordKey = e.GetProperty("key").GetUInt32();
+                    words.Add(new RareWord(list, wordKey, Str(e, "text")) { Display = chinese.Word(list, wordKey, "") });
                     break;
             }
         }
@@ -160,6 +190,28 @@ sealed class CrafterCatalog
 
     static string Str(JsonElement e, string name) => e.GetProperty(name).GetString() ?? "";
     static int Int(JsonElement e, string name) => e.GetProperty(name).GetInt32();
+
+    /// <summary>
+    /// The English description's structure (its variants' conditions and handlers, which the Gateway is authoritative
+    /// for) carrying the client's Chinese words. The client repeats one line per value band ("1|2", "3|9" …) to colour
+    /// the value by tier, so its lines are taken once each, in order: a block whose distinct lines match the English
+    /// variants one-to-one is used whole, a one-line English block takes the first of them, and anything else keeps the
+    /// English (a wrong line would be worse than an untranslated one).
+    /// </summary>
+    static StatDescription Align(StatDescription english, StatDescription chinese)
+    {
+        var lines = new List<string>();
+        foreach (var variant in chinese.Variants)
+            if (variant.Text.Length > 0 && !lines.Contains(variant.Text)) lines.Add(variant.Text);
+        if (lines.Count == 0) return english;
+        if (lines.Count == english.Variants.Count)
+            return new(english.Stats, [.. english.Variants.Select((v, i) => new DescriptionVariant(v.When, lines[i], v.Handlers))]);
+        // Chinese words one line for several English variants ("允许的前缀 {0:+d}" for both more and fewer prefixes):
+        // the line's own sign carries the difference, so it reads for each.
+        if (lines.Count == 1)
+            return new(english.Stats, [.. english.Variants.Select(v => new DescriptionVariant(v.When, lines[0], v.Handlers))]);
+        return english;
+    }
 
     public IReadOnlyList<CraftMod> Pool(CraftBase b, string key) =>
         b.Pools.TryGetValue(key, out int id) && Pools.TryGetValue(id, out var pool) ? pool : [];

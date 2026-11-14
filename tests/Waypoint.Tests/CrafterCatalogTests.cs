@@ -162,4 +162,33 @@ public class CrafterCatalogTests
         // Already inside, on a monitor to the left of the main one: left alone.
         Assert.Equal((-1800, 100, 1320, 840), FormWindow.Fit((-1800, 100, 1320, 840), (-1920, 0, 1920, 1040)));
     }
+
+    [Fact]
+    public void The_client_Chinese_tables_word_the_crafter_in_Chinese()
+    {
+        // The embedded table (Data\crafter-zh.json.gz) is the client's own Chinese: bases by Id, modifiers by mod Id.
+        var zh = CrafterZh.Current;
+        Assert.True(zh.Bases > 1000, "the client's Chinese tables are not embedded");
+        Assert.Equal("锻铁戒指", zh.Base("Metadata/Items/Rings/Ring1", "Iron Ring"));
+        Assert.Equal("野蛮之", zh.Mod("Strength1", "of the Brute"));
+        Assert.Equal("NoSuchRing", zh.Base("Metadata/Items/Rings/NoSuchRing", "NoSuchRing")); // a base the tables lack stays English
+
+        var catalog = CrafterCatalog.Parse(Lines, zh);
+        var ring = Assert.Single(catalog.Bases);
+        Assert.Equal("锻铁戒指", ring.ShowName);
+        Assert.Equal("Iron Ring", ring.Name); // the Gateway's English stays for search and for what is sent back
+
+        // The client words "base_maximum_life" once per value band; one line carries the words, the English variant its
+        // condition, so the range and the rolled value both read in Chinese.
+        var life = catalog.Mods["IncreasedLife7"];
+        Assert.Equal(["+105 最大生命"], catalog.Lines(life, [105]));
+        Assert.Contains("最大生命", catalog.Lines(life).Single());
+
+        // A block whose lines do not line up with the English variants keeps the English instead of guessing.
+        Assert.Equal(["(10-20)% reduced maximum Mana", "Regenerate (1-1.5) Mana per second"],
+            catalog.Lines(catalog.Mods["ReducedMana1"]));
+
+        // The English catalog is unchanged when no table is passed (what the tests above read).
+        Assert.Equal("Iron Ring", Assert.Single(CrafterCatalog.Parse(Lines).Bases).ShowName);
+    }
 }

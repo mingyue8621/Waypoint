@@ -247,10 +247,12 @@ public partial class ItemCrafterWindow : FormWindow
         string search = BaseSearch.Text.Trim();
         var rows = _catalog.Bases
             .Where(b => _class is null || b.Class == _class)
-            .Where(b => search.Length == 0 || b.Name.Contains(search, StringComparison.OrdinalIgnoreCase) || b.Id.Contains(search, StringComparison.OrdinalIgnoreCase))
+            // The list reads in Chinese; the Gateway's English name and the Id still find a base, so either language searches.
+            .Where(b => search.Length == 0 || b.ShowName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                        || b.Name.Contains(search, StringComparison.OrdinalIgnoreCase) || b.Id.Contains(search, StringComparison.OrdinalIgnoreCase))
             .OrderBy(b => Array.IndexOf(ClassOrder, b.Class) is int i and >= 0 ? i : 100).ThenBy(b => b.Class, StringComparer.Ordinal)
-            .ThenBy(b => b.DropLevel).ThenBy(b => b.Name, StringComparer.OrdinalIgnoreCase)
-            .Select(b => new BaseRow(b, IconOf(b.Class), b.Name, BaseDetail(b)))
+            .ThenBy(b => b.DropLevel).ThenBy(b => b.ShowName, StringComparer.OrdinalIgnoreCase)
+            .Select(b => new BaseRow(b, IconOf(b.Class), b.ShowName, BaseDetail(b)))
             .ToList();
         _updating = true;
         BaseList.ItemsSource = rows;
@@ -348,10 +350,11 @@ public partial class ItemCrafterWindow : FormWindow
                 var lines = _catalog.Lines(mod);
                 string text = lines.Count > 0 ? string.Join("\n", lines) : $"{mod.Id} ({string.Join(", ", mod.Stats.Select(s => s.Id))})";
                 if (search.Length > 0 && !text.Contains(search, StringComparison.OrdinalIgnoreCase) && !mod.Id.Contains(search, StringComparison.OrdinalIgnoreCase)
-                    && !mod.Name.Contains(search, StringComparison.OrdinalIgnoreCase) && !mod.Tags.Any(t => t.Contains(search, StringComparison.OrdinalIgnoreCase)))
+                    && !mod.Name.Contains(search, StringComparison.OrdinalIgnoreCase) && !mod.ShowName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                    && !mod.Tags.Any(t => t.Contains(search, StringComparison.OrdinalIgnoreCase)))
                     continue;
                 int tier = poolId >= 0 ? _catalog.Tier(poolId, mod) : 0;
-                string detail = string.Join(" · ", new[] { mod.Name, L.Text("item level {0}", mod.Level), mod.Id }.Where(s => s.Length > 0));
+                string detail = string.Join(" · ", new[] { mod.ShowName, L.Text("item level {0}", mod.Level), mod.Id }.Where(s => s.Length > 0));
                 rows.Add(new ModRow(mod, poolId, kind.Section, tier > 0 ? $"T{tier}" : "·", tier > 0 ? L.Text("Tier {0} of {1}", tier, tiers.Count) : "",
                     text, detail, mod.Level <= level ? 1 : .5));
             }
@@ -466,7 +469,7 @@ public partial class ItemCrafterWindow : FormWindow
             }
             if (size > 0) groups.Add(size);
         }
-        if (_base is not null && colours.Count > _base.Sockets) { error = L.Text("{0} has room for at most {1} sockets", _base.Name, _base.Sockets); return null; }
+        if (_base is not null && colours.Count > _base.Sockets) { error = L.Text("{0} has room for at most {1} sockets", _base.ShowName, _base.Sockets); return null; }
         return (colours, groups);
     }
 
@@ -548,7 +551,7 @@ public partial class ItemCrafterWindow : FormWindow
             }
             else
             {
-                BaseTitle.Text = _base.Name;
+                BaseTitle.Text = _base.ShowName;
                 BaseSummary.Text = BaseDetail(_base);
                 BaseIcon.Kind = IconOf(_base.Class);
             }
@@ -567,9 +570,9 @@ public partial class ItemCrafterWindow : FormWindow
             {
                 if (NameFirst.ItemsSource is null)
                 {
-                    NameFirst.ItemsSource = _catalog.Words.Where(w => w.List == 1).OrderBy(w => w.Text, StringComparer.OrdinalIgnoreCase).ToList();
-                    NameSecond.ItemsSource = _catalog.Words.Where(w => w.List == 2).OrderBy(w => w.Text.Trim(), StringComparer.OrdinalIgnoreCase).ToList();
-                    NameFirst.DisplayMemberPath = NameSecond.DisplayMemberPath = nameof(RareWord.Text);
+                    NameFirst.ItemsSource = _catalog.Words.Where(w => w.List == 1).OrderBy(w => w.ShowName, StringComparer.OrdinalIgnoreCase).ToList();
+                    NameSecond.ItemsSource = _catalog.Words.Where(w => w.List == 2).OrderBy(w => w.ShowName, StringComparer.OrdinalIgnoreCase).ToList();
+                    NameFirst.DisplayMemberPath = NameSecond.DisplayMemberPath = nameof(RareWord.ShowName);
                 }
                 NameFirst.SelectedItem = _item.Name is [var a, _] ? _catalog.Words.FirstOrDefault(w => w.Key == a && w.List == 1) : null;
                 NameSecond.SelectedItem = _item.Name is [_, var b] ? _catalog.Words.FirstOrDefault(w => w.Key == b && w.List == 2) : null;
@@ -800,10 +803,10 @@ public partial class ItemCrafterWindow : FormWindow
         if (_item.Rarity == "magic")
         {
             var mods = _item.Mods.Where(m => m.Section == "explicit").Select(m => _catalog.Mods.GetValueOrDefault(m.Id)).OfType<CraftMod>().ToList();
-            string prefix = mods.FirstOrDefault(m => m.Prefix)?.Name ?? "", suffix = mods.FirstOrDefault(m => m.Suffix)?.Name ?? "";
-            return string.Join(" ", new[] { prefix, _base.Name, suffix }.Where(s => s.Length > 0));
+            string prefix = mods.FirstOrDefault(m => m.Prefix)?.ShowName ?? "", suffix = mods.FirstOrDefault(m => m.Suffix)?.ShowName ?? "";
+            return string.Join(" ", new[] { prefix, _base.ShowName, suffix }.Where(s => s.Length > 0));
         }
-        return _base.Name;
+        return _base.ShowName;
     }
 
     void ShowPreview()
@@ -824,7 +827,7 @@ public partial class ItemCrafterWindow : FormWindow
         if (_item.Rarity == "rare")
         {
             string name = _item.Name is [var a, var b]
-                ? (_catalog.Words.FirstOrDefault(w => w.Key == a)?.Text ?? "") + (_catalog.Words.FirstOrDefault(w => w.Key == b)?.Text ?? "")
+                ? (_catalog.Words.FirstOrDefault(w => w.Key == a)?.ShowName ?? "") + (_catalog.Words.FirstOrDefault(w => w.Key == b)?.ShowName ?? "")
                 : L.Text("(random name)");
             PreviewTitle.Children.Add(Title(name));
         }
@@ -889,10 +892,10 @@ public partial class ItemCrafterWindow : FormWindow
             .Select(i =>
             {
                 var b = _catalog?.Bases.FirstOrDefault(x => x.Id == i.Base);
-                string name = i.Label.Length > 0 ? i.Label : b?.Name ?? i.Base;
+                string name = i.Label.Length > 0 ? i.Label : b?.ShowName ?? i.Base;
                 string detail = string.Join(" · ", new[]
                 {
-                    b?.Name ?? i.Base, RarityName(i.Rarity), L.Text("{0} modifiers", i.Mods.Count), i.Saved.ToLocalTime().ToString("g", L.Current.Culture),
+                    b?.ShowName ?? i.Base, RarityName(i.Rarity), L.Text("{0} modifiers", i.Mods.Count), i.Saved.ToLocalTime().ToString("g", L.Current.Culture),
                 });
                 return new SavedRow(i, b is null ? PackIconKind.Anvil : IconOf(b.Class), name, detail, GameColour(i.Rarity == "normal" ? "normal" : i.Rarity));
             })
@@ -1053,7 +1056,7 @@ public partial class ItemCrafterWindow : FormWindow
         if (at >= 0) _saved[at] = _item.Copy(); else _saved.Add(_item.Copy());
         if (!Persist()) return;
         ShowSaved();
-        Status(L.Text("Saved {0}", _item.Label.Length > 0 ? _item.Label : _base.Name));
+        Status(L.Text("Saved {0}", _item.Label.Length > 0 ? _item.Label : _base.ShowName));
     }
 
     bool Persist()
