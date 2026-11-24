@@ -9560,7 +9560,4 @@ This replaces the saved choices only. Mod DLLs and saves are not restored. The c
   <data name="Text_c2720445a452" xml:space="preserve">
     <value>unique</value>
   </data>
-  <data name="Text_3a7275307918" xml:space="preserve">
-    <value>Unique</value>
-  </data>
 </root>
