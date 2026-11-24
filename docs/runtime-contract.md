@@ -50,10 +50,12 @@ the selected profile's resolved database before backup or mutation; desktop regi
 binding. A profile/location change while a dialog is open requires another review. It shares the global runtime writer mutex,
 requires stopped/known runtime inventory, makes the configured automatic save backup and checks inventory again.
 `AccountBridge.ps1` invokes `AccountData.py` through a UTF-8 stdin pipe, without transcribing passwords. The helper
-checks known tables/fields/import state (a split layout opens characters.db with auth.db attached as `auth`, as the
-servers do, and knows both files' tables, `updates` included), starts an immediate transaction, rechecks the selected account revision,
+checks known tables/fields/import state across legacy single-file `saves.db`, split JSON `characters.db` + `auth.db`,
+and relational `characters.db` + `auth.db` (a split layout opens characters.db with auth.db attached as `auth`, as the
+servers do, and knows both files' tables, `updates` included; `LeagueData.py` reuses the same check for retained league
+names), starts an immediate transaction, rechecks the selected account revision,
 validates names/destinations and commits all related row changes together (across the two split files, each commits
-on its own: the backup before covers both). Unknown layouts are read-only or rejected.
+on its own: the backup before covers both). Unknown layouts or pending legacy migrations are read-only or rejected.
 Password/copy operations additionally recognize the selected checkout's verifier format. LocalExile source and DLLs
 remain independent of the distributable launcher. Registration retains the upstream temporary-service workflow and
 now follows the same backup and account runtime gates.

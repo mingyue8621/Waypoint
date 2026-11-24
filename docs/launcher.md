@@ -329,7 +329,7 @@ Each field takes a typed path as well as **Browse…** (on Linux a picker may be
     profile in use with **Manage…** and **Open**.
   - **The Profiles window** (`ProfilesWindow`) lists the player's own profiles, the active one marked, then the other folders
     there with settings under **Other folders**. **Select** uses one; **Create…** makes one from the normal settings (no login,
-    Predictive); **Copy…** makes one from the selected profile as it is, without its saved login; each asks for the name
+    preferred network mode: Lockstep on current LocalExile, Predictive on older checkouts); **Copy…** makes one from the selected profile as it is, without its saved login; each asks for the name
     (`NameDialog`), and lists the new profile without selecting it. **Rename…** asks for the new name. **Rename** and **Remove** are offered only for a profile made here (`MadeGameSettings`) that is not
     the active one, and Remove never for the last; Remove asks, then sends the folder to the Recycle Bin.
   - Only while the game is closed; a shared (linked) client is asked about first, since every copy that uses it switches too.
@@ -532,7 +532,7 @@ A link to a section Simple mode's list lacks (a log, from a failure) shows that 
 | Section | What it does | How |
 |---|---|---|
 | Play | Simple mode's home on a release: one sentence and one button. On a source copy only the one-time choice between the release and Advanced mode | `InstallTab` and the release's `LocalExile.exe`; `PlayTab`, `Editions.MustChoose` |
-| Control | Play, Start servers, Stop servers, Stop all and the Hot reload, Skip build, Skip data check and Walk maps switches; every service as a table row with its state and one Start/Stop button; the script's output; the server folder and the setup checks | `live.ps1` (or `live.local.ps1`, see below), `-NoClient`, `-Stop -NoClient`, `-ClientOnly`, `-Stop`, `-Only <server>`, `-Walkmaps`, `-NoBuild`, `-NoExtract`, `-NoHotReload`; Close game ends the client's process, Stop all also the dev host |
+| Control | Play, Start servers, Stop servers, Stop all and the Skip build, Skip data check, Walk maps (and on older checkouts, Hot reload) switches; every service as a table row with its state and one Start/Stop button; the script's output; the server folder and the setup checks | `live.ps1` (or `live.local.ps1`, see below), `-NoClient`, `-Stop -NoClient`, `-ClientOnly`, `-Stop`, `-Only <server>`, `-Walkmaps`, `-NoBuild`, `-NoExtract` (and `-NoHotReload` only on older checkouts that declare it); Close game ends the client's process, Stop all also the dev host |
 | Setup | every requirement of the checkout with its next step: instructions, Prepare client, Install dependency, Create account, the Client folder, the setup guide | the adapter's `Inspect`, `PrepareClient` and `Dependencies` |
 | Versions | what the checkout runs and how far it is from LocalExile: LocalExile's branches and open pull requests, a fork's branches, the checkout's own, switching between them, updating the current one, going back to the default branch, restoring stashed changes, deleting the branches of closed pull requests; the commit and the built versions, Build checkout, Reload game data, fresh saves | git in the checkout (`fetch --prune`, `switch`, `merge --ff-only`, `pull --ff-only`, `stash`, `fetch <LocalExile> pull/<n>/head`); the open pull requests from GitHub's public API; the adapter's `Backup`, `Build`, `ReloadData`, `FreshSaves` |
 | Mods | the checkout's mods, built from source or binary only: search, enable and disable, build one or all, reload, live status, the folders; each row shows the manifest's own name (translated: LocalExile-Mods names every mod), with its description, author and the server versions it works with. Enable and disable work while the servers run too: with a client in a playable area the change is live, otherwise it is saved to the mod choices and applies at the next Gateway start | the mods' manifests and the server's saved choices (`ModCatalog.cs`); the adapter's `BuildMod`, `BuildMods`, `EnableMod`, `DisableMod`, `ReloadMod`, `QueryMods` |
@@ -579,8 +579,8 @@ to a user.
   it** ([From a release to a source copy](#from-a-release-to-a-source-copy)).
 - The toolbar holds `live.ps1`'s switches and the actions on everything: **Stop all**, **Stop servers**, **Start
   servers** and **Play**, the one blue button. While a server runs, Start servers reads **Restart servers**: the same
-  `live.ps1 -NoClient` rebuilds and restarts all three, which is what edits hot reload does not cover need (Auth,
-  Patch, the shared projects, a pull).
+  `live.ps1 -NoClient` rebuilds and restarts all three (on current LocalExile, servers restart on code edits while
+  modules and mods reload by themselves).
 - Below it every service is a row: its state (running, starting while its port is not open yet, stopped, or its port
   held by another program; a Gateway under `dotnet watch` is "Running · hot reload"), ports, process, uptime, CPU and memory, and one button that starts or stops that service
   alone. A server's is `live.ps1 -Only <server>` (build and start) or `live.ps1 -Stop -Only <server>`; the client's is
@@ -611,8 +611,9 @@ to a user.
   tray's Stop all and closing with "Yes" do the same.
 - A server's **Restart** is `live.ps1 -Only <server>`. With Walk maps on, the restarted Gateway announces area loads to the recorder
   that is already running.
-- **Hot reload** (on by default, as in `live.ps1`): the Gateway runs under `dotnet watch`, and saved edits to its code
-  apply with the game still running. Off passes `-NoHotReload` to the runs that start a Gateway.
+- **Hot reload** (shown only on older checkouts whose `live.ps1` still runs the Gateway under `dotnet watch` and declares
+  `-NoHotReload`): on by default; off passes `-NoHotReload` to runs that start a Gateway. Current LocalExile restarts
+  servers instead (modules and mods still hot reload), so neither the switch nor `-NoHotReload` is used there.
 - The network mode is the game's own setting (`networking_type`), and there is no switch for it here: a current Gateway serves
   whichever the client picks (LocalExile #684), so a player changes it in game and enters again. Runs set no variable for it.
 - Only one `live.ps1` runs at a time; the buttons wait while one does (the status strip says so). The launcher runs it with Windows PowerShell and
@@ -627,8 +628,10 @@ to a user.
   Windows PowerShell can use.
 - The **Setup** list checks the server's one-time steps (**Guided setup** opens the Setup section): the client copy, the keys, the patched client, the gateway
   list, the extracted data, Node and ooz, whether the checkout has the launcher hooks, whether the game settings are separate
-  from the normal game's, the network mode in the settings file this client really uses (Predictive is preferred; Lockstep or
-  "auto" passes with a hint on a server that serves any mode, and fails on an older one that serves only Predictive), and
+  from the normal game's, the network mode in the settings file this client really uses (on current LocalExile, Lockstep is
+  preferred and "auto" picks Lockstep on localhost, while Predictive passes with a hint; on older checkouts with
+  `LockstepLatency.cs`, Predictive is preferred and Lockstep/"auto" passes with a hint; on very old Predictive-only
+  checkouts, anything other than Predictive fails), and
   Python with Frida. **Game data** runs `extract-data.ps1 -List` (with `-Servers` when the script has it: from LocalExile's
   database split on, the servers read the client tables from `client.db` and live.ps1 extracts only what they still read; the
   setup guide's extraction and a start from the adapter do the same).
@@ -859,7 +862,7 @@ naming other files. A client started by LocalExile, from either a checkout or a 
 | A link, or a `config.json` it can't read | Asks on **Game settings**: anything else started from a linked folder would use the same settings. Leaving it changes nothing |
 
 A new settings file starts as a copy of the shared one without its `[LOGIN]` section, or empty on a PC that never ran the game,
-with `networking_type=predictive`, the preferred mode, so the player no longer sets it by hand (they can still pick another in
+with `networking_type=lockstep` on current LocalExile (`networking_type=predictive` on older checkouts), the preferred mode, so the player no longer sets it by hand (they can still pick another in
 game: the server follows it). A file that already exists there is
 kept, with only that line changed. The shared files are only ever read. `config.json` is written last, so a stop leaves the
 client as it was, and other keys in it stay; one that can't be parsed is kept as `config.json.old`.
@@ -870,7 +873,7 @@ answer ends the card, and a guide that finished with a client counts as answered
 client's Documents are those of its Wine prefix. LocalExile on its own uses one per install (`data/wine-prefix`), so Waypoint
 names one for everything it starts, `~/.local/share/LocalExile/wine-prefix`, through `WINEPREFIX` (`GameSettings`): every
 checkout and release shares it, it outlives them, and no other Path of Exile uses it. Waypoint creates its first settings there
-with Networking Mode Predictive, from the install's older `data/wine-prefix` when it has one, and leaves them alone after that. A
+with the preferred Networking Mode (Lockstep on current LocalExile and releases, Predictive on older checkouts), from the install's older `data/wine-prefix` when it has one, and leaves them alone after that. A
 prefix the shell names with `WINEPREFIX` is the player's, and is only read. A Gateway asked for its commands, values or crafter
 data gets a temporary folder of its own: on Linux its start would otherwise delete a running Gateway's module copies.
 
@@ -1143,8 +1146,10 @@ starts every update): downloads run side by side, and the checkout operations wa
 one at a time. Installs, uninstalls and builds waiting together run as one operation of their kind: one save backup, and the builds
 in parallel. A failed one opens the operation log.
 
-Clicking a row opens the mod's page: its README (Overview, drawn as GitHub-flavoured Markdown with Markdig; images
-show their alt text, HTML is left out, relative links open the mod's folder on GitHub), its shared settings editor
+Mod names, descriptions and settings labels use the selected interface language when a translation exists. Search
+matches both the manifest text and its translation. Clicking a row opens the mod's page: its README (Overview,
+drawn as GitHub-flavoured Markdown with Markdig; images show their alt text, HTML is left out, relative links open
+the mod's folder on GitHub), its shared settings editor
 (all declared types below; written to `data/mods/<id>.json`, which holds only what differs from the defaults,
 and a running Gateway reloads the mod), and its releases (Versions, each installable). The page scrolls as one, its heading
 and tabs with it; the back button stays above it, and the settings' Save bar below it on the Settings tab. Right-clicking a
@@ -1467,6 +1472,10 @@ Advanced mode), the **Diagnostic report** button on an operation's failure dialo
 
 ### Tools: the item crafter
 
+The interface follows the selected language. With the [local Chinese item catalog](localization.md#importing-simplified-chinese-item-data),
+Simplified Chinese also displays and searches the client's item names, modifiers, and item previews. The item the Gateway
+receives uses the same IDs and values in any language.
+
 **Open item crafter** opens its window (one at a time; the button brings it forward): a window of its own in the
 taskbar, with Minimize and Maximize, not kept in front of Waypoint's. It makes any item the server can
 write and gives it to the character in game.
@@ -1596,6 +1605,7 @@ the other leagues. The dev host stays running afterwards (it shares the save dat
 they want the game and every server stopped, are reviewed in their dialog, are backed up first, and are refused when the
 account changed since the list was read ([account-management.md](account-management.md)). A database whose layout the
 adapter does not know can be browsed but not changed.
+When a monitored server or the client stops, Waypoint checks the current workspace again before enabling account edits.
 
 ## Code
 

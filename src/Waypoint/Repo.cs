@@ -87,8 +87,40 @@ static class Repo
 
     /// <summary>Whether the checkout's Gateway serves the network mode the client picks (LocalExile #684); an older one serves
     /// only Predictive unless Game_LOCKSTEP asks (its <c>LockstepLink.cs</c>), and Waypoint no longer sets that.</summary>
-    public static bool ServesAnyNetworkMode() =>
-        File.Exists(Path.Combine("src", "GameServer.Gateway", "Connection", "LockstepLatency.cs"));
+    public static bool ServesAnyNetworkMode() => ServesAnyNetworkMode(".");
+
+    internal static bool ServesAnyNetworkMode(string folder) =>
+        File.Exists(Path.Combine(folder, "src", "GameServer.Gateway", "Connection", "LockstepLatency.cs"));
+
+    /// <summary>Whether the checkout prefers Lockstep as the default network mode (LocalExile commit a0f4c872d,
+    /// <c>ClientPackets.cs</c>). Older checkouts with <c>LockstepLatency.cs</c> serve both modes but prefer Predictive;
+    /// checkouts older than that serve only Predictive. Release installs default to Lockstep.</summary>
+    public static bool PrefersLockstep() => IsInstall || PrefersLockstep(".");
+
+    internal static bool PrefersLockstep(string folder) =>
+        File.Exists(Path.Combine(folder, "src", "GameServer.Core", "Protocol", "Instance", "ClientPackets.cs"));
+
+    /// <summary>Whether the checkout's live.ps1 runs the Gateway under <c>dotnet watch</c> and takes <c>-NoHotReload</c>.
+    /// Current LocalExile restarts servers instead (modules and mods still hot reload) and removed <c>-NoHotReload</c>.</summary>
+    public static bool HasServerHotReload()
+    {
+        try
+        {
+            if (IsInstall || !File.Exists(LiveScript)) return false;
+            string full = Path.GetFullPath(LiveScript);
+            var written = File.GetLastWriteTimeUtc(full);
+            if (_serverHotReload is { } known && known.Path == full && known.Written == written) return known.Has;
+            bool has = HasServerHotReload(File.ReadAllText(full));
+            _serverHotReload = (full, written, has);
+            return has;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { return false; }
+    }
+
+    static (string Path, DateTime Written, bool Has)? _serverHotReload;
+
+    internal static bool HasServerHotReload(string script) =>
+        script.Contains("[switch]$NoHotReload", StringComparison.Ordinal);
 
     /// <summary>Whether the checkout has what Waypoint drives it with: live.ps1 -Stop, the Gateway's <c>commands</c> and
     /// <c>values</c> modes and the dev host's accounts came together. An older Gateway does not know those modes and would
@@ -145,7 +177,7 @@ static class Repo
     public static string Python => File.Exists(Platform.VenvPython(".")) ? Path.GetFullPath(Platform.VenvPython(".")) : Platform.Python;
 #endif
 
-    /// <summary>The settings file this client uses; GettingStarted step 10 needs networking_type=predictive there.</summary>
+    /// <summary>The settings file this client uses; current LocalExile prefers Lockstep (default "auto" picks Lockstep on localhost).</summary>
 #if WINDOWS
     public static string ClientConfig => ClientSettings.Read("Client").ConfigFile;
 #else

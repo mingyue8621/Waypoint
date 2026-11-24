@@ -6,7 +6,8 @@ enum LiveMode { All, Servers, Client, Restart, Stop, StopServers }
 
 /// <summary>One run of scripts/dev/live.ps1. The launcher never starts a server or the client itself: every button is a
 /// live.ps1 switch (Agents/GettingStarted.md, "Play"), so the script's checks and the patching-server argument apply.</summary>
-/// <param name="NoHotReload">Starts the built Gateway instead of running it under `dotnet watch` (live.ps1's default).</param>
+/// <param name="NoHotReload">Starts the built Gateway instead of running it under `dotnet watch` on an older checkout
+/// whose live.ps1 still has -NoHotReload (<see cref="Repo.HasServerHotReload"/>).</param>
 sealed record LiveRequest(LiveMode Mode, string? Server = null, bool Walkmaps = false, bool NoBuild = false, bool NoExtract = false,
     bool NoHotReload = false)
 {
@@ -22,8 +23,9 @@ sealed record LiveRequest(LiveMode Mode, string? Server = null, bool Walkmaps = 
 
     /// <summary>The script's switches. -ClientOnly takes only -Walkmaps (the recorder beside the new client; a checkout's
     /// live.ps1 older than that refuses it, so the caller leaves it out there, <see cref="Repo.ClientOnlyTakesWalkmaps"/>)
-    /// and skips the rest; -Stop takes only -Only.</summary>
-    public IReadOnlyList<string> Arguments()
+    /// and skips the rest; -Stop takes only -Only. -NoHotReload is passed only when <paramref name="supportsNoHotReload"/>
+    /// is true (current LocalExile's live.ps1 removed it).</summary>
+    public IReadOnlyList<string> Arguments(bool supportsNoHotReload = true)
     {
         var args = new List<string>();
         switch (Mode)
@@ -40,8 +42,8 @@ sealed record LiveRequest(LiveMode Mode, string? Server = null, bool Walkmaps = 
         if (Walkmaps) args.Add("-Walkmaps");
         if (NoBuild) args.Add("-NoBuild");
         if (NoExtract) args.Add("-NoExtract");
-        // Only where a Gateway starts: a restart of Auth or Patch leaves the running Gateway as it is.
-        if (NoHotReload && (Mode != LiveMode.Restart || Server == "Gateway")) args.Add("-NoHotReload");
+        // Only where a Gateway starts and the checkout's live.ps1 declares -NoHotReload.
+        if (supportsNoHotReload && NoHotReload && (Mode != LiveMode.Restart || Server == "Gateway")) args.Add("-NoHotReload");
         return args;
     }
 
@@ -111,7 +113,7 @@ static class Scripts
             if (ClientExtractionFailure.IsBuildRefusal(line)) Interlocked.Exchange(ref refused, 1);
             output(line);
         }
-        int code = await RunAsync(Repo.LiveEntry, request.Arguments(), Line, request.Variables());
+        int code = await RunAsync(Repo.LiveEntry, request.Arguments(Repo.HasServerHotReload()), Line, request.Variables());
         if (code != 0 && hncFailure is { } failure) output(ClientExtractionFailure.Describe(checkout, failure));
         // LocalExile's refusal ends in a stack trace: the last line says it in plain words.
         if (code != 0 && refused != 0) output(ClientExtractionFailure.Refused);

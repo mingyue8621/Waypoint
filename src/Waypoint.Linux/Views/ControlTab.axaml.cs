@@ -143,6 +143,7 @@ partial class ControlTab : UserControl
         NoBuild.IsChecked = shared.Settings.NoBuild;
         NoExtract.IsChecked = shared.Settings.NoExtract;
         HotReload.IsChecked = shared.Settings.HotReload;
+        HotReload.IsVisible = Repo.HasServerHotReload();
         ServerFolder.Text = Environment.CurrentDirectory;
         ToolTip.SetTip(ServerFolder, Environment.CurrentDirectory);
         ServiceList.ItemsSource = Repo.IsInstall ? _rows.Where(r => r.Service.Kind is ServiceKind.Server or ServiceKind.Client).ToList()
@@ -189,9 +190,13 @@ partial class ControlTab : UserControl
         }
         StartServersText.Text = L.Text(anyUp ? "Restart servers" : "Start servers");
         StartServersIcon.Kind = anyUp ? MaterialIconKind.Refresh : MaterialIconKind.Play;
+        bool serverHotReload = Repo.HasServerHotReload();
+        HotReload.IsVisible = serverHotReload;
         ToolTip.SetTip(StartServersButton, anyUp
-            ? L.Text("live.ps1 -NoClient: rebuilds and restarts Patch, Auth and Gateway (after a pull, or edits outside the Gateway); " +
-              "the Gateway's own code edits apply by themselves with hot reload. A running client stays.")
+            ? serverHotReload
+                ? L.Text("live.ps1 -NoClient: rebuilds and restarts Patch, Auth and Gateway (after a pull, or edits outside the Gateway); " +
+                  "the Gateway's own code edits apply by themselves with hot reload. A running client stays.")
+                : L.Text("live.ps1 -NoClient: rebuilds and restarts Patch, Auth and Gateway (after a pull or server edits; modules and mods reload by themselves). A running client stays.")
             : L.Text("live.ps1 -NoClient: builds and starts Patch, Auth and Gateway; a running client stays"));
         ToolTip.SetTip(PlayButton, PlaysOnlyTheGame(samples, Walkmaps.IsChecked == true, Repo.ClientOnlyTakesWalkmaps())
             ? L.Text("live.ps1 -ClientOnly: starts the game against the running servers (Restart servers rebuilds them)")
@@ -204,9 +209,10 @@ partial class ControlTab : UserControl
         s.Walkmaps = Walkmaps.IsChecked == true;
         s.NoBuild = NoBuild.IsChecked == true;
         s.NoExtract = NoExtract.IsChecked == true;
-        s.HotReload = HotReload.IsChecked == true;
+        bool serverHotReload = Repo.HasServerHotReload();
+        if (serverHotReload) s.HotReload = HotReload.IsChecked == true;
         s.Save();
-        return new LiveRequest(mode, server, s.Walkmaps, s.NoBuild, s.NoExtract, NoHotReload: !s.HotReload);
+        return new LiveRequest(mode, server, s.Walkmaps, s.NoBuild, s.NoExtract, NoHotReload: serverHotReload && !s.HotReload);
     }
 
     bool ClientRunning => _shared.Monitor.Latest.Any(s => s.Service == Service.Client && s.Running);

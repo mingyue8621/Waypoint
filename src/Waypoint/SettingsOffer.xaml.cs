@@ -18,7 +18,7 @@ public partial class SettingsOffer : UserControl
     {
         bool offer = idle && ClientSettings.ShouldOffer("Client", _settings.GameSettingsOffered);
         Visibility = offer ? Visibility.Visible : Visibility.Collapsed;
-        if (offer) OfferText.Text = ClientSettings.Explain("Client");
+        if (offer) OfferText.Text = ClientSettings.Explain("Client", Repo.PrefersLockstep());
     }
 
     void Answered()
@@ -30,7 +30,7 @@ public partial class SettingsOffer : UserControl
 
     void UseClicked(object sender, RoutedEventArgs e)
     {
-        try { ClientSettings.UseOwn("Client"); }
+        try { ClientSettings.UseOwn("Client", preferLockstep: Repo.PrefersLockstep()); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             Dialog.Tell(Window.GetWindow(this), DialogKind.Error, L.Text("Game settings were not changed"), ex.Message);

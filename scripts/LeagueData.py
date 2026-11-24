@@ -13,7 +13,7 @@ import uuid
 # A release runs this with its own Python, the embeddable one, which does not look for modules beside the script it
 # runs: without this line the import below fails there, and every league change with it.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from AccountData import AccountError, inspect_schema, open_saves, physical, record, require
+from AccountData import AccountError, inspect_schema, is_relational, open_saves, physical, record, require
 
 
 EMPTY_SOURCE = "public sealed class WaypointLeague : League { }\n"
@@ -245,14 +245,24 @@ def unused_saved_name(database, name, auth=None):
     with closing(open_saves(database, auth)) as db:
         db.execute("BEGIN")
         require(inspect_schema(db), "The save layout or pending import cannot be safely inspected. League creation is blocked.")
-        for table, column in (("account_characters", "character"), ("characters", "save"), ("deleted_characters", "save")):
-            for row in db.execute('SELECT "' + column + '" FROM "' + table + '"'):
-                values = [value for key, value in record(row[0]).items() if key.casefold() == "league"]
-                require(all(isinstance(value, str) and value.casefold() != name.casefold() for value in values), "That league name has retained characters. Choose a new name.")
-        for table in ("stashes", "stash_tabs"):
-            for row in db.execute('SELECT account FROM "' + table + '"'):
+        if is_relational(db):
+            for row in db.execute("SELECT league, hardcore_death_league FROM account_characters"):
+                for value in row:
+                    if value is not None:
+                        require(isinstance(value, str) and value.casefold() != name.casefold(),
+                                "That league name has retained characters. Choose a new name.")
+            for row in db.execute("SELECT account FROM stash_saves"):
                 require(isinstance(row[0], str) and not row[0].casefold().endswith(" (" + name.casefold() + ")"),
                         "That league name has retained stash data. Choose a new name.")
+        else:
+            for table, column in (("account_characters", "character"), ("characters", "save"), ("deleted_characters", "save")):
+                for row in db.execute('SELECT "' + column + '" FROM "' + table + '"'):
+                    values = [value for key, value in record(row[0]).items() if key.casefold() == "league"]
+                    require(all(isinstance(value, str) and value.casefold() != name.casefold() for value in values), "That league name has retained characters. Choose a new name.")
+            for table in ("stashes", "stash_tabs"):
+                for row in db.execute('SELECT account FROM "' + table + '"'):
+                    require(isinstance(row[0], str) and not row[0].casefold().endswith(" (" + name.casefold() + ")"),
+                            "That league name has retained stash data. Choose a new name.")
         db.execute("COMMIT")
 
 

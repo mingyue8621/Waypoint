@@ -163,8 +163,8 @@ public partial class SetupTab : UserControl
     async void SeparateSettings(object sender, RoutedEventArgs e)
     {
         var owner = Window.GetWindow(this);
-        if (!Dialog.Ask(owner, DialogKind.Info, L.Text("Use separate game settings"), ClientSettings.Explain("Client"), L.Text("Use separate settings"), L.Text("Cancel"))) return;
-        try { await _shared.RunExclusiveAsync(L.Text("Game settings"), () => Task.Run(() => ClientSettings.UseOwn("Client"))); }
+        if (!Dialog.Ask(owner, DialogKind.Info, L.Text("Use separate game settings"), ClientSettings.Explain("Client", Repo.PrefersLockstep()), L.Text("Use separate settings"), L.Text("Cancel"))) return;
+        try { await _shared.RunExclusiveAsync(L.Text("Game settings"), () => Task.Run(() => ClientSettings.UseOwn("Client", preferLockstep: Repo.PrefersLockstep()))); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             Dialog.Tell(owner, DialogKind.Error, L.Text("Game settings were not changed"), ex.Message);

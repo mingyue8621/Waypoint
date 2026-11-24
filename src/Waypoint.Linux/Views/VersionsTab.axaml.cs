@@ -149,10 +149,19 @@ public partial class VersionsTab : UserControl
     {
         var state = _shared.Workspace.Latest;
         var gateway = state?.Services.FirstOrDefault(s => s.Name == "Gateway");
-        var reload = _hotReload.Update(gateway, LogReader.Tail(Path.Combine(Repo.Logs, "live-gateway.log")));
         BuildIdentity.Text = state is null ? "" : $"{state.SourceCommit}\n{string.Join("\n", state.BuildCommit.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))}";
-        ToolTip.SetTip(BuildIdentity, L.Text(reload.Detail));
-        HotReloadState.Text = $"{L.Text("Hot reload")}: {L.Text(reload.State)}";
+        bool serverHotReload = Repo.HasServerHotReload() || gateway?.WatchProcessId > 0;
+        HotReloadState.IsVisible = serverHotReload;
+        if (serverHotReload)
+        {
+            var reload = _hotReload.Update(gateway, LogReader.Tail(Path.Combine(Repo.Logs, "live-gateway.log")));
+            ToolTip.SetTip(BuildIdentity, L.Text(reload.Detail));
+            HotReloadState.Text = $"{L.Text("Hot reload")}: {L.Text(reload.State)}";
+        }
+        else
+        {
+            ToolTip.SetTip(BuildIdentity, L.Text("Servers restart on code edits; modules and mods reload into the running Gateway by themselves."));
+        }
         bool free = !_shared.IsLiveRunning && state is not null;
         BuildButton.IsEnabled = free && !state!.HasServers;
         ReloadDataButton.IsEnabled = free && state!.GameRunning && gateway?.Status == "Ready";

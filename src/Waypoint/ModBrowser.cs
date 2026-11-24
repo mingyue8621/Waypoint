@@ -52,7 +52,7 @@ sealed record BrowseItem(ModSource Source, ModListing Listing, ModRelease? Relea
     public bool IsUpdate => Offer == ModOffer.Update;
     public string Origin => Release is not null ? L.Text("Release {0}", Release.Tag)
         : Listing.IsProject ? L.Text("No release: installs the source") : L.Text("Scripts: no build needed");
-    public string SearchText => $"{Listing.Id} {Listing.Name} {Listing.Author} {Listing.Description}";
+    public string SearchText => $"{Listing.Id} {Listing.Name} {Listing.Author} {Listing.Description} {Title} {Description}";
     public string Initial => ModsText.Initial(Title);
     public ModIconKind Icon => ModsText.Icon(Listing.Id);
     /// <summary>The installed mod's own icon.png, else the repository's.</summary>

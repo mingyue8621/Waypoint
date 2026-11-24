@@ -103,15 +103,31 @@ static class SetupChecks
         (Environment.GetEnvironmentVariable("PATH") ?? "").Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries)
             .Any(dir => { try { return System.IO.File.Exists(Path.Combine(dir.Trim('"'), exe)); } catch (ArgumentException) { return false; } });
 
-    /// <summary>The game picks its network mode and a current server follows it; Predictive is the preferred one, and "auto"
-    /// picks lockstep on localhost. An older server serves only Predictive (GettingStarted step 10).</summary>
+    /// <summary>The game picks its network mode and a current server follows it: current LocalExile prefers Lockstep
+    /// (and "auto" picks Lockstep on localhost); older servers with <c>LockstepLatency.cs</c> serve both modes but prefer
+    /// Predictive; servers older than that serve only Predictive (GettingStarted step 10).</summary>
     static SetupCheck NetworkMode()
     {
+        bool exists = System.IO.File.Exists(Repo.ClientConfig);
+        return NetworkMode(exists, exists ? ClientSettings.NetworkMode(Repo.ClientConfig) : null,
+            Repo.ServesAnyNetworkMode(), Repo.PrefersLockstep());
+    }
+
+    internal static SetupCheck NetworkMode(bool configExists, string? mode, bool servesAny, bool prefersLockstep)
+    {
+        if (prefersLockstep)
+        {
+            string lockstepHint = L.Text("Esc → Options → Game → Networking Mode → Lockstep, then log out to the character screen and Play again");
+            if (!configExists || mode is null || string.Equals(mode, "auto", StringComparison.OrdinalIgnoreCase))
+                return new(true, L.Text("network mode auto (Lockstep on localhost)"));
+            if (string.Equals(mode, "lockstep", StringComparison.OrdinalIgnoreCase))
+                return new(true, L.Text("network mode Lockstep"));
+            return new(true, L.Text("network mode {0}: served, but Lockstep is preferred", mode), lockstepHint);
+        }
         string hint = L.Text("Esc → Options → Game → Networking Mode → Predictive, then log out to the character screen and Play again");
-        if (!System.IO.File.Exists(Repo.ClientConfig)) return new(null, L.Text("network mode not set yet: set Predictive in game"), hint);
-        string? mode = ClientSettings.NetworkMode(Repo.ClientConfig);
+        if (!configExists) return new(null, L.Text("network mode not set yet: set Predictive in game"), hint);
         if (string.Equals(mode, "predictive", StringComparison.OrdinalIgnoreCase)) return new(true, L.Text("network mode Predictive"));
-        return Repo.ServesAnyNetworkMode() ? new(true, L.Text("network mode {0}: served, but Predictive is preferred", mode ?? "auto"), hint)
+        return servesAny ? new(true, L.Text("network mode {0}: served, but Predictive is preferred", mode ?? "auto"), hint)
             : new(false, L.Text("network mode is {0}: the character won't move", mode ?? "auto"), hint);
     }
 

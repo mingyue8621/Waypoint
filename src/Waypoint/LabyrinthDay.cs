@@ -188,8 +188,10 @@ sealed class LabyrinthDay
         DateTime built = File.GetLastWriteTimeUtc(dll);
         lock (Loaded) if (Loaded.TryGetValue((built, day), out var known)) return known;
         // A Gateway built before the hook does not know `labyrinth` and would start for real: the saves, Auth, the port.
-        // /lab_layout's date came with it, and `commands` is safe on every Gateway with the launcher hooks.
-        if (!HasLayouts(await CommandCatalog.LoadAsync())) throw new InvalidOperationException(NoLayouts);
+        // Its assembly says whether it has the hook (LabyrinthDay.Listing), read without running it; /lab_layout moved
+        // to the gm-commands mod, so `commands` no longer lists it everywhere.
+        if (!HasLabyrinth(CrafterCatalog.GatewayAssembly(dll)) && !HasLayouts(await CommandCatalog.LoadAsync()))
+            throw new InvalidOperationException(NoLayouts);
         var loaded = Parse(await CommandCatalog.AskGateway(TimeSpan.FromSeconds(60), dll, "labyrinth", day.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)));
         if (loaded.Tiers.Count == 0) throw new InvalidOperationException(NoLayouts);
         lock (Loaded) Loaded[(built, day)] = loaded;
@@ -197,6 +199,29 @@ sealed class LabyrinthDay
     }
 
     static string NoLayouts => L.Text("This checkout's Gateway cannot list the Labyrinth's layouts yet: update LocalExile, then play or start the servers once to build it.");
+
+    /// <summary>Whether this Gateway build has the `labyrinth` mode: its assembly defines <c>LabyrinthDay.Listing</c>.</summary>
+    internal static bool HasLabyrinth(string assembly)
+    {
+        try
+        {
+            using var stream = File.OpenRead(assembly);
+            using var pe = new System.Reflection.PortableExecutable.PEReader(stream);
+            if (!pe.HasMetadata) return false;
+            var metadata = System.Reflection.Metadata.PEReaderExtensions.GetMetadataReader(pe);
+            foreach (var handle in metadata.TypeDefinitions)
+            {
+                var type = metadata.GetTypeDefinition(handle);
+                if (!metadata.StringComparer.Equals(type.Name, "LabyrinthDay")) continue;
+                return type.GetMethods().Any(m => metadata.StringComparer.Equals(metadata.GetMethodDefinition(m).Name, "Listing"));
+            }
+            return false;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or BadImageFormatException or InvalidOperationException)
+        {
+            return false;
+        }
+    }
 
     /// <summary>Whether this Gateway build has the `labyrinth` mode: its /lab_layout takes a date.</summary>
     internal static bool HasLayouts(CommandCatalog commands) =>

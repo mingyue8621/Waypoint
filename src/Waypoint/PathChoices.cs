@@ -223,13 +223,13 @@ static class PathChoices
         }
     }
 
-    /// <summary>Create (<paramref name="from"/> null: from the normal settings, no login, Predictive) or Copy (from that profile,
+    /// <summary>Create (<paramref name="from"/> null: from the normal settings, no login, preferred network mode) or Copy (from that profile,
     /// as it is, without its saved login). The new profile is listed, not selected. True when it was made.</summary>
     public static bool CreateGameSettings(Shared shared, string name, string? from, Ask ask)
     {
         name = name.Trim();
         if (!Named(name, ask)) return false;
-        try { ClientSettings.CreateProfile(name, from); }
+        try { ClientSettings.CreateProfile(name, from, preferLockstep: Repo.PrefersLockstep()); }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
         {
             ask(DialogKind.Error, L.Text("The profile wasn't made"), e.Message, [L.Text("OK")]);

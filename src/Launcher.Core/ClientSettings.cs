@@ -68,12 +68,15 @@ public static class ClientSettings
         : L.Text("Its config.json could not be read. It is kept beside the new one as config.json.old.");
 
     /// <summary>What separate settings would change for this client, for a player deciding.</summary>
-    public static string Explain(string client)
+    public static string Explain(string client, bool preferLockstep = true)
     {
         string found = Read(client).Kind == ClientSettingsKind.Unknown
             ? L.Text("Waypoint can't tell what else uses this client's settings.") + " " + WhyUnknown(Path.GetFullPath(client), IsLink(client))
             : L.Text("LocalExile shares its settings and saved login with your normal Path of Exile.");
-        return found + "\n\n" + L.Text("LocalExile gets its own in {0}, starting from a copy of your normal settings without your login, with Networking Mode set to Predictive. Your normal game's files are not changed.", OwnFolderPath);
+        string detail = preferLockstep
+            ? L.Text("LocalExile gets its own in {0}, starting from a copy of your normal settings without your login, with Networking Mode set to Lockstep. Your normal game's files are not changed.", OwnFolderPath)
+            : L.Text("LocalExile gets its own in {0}, starting from a copy of your normal settings without your login, with Networking Mode set to Predictive. Your normal game's files are not changed.", OwnFolderPath);
+        return found + "\n\n" + detail;
     }
 
     /// <summary>A setup with a whole client that has no settings of its own, and has not been offered them.</summary>
@@ -92,22 +95,25 @@ public static class ClientSettings
 
     public static bool IsPredictive(string configFile) => string.Equals(NetworkMode(configFile), "predictive", StringComparison.OrdinalIgnoreCase);
 
+    public static bool IsLockstep(string configFile) => string.Equals(NetworkMode(configFile), "lockstep", StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Gives the client LocalExile's own files. A new settings file starts as a copy of the shared one without its saved
-    /// login, set to Predictive, the preferred network mode (the server follows whichever the game picks, and the player can
-    /// change it in game). config.json goes last, so a stop leaves the client as it was.</summary>
-    public static void UseOwn(string client, string? documents = null)
+    /// login, set to the preferred network mode (Lockstep on current LocalExile, Predictive on older checkouts; the server
+    /// follows whichever the game picks, and the player can change it in game). config.json goes last, so a stop leaves the
+    /// client as it was.</summary>
+    public static void UseOwn(string client, string? documents = null, bool preferLockstep = true)
     {
         documents ??= Documents;
         Directory.CreateDirectory(Path.Combine(documents, OwnFolder));
-        Seed(Path.Combine(documents, OwnConfig), Path.Combine(documents, SharedConfig));
+        Seed(Path.Combine(documents, OwnConfig), Path.Combine(documents, SharedConfig), preferLockstep ? "lockstep" : "predictive");
         Point(Path.Combine(client, "config.json"));
     }
 
-    static void Seed(string own, string shared)
+    static void Seed(string own, string shared, string networkMode)
     {
         bool exists = File.Exists(own);
         string[] lines = exists ? File.ReadAllLines(own) : File.Exists(shared) ? [.. WithoutLogin(File.ReadAllLines(shared))] : [];
-        string[] wanted = Predictive(lines);
+        string[] wanted = WithNetworkMode(lines, networkMode);
         if (exists && lines.SequenceEqual(wanted)) return;
         // The byte-order mark is how the client writes this file.
         Replace(own, string.Join(Environment.NewLine, wanted) + Environment.NewLine, new UTF8Encoding(true));
@@ -124,22 +130,22 @@ public static class ClientSettings
         }
     }
 
-    static string[] Predictive(string[] lines)
+    static string[] WithNetworkMode(string[] lines, string mode)
     {
-        const string Line = NetworkKey + "predictive";
+        string line = NetworkKey + mode;
         var result = lines.ToList();
         int section = result.FindIndex(l => l.Trim().Equals(NetworkSection, StringComparison.OrdinalIgnoreCase));
         if (section < 0)
         {
             if (result.Count > 0 && result[^1].Trim().Length > 0) result.Add("");
-            result.AddRange([NetworkSection, Line]);
+            result.AddRange([NetworkSection, line]);
             return [.. result];
         }
         int end = result.FindIndex(section + 1, l => l.TrimStart().StartsWith('['));
         if (end < 0) end = result.Count;
         int found = result.FindIndex(section + 1, end - section - 1, l => l.TrimStart().StartsWith(NetworkKey, StringComparison.OrdinalIgnoreCase));
-        if (found >= 0) result[found] = Line;
-        else result.Insert(section + 1, Line);
+        if (found >= 0) result[found] = line;
+        else result.Insert(section + 1, line);
         return [.. result];
     }
 
@@ -173,9 +179,9 @@ public static class ClientSettings
     }
 
     /// <summary>A new game settings folder. From <paramref name="from"/>, a copy of that folder's settings as they are, without the
-    /// saved login; from none, a copy of the player's normal settings as <see cref="UseOwn"/> makes one (no login, Predictive).
+    /// saved login; from none, a copy of the player's normal settings as <see cref="UseOwn"/> makes one (no login, preferred network mode).
     /// The saved login is never copied: the new folder has one of its own. The player's normal files are only read.</summary>
-    public static void CreateProfile(string name, string? from, string? documents = null)
+    public static void CreateProfile(string name, string? from, string? documents = null, bool preferLockstep = true)
     {
         if (!ValidProfile(name)) throw new ArgumentException(L.Text("\"{0}\" is not a folder name.", name));
         documents ??= Documents;
@@ -184,7 +190,7 @@ public static class ClientSettings
         Directory.CreateDirectory(folder);
         if (from is not null && File.Exists(Path.Combine(documents, from, SharedConfig)))
             Replace(settings, string.Join(Environment.NewLine, WithoutLogin(File.ReadAllLines(Path.Combine(documents, from, SharedConfig)))) + Environment.NewLine, new UTF8Encoding(true));
-        else Seed(settings, Path.Combine(documents, SharedConfig));
+        else Seed(settings, Path.Combine(documents, SharedConfig), preferLockstep ? "lockstep" : "predictive");
     }
 
     /// <summary>A game settings folder under a new name, beside the others. A client whose config.json names it is pointed at the

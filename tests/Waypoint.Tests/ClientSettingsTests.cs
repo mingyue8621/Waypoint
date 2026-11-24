@@ -70,7 +70,7 @@ public class ClientSettingsTests : IDisposable
         Assert.Contains("scale=1", own);
         Assert.DoesNotContain("someone", own);
         Assert.DoesNotContain("LOGIN", own);
-        Assert.True(ClientSettings.IsPredictive(Own));
+        Assert.True(ClientSettings.IsLockstep(Own));
         Assert.Equal([0xEF, 0xBB, 0xBF], File.ReadAllBytes(Own)[..3]);
         Assert.Contains(@"LocalExile\\production_login.credentials", File.ReadAllText(Config));
     }
@@ -80,18 +80,22 @@ public class ClientSettingsTests : IDisposable
     {
         ClientSettings.UseOwn(Client, Documents);
         Assert.False(File.Exists(Shared));
-        Assert.True(ClientSettings.IsPredictive(Own));
+        Assert.True(ClientSettings.IsLockstep(Own));
     }
 
     [Fact]
     public void Existing_own_settings_are_kept_and_only_the_network_mode_changes()
     {
         Directory.CreateDirectory(Path.GetDirectoryName(Own)!);
-        File.WriteAllLines(Own, ["[DISPLAY]", "resolution_width=800", "[NETWORKING]", "networking_type=lockstep", "other=1"]);
+        File.WriteAllLines(Own, ["[DISPLAY]", "resolution_width=800", "[NETWORKING]", "networking_type=predictive", "other=1"]);
         File.WriteAllLines(Shared, ["[DISPLAY]", "resolution_width=2560"]);
 
         ClientSettings.UseOwn(Client, Documents);
 
+        Assert.Equal(["[DISPLAY]", "resolution_width=800", "[NETWORKING]", "networking_type=lockstep", "other=1"], File.ReadAllLines(Own));
+
+        // Older checkouts that prefer Predictive can still request it explicitly.
+        ClientSettings.UseOwn(Client, Documents, preferLockstep: false);
         Assert.Equal(["[DISPLAY]", "resolution_width=800", "[NETWORKING]", "networking_type=predictive", "other=1"], File.ReadAllLines(Own));
     }
 
@@ -137,8 +141,13 @@ public class ClientSettingsTests : IDisposable
         Assert.Null(ClientSettings.NetworkMode(Shared));
         File.WriteAllLines(Shared, ["[UI]", "scale=1"]);
         Assert.False(ClientSettings.IsPredictive(Shared));
+        Assert.False(ClientSettings.IsLockstep(Shared));
         File.WriteAllLines(Shared, ["[NETWORKING]", "NETWORKING_TYPE=Predictive"]);
         Assert.True(ClientSettings.IsPredictive(Shared));
+        Assert.False(ClientSettings.IsLockstep(Shared));
+        File.WriteAllLines(Shared, ["[NETWORKING]", "NETWORKING_TYPE=Lockstep"]);
+        Assert.True(ClientSettings.IsLockstep(Shared));
+        Assert.False(ClientSettings.IsPredictive(Shared));
     }
 
     [Fact]
@@ -147,7 +156,7 @@ public class ClientSettingsTests : IDisposable
         File.WriteAllLines(Shared, ["[DISPLAY]", "fullscreen=true", "[LOGIN]", "login_email=me@example.invalid"]);
         File.WriteAllText(Config, """{ "GGG_LOGIN_SERVER_PORT": "20481" }""");
         ClientSettings.UseOwn(Client, Documents);
-        File.AppendAllLines(Own, ["[NETWORKING]", "networking_type=lockstep", "[LOGIN]", "login_email=own@example.invalid"]);
+        File.WriteAllLines(Own, ["[DISPLAY]", "fullscreen=true", "[NETWORKING]", "networking_type=predictive", "[LOGIN]", "login_email=own@example.invalid"]);
         File.WriteAllText(Path.Combine(Documents, "LocalExile", "production_login.credentials"), "saved");
         Directory.CreateDirectory(Path.Combine(Documents, "Screenshots"));
         Assert.Equal("LocalExile", ClientSettings.Profile(Client, Documents));
@@ -155,7 +164,7 @@ public class ClientSettingsTests : IDisposable
         // A copy of the folder in use, as it is but for the saved login; listed with it, not the folders without settings.
         ClientSettings.CreateProfile("Test", "LocalExile", Documents);
         string copy = File.ReadAllText(Path.Combine(Documents, "Test", "production_Config.ini"));
-        Assert.Contains("networking_type=lockstep", copy);
+        Assert.Contains("networking_type=predictive", copy);
         Assert.DoesNotContain("login_email", copy);
         Assert.False(File.Exists(Path.Combine(Documents, "Test", "production_login.credentials")));
         Assert.Equal(["LocalExile", "Test"], ClientSettings.Profiles(Documents));

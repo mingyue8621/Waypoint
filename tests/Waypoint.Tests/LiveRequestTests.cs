@@ -71,6 +71,74 @@ public class LiveRequestTests
         Assert.Equal(["-Stop"], new LiveRequest(LiveMode.Stop, NoHotReload: true).Arguments());
     }
 
+    [Fact]
+    public void NoHotReload_is_omitted_when_live_script_removed_server_hot_reload()
+    {
+        Assert.True(Repo.HasServerHotReload("param([switch]$NoClient, [switch]$NoHotReload, [switch]$Stop)"));
+        // Current LocalExile's live.ps1 still mentions `dotnet watch` in cleanup comments/regex, without declaring -NoHotReload.
+        Assert.False(Repo.HasServerHotReload("# an older run's dotnet watch\nparam([switch]$NoClient, [switch]$Stop)"));
+        Assert.Empty(new LiveRequest(LiveMode.All, NoHotReload: true).Arguments(supportsNoHotReload: false));
+        Assert.Equal(["-NoClient"], new LiveRequest(LiveMode.Servers, NoHotReload: true).Arguments(supportsNoHotReload: false));
+        Assert.Equal(["-Only", "Gateway"], new LiveRequest(LiveMode.Restart, "Gateway", NoHotReload: true).Arguments(supportsNoHotReload: false));
+    }
+
+    [Fact]
+    public void Network_mode_check_prefers_lockstep_on_current_checkouts_and_keeps_older_ones_safe()
+    {
+        // Current LocalExile (Lockstep default/preferred): auto, missing config and lockstep are green with no hint; predictive is served with a Lockstep hint.
+        var autoCheck = SetupChecks.NetworkMode(configExists: true, mode: "auto", servesAny: true, prefersLockstep: true);
+        Assert.True(autoCheck.Ok);
+        Assert.Equal("", autoCheck.Hint);
+        var missingCheck = SetupChecks.NetworkMode(configExists: false, mode: null, servesAny: true, prefersLockstep: true);
+        Assert.True(missingCheck.Ok);
+        Assert.Equal("", missingCheck.Hint);
+        var lockstepCheck = SetupChecks.NetworkMode(configExists: true, mode: "lockstep", servesAny: true, prefersLockstep: true);
+        Assert.True(lockstepCheck.Ok);
+        Assert.Equal("", lockstepCheck.Hint);
+        var predictiveOnCurrent = SetupChecks.NetworkMode(configExists: true, mode: "predictive", servesAny: true, prefersLockstep: true);
+        Assert.True(predictiveOnCurrent.Ok);
+        Assert.Contains("Lockstep", predictiveOnCurrent.Text);
+        Assert.Contains("Lockstep", predictiveOnCurrent.Hint);
+
+        // Older checkout that serves both modes but prefers Predictive.
+        var lockstepOnMid = SetupChecks.NetworkMode(configExists: true, mode: "lockstep", servesAny: true, prefersLockstep: false);
+        Assert.True(lockstepOnMid.Ok);
+        Assert.Contains("Predictive", lockstepOnMid.Text);
+        var missingOnMid = SetupChecks.NetworkMode(configExists: false, mode: null, servesAny: true, prefersLockstep: false);
+        Assert.Null(missingOnMid.Ok);
+
+        // Very old Predictive-only checkout.
+        var lockstepOnOld = SetupChecks.NetworkMode(configExists: true, mode: "lockstep", servesAny: false, prefersLockstep: false);
+        Assert.False(lockstepOnOld.Ok);
+        var predictiveOnOld = SetupChecks.NetworkMode(configExists: true, mode: "predictive", servesAny: false, prefersLockstep: false);
+        Assert.True(predictiveOnOld.Ok);
+    }
+
+    [Fact]
+    public void Checkout_network_mode_capability_follows_ClientPackets_and_LockstepLatency()
+    {
+        string top = Path.Combine(Path.GetTempPath(), $"lxnet-{Guid.NewGuid():N}");
+        try
+        {
+            Directory.CreateDirectory(top);
+            Assert.False(Repo.ServesAnyNetworkMode(top));
+            Assert.False(Repo.PrefersLockstep(top));
+
+            string latency = Path.Combine(top, "src", "GameServer.Gateway", "Connection", "LockstepLatency.cs");
+            Directory.CreateDirectory(Path.GetDirectoryName(latency)!);
+            File.WriteAllText(latency, "");
+            Assert.True(Repo.ServesAnyNetworkMode(top));
+            Assert.False(Repo.PrefersLockstep(top));
+
+            string packets = Path.Combine(top, "src", "GameServer.Core", "Protocol", "Instance", "ClientPackets.cs");
+            Directory.CreateDirectory(Path.GetDirectoryName(packets)!);
+            File.WriteAllText(packets, "");
+            Assert.True(Repo.ServesAnyNetworkMode(top));
+            Assert.True(Repo.PrefersLockstep(top));
+        }
+        finally { Directory.Delete(top, recursive: true); }
+    }
+
     /// <summary>A folder that looks like a server checkout to the launcher.</summary>
     static string Checkout(string dir)
     {

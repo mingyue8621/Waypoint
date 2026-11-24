@@ -19,14 +19,15 @@ static class GameSettings
         if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WINEPREFIX"))) return;
         string prefix = Platform.GamePrefix;
         try { Initialize(prefix, install); }
-        // Without first settings the client still starts, and asks for Predictive the way it always has.
+        // Without first settings the client still starts with its default network mode ("auto", Lockstep on localhost).
         catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
         Environment.SetEnvironmentVariable("WINEPREFIX", prefix);
     }
 
-    /// <summary>The first settings: this install's own from before, when it has them, and Predictive, the preferred network mode. Once
-    /// the file exists nothing here touches it, so what the player sets in game stays.</summary>
-    internal static void Initialize(string prefix, string install)
+    /// <summary>The first settings: this install's own from before, when it has them, and the preferred network mode
+    /// (Lockstep on current LocalExile, Predictive on older checkouts). Once the file exists nothing here touches it,
+    /// so what the player sets in game stays.</summary>
+    internal static void Initialize(string prefix, string install, bool? preferLockstep = null)
     {
         string folder = Path.Combine(prefix, Documents), settings = Path.Combine(folder, Config);
         if (File.Exists(settings)) return;
@@ -34,9 +35,11 @@ static class GameSettings
         string old = Path.Combine(install, "data", "wine-prefix", Documents);
         foreach (string name in new[] { "production_login.credentials", Config })
             if (File.Exists(Path.Combine(old, name))) File.Copy(Path.Combine(old, name), Path.Combine(folder, name));
+        bool lockstep = preferLockstep ?? (!Repo.IsRoot(install) || Repo.PrefersLockstep(install));
+        string line = "networking_type=" + (lockstep ? "lockstep" : "predictive");
         string text = File.Exists(settings) ? File.ReadAllText(settings) : "";
-        text = NetworkMode().IsMatch(text) ? NetworkMode().Replace(text, "networking_type=predictive")
-            : text.TrimEnd() + "\r\n[NETWORKING]\r\nnetworking_type=predictive\r\n";
+        text = NetworkMode().IsMatch(text) ? NetworkMode().Replace(text, line)
+            : text.TrimEnd() + "\r\n[NETWORKING]\r\n" + line + "\r\n";
         // The byte-order mark is how the client writes this file.
         File.WriteAllText(settings, text.TrimStart(), new UTF8Encoding(true));
     }

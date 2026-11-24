@@ -188,10 +188,7 @@ sealed class CrafterCatalog
                     { Display = chinese.Base(Str(e, "id"), "") });
                     break;
                 case "desc":
-                    var description = new StatDescription([.. e.GetProperty("stats").EnumerateArray().Select(s => s.GetString()!)],
-                        [.. e.GetProperty("variants").EnumerateArray().Select(v => new DescriptionVariant(
-                            [.. v.GetProperty("when").EnumerateArray().Select(w => w.GetString()!)], Str(v, "text"),
-                            [.. v.GetProperty("handlers").EnumerateArray().Select(h => (h[0].GetString()!, h[1].GetInt32()))]))]);
+                    var description = ParseDescription(e);
                     // The client's own Chinese wording of the same stats, laid over the English structure.
                     if (chinese.Description(description.Stats) is { } translated)
                         description = Align(description, translated);
@@ -207,6 +204,12 @@ sealed class CrafterCatalog
         var resolved = poolIds.ToDictionary(p => p.Key, p => (IReadOnlyList<CraftMod>)[.. p.Value.Select(mods.GetValueOrDefault).OfType<CraftMod>()]);
         return new(classes, bases, mods, resolved, descriptions, words);
     }
+
+    internal static StatDescription ParseDescription(JsonElement e) => new(
+        [.. e.GetProperty("stats").EnumerateArray().Select(s => s.GetString()!)],
+        [.. e.GetProperty("variants").EnumerateArray().Select(v => new DescriptionVariant(
+            [.. v.GetProperty("when").EnumerateArray().Select(w => w.GetString()!)], Str(v, "text"),
+            [.. v.GetProperty("handlers").EnumerateArray().Select(h => (h[0].GetString()!, h[1].GetInt32()))]))]);
 
     /// <summary>One of a base's "enchants": {"id", "values", "ranges": [[min, max] …]}.</summary>
     static CraftEnchant Enchant(JsonElement e) => new(Str(e, "id"),
@@ -276,7 +279,10 @@ sealed class CrafterCatalog
     /// <summary>The lines the game shows for a theme, which it words from the theme's value alone: "Added Small Passive
     /// Skills grant: 12% increased Fire Damage", one for each thing a small passive grants.</summary>
     public IReadOnlyList<string> ThemeLines(CraftTheme theme) =>
-        [.. ModText.Lines(new CraftMod("", "", 0, 0, 0, [], [], theme.Stats), Description, null).Where(l => l.Length > 0).Select(l => "Added Small Passive Skills grant: " + l)];
+        [.. ThemeStats(theme, Description).Select(l => "Added Small Passive Skills grant: " + l)];
+
+    internal static IReadOnlyList<string> ThemeStats(CraftTheme theme, Func<string, StatDescription?> describe) =>
+        ModText.Lines(new CraftMod("", "", 0, 0, 0, [], [], theme.Stats), describe, null);
 
     /// <summary>The lines of a mod on an item of the base, with its values. A cluster jewel's passives mod also reads
     /// with its theme's lines.</summary>

@@ -772,10 +772,11 @@ public partial class SetupWizard : FormWindow
     static SetupTask SettingsBack(string folder) =>
         new(L.Text("Bring back your game settings"), () => !File.Exists(ClientLocator.SavedSettings(folder)), (_, _) => Task.Run(() => ClientLocator.RestoreSettings(folder)));
 
-    static SetupTask SettingsStep(string checkout)
+    static SetupTask SettingsStep(string checkout, bool release = false)
     {
         string client = Path.Combine(checkout, "Client");
-        return new(L.Text("Give LocalExile its own game settings"), () => ClientSettings.Read(client).Kind == ClientSettingsKind.Separate, (_, _) => Task.Run(() => ClientSettings.UseOwn(client)));
+        return new(L.Text("Give LocalExile its own game settings"), () => ClientSettings.Read(client).Kind == ClientSettingsKind.Separate,
+            (_, _) => Task.Run(() => ClientSettings.UseOwn(client, preferLockstep: release || Repo.PrefersLockstep(checkout))));
     }
 
     /// <summary>A release's steps: the zip, then LocalExile.exe's own setup, which goes on from wherever it stopped.</summary>
@@ -785,7 +786,7 @@ public partial class SetupWizard : FormWindow
         var tasks = new List<SetupTask> { new(L.Text("Download LocalExile"), () => LocalExileReleases.IsInstall(folder), (detail, stop) => DownloadReleaseAsync(folder, older, detail, stop)) };
         if (prepare) tasks.Add(new(L.Text("Prepare LocalExile"), null, (detail, stop) => PrepareReleaseAsync(folder, client, detail, stop)));
         if (prepare) tasks.Add(SettingsBack(folder));
-        if (prepare && ownSettings) tasks.Add(SettingsStep(folder));
+        if (prepare && ownSettings) tasks.Add(SettingsStep(folder, release: true));
         return tasks;
     }
 
@@ -975,13 +976,16 @@ public partial class SetupWizard : FormWindow
                 _settings.GameSettingsOffered = _settings.GameSettingsOffered || HasClient(checkout);
                 _settings.Save();
                 var settings = ClientSettings.Read(Path.Combine(checkout, "Client"));
-                bool ready = settings.Kind == ClientSettingsKind.Separate && ClientSettings.IsPredictive(settings.ConfigFile);
+                bool preferLockstep = UsingRelease || Repo.PrefersLockstep(checkout);
+                bool ready = settings.Kind == ClientSettingsKind.Separate && (preferLockstep || ClientSettings.IsPredictive(settings.ConfigFile));
                 DoneText.Text = !HasClient(checkout) ? L.Text("LocalExile is built. Add your game client with this guide when you have it: Setup → Run setup guide.")
                     : ready ? L.Text("Everything is in place. Press Play in Waypoint to start the servers and the game. LocalExile has its own game settings, so your normal Path of Exile keeps its own.")
+                    : preferLockstep ? L.Text("Everything is in place. Press Play in Waypoint to start the servers and the game.")
                     : L.Text("Everything is in place. Press Play in Waypoint to start the servers and the game. In the game, set Options → Game → Networking Mode to Predictive the first time.");
                 bool accounts = HasClient(checkout) && !UsingRelease;
                 if (UsingRelease) DoneText.Text = !HasClient(checkout) ? L.Text("LocalExile is installed. Run this guide again when you have your game client: Play → Finish setup.")
                     : ready ? L.Text("Everything is in place. Press Play in Waypoint to start the game. Log in with your account: its name goes in the Email field. LocalExile has its own game settings, so your normal Path of Exile keeps its own.")
+                    : preferLockstep ? L.Text("Everything is in place. Press Play in Waypoint to start the game. Log in with your account: its name goes in the Email field.")
                     : L.Text("Everything is in place. Press Play in Waypoint to start the game. Log in with your account: its name goes in the Email field. In the game, set Options → Game → Networking Mode to Predictive the first time.");
                 if (SwitchFrom is not null)
                 {

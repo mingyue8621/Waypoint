@@ -320,6 +320,42 @@ class LeagueDataTests(unittest.TestCase):
         with self.assertRaisesRegex(data.AccountError, "retained stash"):
             self.run_request(self.request())
 
+    def test_relational_saves_reserve_removed_league_names(self):
+        self.database.parent.mkdir(exist_ok=True)
+        auth = self.root / "data/auth.db"
+        with closing(sqlite3.connect(auth)) as db:
+            db.executescript(
+                "CREATE TABLE updates(name TEXT PRIMARY KEY,hash TEXT NOT NULL,state TEXT NOT NULL,applied_utc TEXT NOT NULL,speed_ms INTEGER NOT NULL) STRICT;"
+                "CREATE TABLE accounts(id TEXT PRIMARY KEY,name TEXT NOT NULL UNIQUE COLLATE NOCASE,account TEXT NOT NULL) STRICT;"
+            )
+            db.commit()
+        with closing(sqlite3.connect(self.database)) as db:
+            db.executescript('''
+                CREATE TABLE account_characters(id TEXT PRIMARY KEY,account_id TEXT NOT NULL,name TEXT NOT NULL UNIQUE COLLATE NOCASE,class INTEGER NOT NULL,level INTEGER NOT NULL,league TEXT NOT NULL,area_id TEXT NOT NULL,created_utc TEXT NOT NULL,last_played_utc TEXT NOT NULL,last_town TEXT,portrait INTEGER NOT NULL DEFAULT 0,portrait_frame INTEGER NOT NULL DEFAULT 0,hardcore_death_league TEXT,hardcore_death_utc TEXT,hardcore_death_permanent INTEGER) STRICT;
+                CREATE TABLE character_saves(id INTEGER PRIMARY KEY,name TEXT NOT NULL COLLATE NOCASE,deleted_utc TEXT,vitals_character TEXT,vitals_session TEXT,vitals_retired INTEGER) STRICT;
+                CREATE TABLE character_ascendancies(save INTEGER PRIMARY KEY,family TEXT NOT NULL,ascendancy TEXT NOT NULL) STRICT;
+                CREATE TABLE stash_saves(id INTEGER PRIMARY KEY,account TEXT NOT NULL UNIQUE COLLATE NOCASE) STRICT;
+                CREATE TABLE stash_tab_headers(stash INTEGER NOT NULL,tab INTEGER NOT NULL,PRIMARY KEY(stash,tab)) STRICT;
+                CREATE TABLE items(id INTEGER PRIMARY KEY,character INTEGER,stash INTEGER,parent INTEGER) STRICT;
+                CREATE TABLE item_mods(item INTEGER NOT NULL,ord INTEGER NOT NULL,PRIMARY KEY(item,ord)) STRICT;
+                CREATE TABLE meta(key TEXT PRIMARY KEY,value TEXT NOT NULL) STRICT;
+                INSERT INTO meta VALUES ('accounts_imported','1'),('relational_saves','1');''')
+            db.execute("INSERT INTO account_characters VALUES('c1','a1','Hero',3,1,'My League','1_1_1','t','t',NULL,0,0,NULL,NULL,NULL)")
+            db.commit()
+        with self.assertRaisesRegex(data.AccountError, "retained characters"):
+            data.run(self.modules, self.leagues, self.choices, self.database, self.history, "CreateLeague", self.request(), True, auth)
+        with closing(sqlite3.connect(self.database)) as db:
+            db.execute("UPDATE account_characters SET league='Standard', hardcore_death_league='My League'")
+            db.commit()
+        with self.assertRaisesRegex(data.AccountError, "retained characters"):
+            data.run(self.modules, self.leagues, self.choices, self.database, self.history, "CreateLeague", self.request(), True, auth)
+        with closing(sqlite3.connect(self.database)) as db:
+            db.execute("DELETE FROM account_characters")
+            db.execute("INSERT INTO stash_saves(account) VALUES('Fixture (My League)')")
+            db.commit()
+        with self.assertRaisesRegex(data.AccountError, "retained stash"):
+            data.run(self.modules, self.leagues, self.choices, self.database, self.history, "CreateLeague", self.request(), True, auth)
+
     def test_unknown_save_schema_and_pending_import_fail_closed(self):
         self.database_fixture()
         with closing(sqlite3.connect(self.database)) as db:

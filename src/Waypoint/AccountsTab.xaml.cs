@@ -41,10 +41,15 @@ public partial class AccountsTab : UserControl
             ShowAccess();
         });
         shared.Workspace.Changed += () => Dispatcher.BeginInvoke(ShowAccess);
+        shared.Monitor.Exited += (service, _) =>
+        {
+            if (service.Kind != ServiceKind.Recorder)
+                Dispatcher.BeginInvoke(async () => await shared.Workspace.RefreshAfterRuntimeStopAsync());
+        };
         shared.LiveRunning += running => Dispatcher.BeginInvoke(async () =>
         {
-            if (!running) await _shared.Workspace.RefreshAsync();
             ShowAccess();
+            if (!running) await shared.Workspace.RefreshAfterRuntimeStopAsync();
         });
         L.Current.PropertyChanged += (_, _) => { AccountGrid.Items.Refresh(); CharacterGrid.Items.Refresh(); ShowAccess(); };
         // Showing the section reads the list: the adapter needs no server for that.

@@ -87,7 +87,7 @@ sealed class SettingsEditor : StackPanel
         {
             var inner = new StackPanel { Margin = new Thickness(14, 0, 14, 6) };
             // The card is its frame: the expander's own bar and padding would be a second one inside it.
-            var expander = new Expander { Header = setting.Title, Content = inner, IsExpanded = setting.Type == "group" && !setting.Advanced, Background = null };
+            var expander = new Expander { Header = L.Text(setting.Title), Content = inner, IsExpanded = setting.Type == "group" && !setting.Advanced, Background = null };
 #if WINDOWS
             MaterialDesignThemes.Wpf.ExpanderAssist.SetHorizontalHeaderPadding(expander, new Thickness(14, 10, 14, 10));
 #endif
@@ -100,9 +100,13 @@ sealed class SettingsEditor : StackPanel
                 var readers = new Dictionary<string, Func<JsonNode?>>(StringComparer.Ordinal);
                 var values = value as JsonObject;
                 BuildGroup(inner, setting.Children ?? [], s => ModSettingsForm.Merge(s, values?.FirstOrDefault(p => p.Key.Equals(s.Name, StringComparison.OrdinalIgnoreCase)).Value), readers);
+                var declared = readers.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
                 return () =>
                 {
-                    var result = values?.DeepClone() as JsonObject ?? new JsonObject();
+                    var result = new JsonObject();
+                    if (values is not null)
+                        foreach (var (key, previous) in values)
+                            if (!declared.Contains(key)) result[key] = previous?.DeepClone();
                     foreach (var (name, read) in readers) result[name] = read()?.DeepClone();
                     return result;
                 };
@@ -119,7 +123,7 @@ sealed class SettingsEditor : StackPanel
             case "bool":
                 // With no text of its own: the shared style's margin and padding would keep it off the column's edge.
                 var toggle = new CheckBox { HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0), Padding = new Thickness(0), MinWidth = 0, IsChecked = value is JsonValue flag && flag.TryGetValue(out bool b) && b };
-                A11y.SetName(toggle, setting.Title);
+                A11y.SetName(toggle, L.Text(setting.Title));
                 control.Children.Add(toggle); CheckChanged(toggle, Change);
                 read = () => JsonValue.Create(toggle.IsChecked == true); break;
             case "integer" or "number": read = Number(control, setting, value); break;
@@ -135,7 +139,7 @@ sealed class SettingsEditor : StackPanel
                 var choice = new ComboBox { MinWidth = 120, HorizontalAlignment = HorizontalAlignment.Stretch };
                 foreach (var option in setting.Options) choice.Items.Add(new ComboBoxItem { Content = L.Text(option.Label), Tag = option.Value });
                 choice.SelectedItem = choice.Items.OfType<ComboBoxItem>().FirstOrDefault(i => ModSettingsForm.Equal((JsonNode?)i.Tag, value));
-                A11y.SetName(choice, setting.Title);
+                A11y.SetName(choice, L.Text(setting.Title));
                 choice.SelectionChanged += (_, _) => Change(); control.Children.Add(choice);
                 read = () => (choice.SelectedItem as ComboBoxItem)?.Tag is JsonNode chosen ? chosen.DeepClone() : null; break;
             case "choices":
@@ -146,7 +150,7 @@ sealed class SettingsEditor : StackPanel
                 read = () => new JsonArray(boxes.Where(b => b.Box.IsChecked == true).Select(b => b.Value.DeepClone()).ToArray()); break;
             default:
                 var entry = new TextBox { Text = ModSettingsForm.Show(value) };
-                A11y.SetName(entry, setting.Title);
+                A11y.SetName(entry, L.Text(setting.Title));
                 entry.TextChanged += (_, _) => Change(); control.Children.Add(entry);
                 read = () => JsonValue.Create(entry.Text ?? ""); break;
         }
@@ -188,7 +192,7 @@ sealed class SettingsEditor : StackPanel
     Func<JsonNode?> Number(StackPanel panel, ModSetting setting, JsonNode? value)
     {
         var text = new TextBox { Text = ModSettingsForm.Show(value, setting), Width = 84, VerticalAlignment = VerticalAlignment.Center, TextAlignment = TextAlignment.Right };
-        A11y.SetName(text, setting.Title);
+        A11y.SetName(text, L.Text(setting.Title));
         string initialText = text.Text ?? "";
         var line = new DockPanel();
         DockPanel.SetDock(text, Dock.Right);
@@ -200,7 +204,7 @@ sealed class SettingsEditor : StackPanel
         if (setting.Min is { } min && setting.Max is { } max && min < max && double.IsFinite(min) && double.IsFinite(max))
         {
             slider = new Slider { Minimum = min * scale, Maximum = max * scale, Margin = new Thickness(0, 0, 12, 0), VerticalAlignment = VerticalAlignment.Center };
-            A11y.SetName(slider, setting.Title);
+            A11y.SetName(slider, L.Text(setting.Title));
 #if WINDOWS
             slider.IsSnapToTickEnabled = setting.Step is not null || setting.Type == "integer";
             slider.TickFrequency = (setting.Step ?? 1) * scale;
@@ -295,7 +299,7 @@ sealed class SettingsEditor : StackPanel
         "list" or "choices" => new JsonArray(), "map" or "group" => new JsonObject(),
         "choice" when setting.Options.Count > 0 => setting.Options[0].Value.DeepClone(), _ => JsonValue.Create(""),
     };
-    static string Heading(ModSetting s) => s.Title + (s.Format == "percent" ? " (%)" : s.Format == "duration" ? " (" + L.Text("seconds") + ")" : s.Format == "multiplier" ? " (×)" : s.Unit.Length > 0 ? " (" + L.Text(s.Unit) + ")" : "");
+    static string Heading(ModSetting s) => L.Text(s.Title) + (s.Format == "percent" ? " (%)" : s.Format == "duration" ? " (" + L.Text("seconds") + ")" : s.Format == "multiplier" ? " (×)" : s.Unit.Length > 0 ? " (" + L.Text(s.Unit) + ")" : "");
     static void Description(StackPanel panel, ModSetting s)
     {
         void Add(string text)
