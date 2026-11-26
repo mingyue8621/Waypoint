@@ -37,9 +37,10 @@ public class VersionsTests
     }
 
     [Theory]
-    [InlineData(Launcher.Core.LocalExileReleases.Repository, true)]
-    [InlineData("MINGYUE8621/LOCALEXILE", true)]
+    [InlineData("LocalExile/LocalExile", true)]
+    [InlineData("localexile/LOCALEXILE", true)]
     [InlineData("Wrathen/LocalExile", true)]
+    [InlineData("mingyue8621/LocalExile", false)]
     [InlineData("evrydayjunglist/evryPath", false)]
     [InlineData(null, false)]
     public void LocalExile_is_known_by_its_old_name_too(string? repository, bool expected) =>

@@ -23,9 +23,10 @@ public sealed record RepositoryLookupResult(UpstreamHead? Upstream, DiscoveredRe
 
 public static class GitRepositoryProbe
 {
-    /// <summary>The repository the checkout follows: this build's own fork, not the project it was forked from, so the
-    /// Versions section compares and fetches against the place its commits are pushed to.</summary>
-    public const string UpstreamUrl = "https://github.com/mingyue8621/LocalExile.git";
+    /// <summary>The project's own repository, which is what a checkout follows: this is the source the installer clones,
+    /// the branches Versions compares against and the pull requests it fetches. Releases are separate: they are this
+    /// build's own, published where Launcher.Core.LocalExileReleases.Repository points.</summary>
+    public const string UpstreamUrl = "https://github.com/LocalExile/LocalExile.git";
 
     public static UpstreamHead? ParseUpstream(string output)
     {
