@@ -126,7 +126,9 @@ Accept a server as owned only when:
 
 - It is dotnet with exactly the expected Debug assembly argument (+ `serve` for Auth).
 - Its live parent is a dedicated cmd created no later than the server, with the exact upstream command and both
-  absolute per-checkout log destinations. Trailing Windows command-line whitespace is ignored.
+  absolute per-checkout log destinations. Trailing Windows command-line whitespace is ignored. The command names the
+  assembly by its path under the checkout or, as LocalExile's launcher does since 2026-10-31, by its full path, with the
+  whole line in quotes.
 - Its PID owns every required listening port before the status becomes Ready.
 
 Do not adopt unrelated absolute build folders, identical relative DLL paths in another checkout, shared terminal
@@ -329,7 +331,11 @@ check installed modules and dependencies and preserve the choices of other leagu
 server. Membership is a next-start choice, never a claim that the running server applied it.
 
 League changes now use an envelope with `league`, `choices` and `review`. `review` maps every relevant module manifest,
-league definition/list/settings/source file and custom marker to its SHA-256, plus the user override file. The inventory
+league definition/list/settings/source file and custom marker to its SHA-256, plus the user override file. With mods on
+(`ContentEnvironment.Mods`, the mods' folder; empty under `Game_MODS=0`) it also maps `mod-state.txt`, every mod's
+`mod.json` and the league files of every mod's `Leagues/` (`league/<mod id>:<path>`): which mods are on, which belong to
+leagues and which leagues they bring follows from those, read the same way by `GameSystems` and `LeagueData.py` (the
+mods' folder is the helper's eighth argument, `-` for none). The inventory
 must match exactly, including new/deleted files. `LeagueData.py` validates dependencies, cycles, required dedicated bundles,
 parent chains and a whole-composition witness from an existing same-family/mode profile. Only the selected league's
 override can change; other entries remain byte-value equivalent. Prior configuration is retained before atomic replacement.

@@ -1568,6 +1568,9 @@ Change location above to choose somewhere else.</value>
   <data name="Text_28c9a44bcbb7" xml:space="preserve">
     <value>Nothing changes. If this client shares its settings with your normal game, you set Networking Mode in the game yourself.</value>
   </data>
+  <data name="Text_28f8132472d1" xml:space="preserve">
+    <value>Restart the servers to apply the change to a league's mod.</value>
+  </data>
   <data name="Text_28fd171b0b6b" xml:space="preserve">
     <value>Ask again next time</value>
   </data>
@@ -2147,6 +2150,9 @@ This checkout has modified tracked files.</value>
   </data>
   <data name="Text_378c3757374c" xml:space="preserve">
     <value>Wild: any modifier on any gear</value>
+  </data>
+  <data name="Text_37a50d180bfc" xml:space="preserve">
+    <value>From the mod: {0}</value>
   </data>
   <data name="Text_37a8eec1ce19" xml:space="preserve">
     <value>default</value>
@@ -2760,6 +2766,9 @@ This checkout has modified tracked files.</value>
   </data>
   <data name="Text_480d4be7d61f" xml:space="preserve">
     <value>Shield</value>
+  </data>
+  <data name="Text_481ebcccf62c" xml:space="preserve">
+    <value>No league uses it</value>
   </data>
   <data name="Text_4850b174b713" xml:space="preserve">
     <value>Required</value>
@@ -3915,6 +3924,9 @@ Switching to it builds and runs that code on this computer with your rights, liv
   <data name="Text_6707ce0b6be2" xml:space="preserve">
     <value>that character name is taken</value>
   </data>
+  <data name="Text_6712fcd28cdc" xml:space="preserve">
+    <value>{0} (mod not on)</value>
+  </data>
   <data name="Text_67181a386da0" xml:space="preserve">
     <value>That folder is a LocalExile release</value>
   </data>
@@ -4797,6 +4809,9 @@ Switching to it builds and runs that code on this computer with your rights, liv
   <data xml:space="preserve" name="Text_808fc010f815">
     <value>{0}: {1} at backup</value>
   </data>
+  <data name="Text_809765cacb05" xml:space="preserve">
+    <value>This league needs this mod. LocalExile does not load the league while the mod is not installed or is turned off. Untick it to take it off the list.</value>
+  </data>
   <data xml:space="preserve" name="Text_80d16534322e">
     <value>BuildMod completed.</value>
   </data>
@@ -5147,6 +5162,9 @@ Switching to it builds and runs that code on this computer with your rights, liv
   </data>
   <data name="Text_8ad920a3b55b" xml:space="preserve">
     <value>Shaper</value>
+  </data>
+  <data name="Text_8b10a3945dee" xml:space="preserve">
+    <value>League content</value>
   </data>
   <data name="Text_8b18eaba7be1" xml:space="preserve">
     <value>3.  Copies the client and prepares it</value>
@@ -7215,6 +7233,9 @@ Owned servers will stop. Automatic backup is {2}. Source, client and login keys 
   <data name="Text_c1949802a579" xml:space="preserve">
     <value>Enchantments</value>
   </data>
+  <data name="Text_c19cd7719e80" xml:space="preserve">
+    <value>Adds league {0}</value>
+  </data>
   <data name="Text_c1a0441de50c" xml:space="preserve">
     <value>Back to My Mods</value>
   </data>
@@ -7449,6 +7470,9 @@ Last reported Gateway event. Open Gateway output for details.</value>
   </data>
   <data name="Text_c83931177471" xml:space="preserve">
     <value>This is not an item: copy one with Ctrl+C in Path of Building or in the game.</value>
+  </data>
+  <data name="Text_c86ca7b723e9" xml:space="preserve">
+    <value>A mod that runs in every league. Untick it to take it off the list.</value>
   </data>
   <data name="Text_c87d285421d0" xml:space="preserve">
     <value>The tested version could not be chosen (git exit {0}).</value>
@@ -8955,6 +8979,9 @@ Dependencies: {2}
   </data>
   <data name="Text_f18e2bb0aa10" xml:space="preserve">
     <value>Use separate game settings</value>
+  </data>
+  <data name="Text_f1959987d67e" xml:space="preserve">
+    <value>A league that a mod brings can't be hidden or shown here: an update of the mod would undo it.</value>
   </data>
   <data name="Text_f1b7505afa5c" xml:space="preserve">
     <value>Social</value>

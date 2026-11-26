@@ -26,20 +26,20 @@ public class CheckoutUpdatesTests
 
     [Fact]
     public void A_plain_copy_of_LocalExile_may_be_updated() =>
-        Assert.True(CheckoutUpdates.PlainCopy("main", "main", "LocalExile/LocalExile", 0, (0, 5)));
+        Assert.True(CheckoutUpdates.PlainCopy("main", "main", Git.UpstreamRepository, 0, (0, 5)));
 
     [Theory]
-    [InlineData("feature/x", "LocalExile/LocalExile", 0, 0)]    // another branch
+    [InlineData("feature/x", Git.UpstreamRepository, 0, 0)]    // another branch
     [InlineData("main", "evrydayjunglist/evryPath", 0, 0)]      // a fork as origin
     [InlineData("main", null, 0, 0)]                            // not from GitHub
-    [InlineData("main", "LocalExile/LocalExile", 1, 0)]         // uncommitted changes
-    [InlineData("main", "LocalExile/LocalExile", 0, 2)]         // commits of the player's own
+    [InlineData("main", Git.UpstreamRepository, 1, 0)]         // uncommitted changes
+    [InlineData("main", Git.UpstreamRepository, 0, 2)]         // commits of the player's own
     public void Anything_of_the_players_own_keeps_the_checkout_as_it_is(string branch, string? origin, int changes, int ahead) =>
         Assert.False(CheckoutUpdates.PlainCopy(branch, "main", origin, changes, (ahead, 5)));
 
     [Fact]
     public void A_checkout_LocalExile_cannot_be_compared_with_is_left_alone() =>
-        Assert.False(CheckoutUpdates.PlainCopy("main", "main", "LocalExile/LocalExile", 0, null));
+        Assert.False(CheckoutUpdates.PlainCopy("main", "main", Git.UpstreamRepository, 0, null));
 
     [Fact]
     public void The_way_back_is_offered_for_a_week()

@@ -1568,6 +1568,9 @@
   <data name="Text_28c9a44bcbb7" xml:space="preserve">
     <value>Ничего не меняется. Если этот клиент использует настройки вашей обычной игры, вы выбираете «Режим работы сети» (Networking Mode) в игре сами.</value>
   </data>
+  <data name="Text_28f8132472d1" xml:space="preserve">
+    <value>Перезапустите серверы, чтобы применить изменение мода лиги.</value>
+  </data>
   <data name="Text_28fd171b0b6b" xml:space="preserve">
     <value>Спросить снова в следующий раз</value>
   </data>
@@ -2147,6 +2150,9 @@
   </data>
   <data name="Text_378c3757374c" xml:space="preserve">
     <value>Любое свойство на любом снаряжении</value>
+  </data>
+  <data name="Text_37a50d180bfc" xml:space="preserve">
+    <value>Из мода: {0}</value>
   </data>
   <data name="Text_37a8eec1ce19" xml:space="preserve">
     <value>основная</value>
@@ -2760,6 +2766,9 @@
   </data>
   <data name="Text_480d4be7d61f" xml:space="preserve">
     <value>Щит</value>
+  </data>
+  <data name="Text_481ebcccf62c" xml:space="preserve">
+    <value>Не используется ни одной лигой</value>
   </data>
   <data name="Text_4850b174b713" xml:space="preserve">
     <value>Обязательный</value>
@@ -3915,6 +3924,9 @@
   <data name="Text_6707ce0b6be2" xml:space="preserve">
     <value>это имя персонажа уже занято</value>
   </data>
+  <data name="Text_6712fcd28cdc" xml:space="preserve">
+    <value>{0} (мод не включён)</value>
+  </data>
   <data name="Text_67181a386da0" xml:space="preserve">
     <value>Эта папка — релиз LocalExile</value>
   </data>
@@ -4797,6 +4809,9 @@
   <data xml:space="preserve" name="Text_808fc010f815">
     <value>{0}: {1} при копировании</value>
   </data>
+  <data name="Text_809765cacb05" xml:space="preserve">
+    <value>Этой лиге нужен этот мод. LocalExile не загружает лигу, пока мод не установлен или выключен. Снимите флажок, чтобы убрать его из списка.</value>
+  </data>
   <data xml:space="preserve" name="Text_80d16534322e">
     <value>Мод собран.</value>
   </data>
@@ -5147,6 +5162,9 @@
   </data>
   <data name="Text_8ad920a3b55b" xml:space="preserve">
     <value>Создатель</value>
+  </data>
+  <data name="Text_8b10a3945dee" xml:space="preserve">
+    <value>Контент лиги</value>
   </data>
   <data name="Text_8b18eaba7be1" xml:space="preserve">
     <value>3.  Копирует клиент и подготавливает его</value>
@@ -7215,6 +7233,9 @@
   <data name="Text_c1949802a579" xml:space="preserve">
     <value>Зачарования</value>
   </data>
+  <data name="Text_c19cd7719e80" xml:space="preserve">
+    <value>Добавляет лигу {0}</value>
+  </data>
   <data name="Text_c1a0441de50c" xml:space="preserve">
     <value>Назад к моим модам</value>
   </data>
@@ -7449,6 +7470,9 @@
   </data>
   <data name="Text_c83931177471" xml:space="preserve">
     <value>Это не предмет: скопируйте его через Ctrl+C в Path of Building или в игре.</value>
+  </data>
+  <data name="Text_c86ca7b723e9" xml:space="preserve">
+    <value>Мод, который работает во всех лигах. Снимите флажок, чтобы убрать его из списка.</value>
   </data>
   <data name="Text_c87d285421d0" xml:space="preserve">
     <value>Не удалось выбрать проверенную версию (git завершился с кодом {0}).</value>
@@ -8955,6 +8979,9 @@
   </data>
   <data name="Text_f18e2bb0aa10" xml:space="preserve">
     <value>Использовать отдельные настройки игры</value>
+  </data>
+  <data name="Text_f1959987d67e" xml:space="preserve">
+    <value>Лигу, которую добавляет мод, здесь нельзя скрыть или показать: обновление мода отменит это изменение.</value>
   </data>
   <data name="Text_f1b7505afa5c" xml:space="preserve">
     <value>Общение</value>

@@ -479,6 +479,100 @@ class LeagueDataTests(unittest.TestCase):
         with self.assertRaises(data.AccountError):
             self.run_request(self.visibility("Survivors", True), action="SetLeagueVisibility")
 
+    def test_a_leagues_mod_is_listed_like_a_module_and_a_mods_league_is_a_league(self):
+        self.standard_as_shipped()
+        mods = self.root / "Mods/Binaries"
+        # Mods of the leagues that list them (bots, idols), one of every league, two turned off, one with a module's id.
+        self.write(mods / "bots/mod.json", {"Leagues": "listed", "depends": ["Vendors"]})
+        self.write(mods / "idols/mod.json", {"leagues": "listed"})
+        self.write(mods / "every/mod.json", {})
+        self.write(mods / "off/mod.json", {"leagues": "listed", "enabled": False})
+        self.write(mods / "stated/mod.json", {"leagues": "listed"})
+        self.write(mods / "harvest/mod.json", {"leagues": "listed"})
+        (mods / "broken").mkdir()
+        (mods / "broken/mod.json").write_text("{ not json", encoding="utf-8")
+        (mods / "mod-state.txt").write_text("stated off\nbots on\n", encoding="utf-8")
+        phrecia = mods / "idols/Leagues/Phrecia"
+        self.write(phrecia / "league.json", {"name": "Phrecia", "base": "Standard", "parent": "Standard", "mods": ["idols"]})
+        self.write(phrecia / "modules.json", {"modules": ["Core/Game"]})
+        (phrecia / "Source").mkdir()
+        (phrecia / "Source/Fixture.cs").write_text("public sealed class FixtureLeague : League { }", encoding="utf-8")
+        self.write(mods / "idols/Leagues/Standard/league.json", {"name": "Standard"})
+        self.write(mods / "idols/Leagues/Standard/modules.json", {"modules": []})
+        self.write(mods / "off/Leagues/Hidden/league.json", {"name": "Hidden", "parent": "Standard"})
+        self.write(mods / "off/Leagues/Hidden/modules.json", {"modules": ["Core/Game"]})
+
+        systems, profiles = data.catalogue(self.modules, self.leagues, mods)
+        self.assertEqual(sorted(k for k, v in systems.items() if v.get("mod")), ["bots", "idols"])
+        self.assertFalse(systems["harvest"].get("mod"))
+        by_name = {p["name"]: p for p in profiles}
+        self.assertNotIn("Hidden", by_name)
+        self.assertEqual((by_name["Phrecia"]["mod"], by_name["Phrecia"]["modules"]), ("idols", ["Core/Game", "idols"]))
+        self.assertEqual((by_name["Standard"]["mod"], by_name["Standard"]["folder"]), ("", self.leagues / "Standard"))
+
+        def choose(league, add=(), remove=()):
+            current = data.read_json(self.choices) if self.choices.exists() else {}
+            return {"league": league, "review": data.review(self.modules, self.leagues, self.choices, mods),
+                    "choices": {**current, league: {"add": list(add), "remove": list(remove)}}}
+
+        def run(request, action="SaveLeagueModules"):
+            data.run(self.modules, self.leagues, self.choices, self.database, self.history, action, request, True, mods=mods)
+
+        # A mod is ticked like a module, by its id in any case or by the path it had as a module; what it needs is on.
+        run(choose("Standard", ["Custom/Bots", "idols"]))
+        self.assertEqual(data.read_json(self.choices)["Standard"]["add"], ["Custom/Bots", "idols"])
+        run(choose("Phrecia", remove=["IDOLS"]))
+        # A mod of every league that is on is not missing (it runs anyway); one that is off is.
+        run(choose("Standard", ["every"]))
+        with self.assertRaisesRegex(data.AccountError, "missing"):
+            run(choose("Standard", ["stated"]))
+        with self.assertRaisesRegex(data.AccountError, "bots needs Vendors"):
+            run(choose("Phrecia", ["bots"]))
+        # The review a request was made with knows no mods: it is not this folder's.
+        with self.assertRaisesRegex(data.AccountError, "changed"):
+            run({**choose("Standard"), "review": self.review()})
+        # A mod's league is the mod's files, also as part of another league's change.
+        with self.assertRaisesRegex(data.AccountError, "mod brings"):
+            run({"league": "Phrecia", "visible": False, "review": data.review(self.modules, self.leagues, self.choices, mods)}, "SetLeagueVisibility")
+        # A league made from a mod's league lists its mods as modules, once.
+        request = {"template": "Phrecia", "name": "My Phrecia", "description": "Mine.", "modules": ["Core/Game", "idols"],
+                   "review": data.review(self.modules, self.leagues, self.choices, mods)}
+        run(request, "CreateLeague")
+        made = self.leagues / "My Phrecia"
+        self.assertEqual(data.read_json(made / "league.json")["mods"], ["idols"])
+        self.assertEqual(data.read_json(made / "modules.json")["modules"], ["Core/Game"])
+        # A new league's name is not an installed mod's.
+        with self.assertRaisesRegex(data.AccountError, "already in use"):
+            run({**request, "name": "every", "review": data.review(self.modules, self.leagues, self.choices, mods)}, "CreateLeague")
+        # What GameSystems reads the same way: a mod.json in UTF-16, a key in two cases (the first counts), "depends": null.
+        (mods / "every/mod.json").write_bytes('{"leagues": "listed", "LEAGUES": "all", "depends": null}'.encode("utf-16"))
+        systems, _ = data.catalogue(self.modules, self.leagues, mods)
+        self.assertNotIn("every", systems)
+        (mods / "every/mod.json").write_bytes('{"leagues": "listed", "LEAGUES": "all"}'.encode("utf-16"))
+        systems, _ = data.catalogue(self.modules, self.leagues, mods)
+        self.assertEqual(systems["every"], {"path": "every", "depends": [], "mod": True})
+        # A league mod that depends on a mod of every league can be ticked.
+        self.write(mods / "lib/mod.json", {})
+        self.write(mods / "uses/mod.json", {"leagues": "listed", "depends": ["lib"]})
+        run(choose("Standard", ["Custom/Bots", "idols", "uses"]))
+        # A mod's league that cannot be read, or has no Source/ or Binaries/, is not there; the others still save.
+        self.write(mods / "uses/Leagues/Broken/league.json", {"name": "Broken", "creatable": "yes"})
+        (mods / "uses/Leagues/Broken/Source").mkdir()
+        self.write(mods / "uses/Leagues/NoSource/league.json", {"name": "NoSource"})
+        self.write(mods / "uses/Leagues/NoSource/modules.json", {"modules": ["Core/Game"]})
+        self.assertFalse({"Broken", "NoSource"} & {p["name"] for p in data.catalogue(self.modules, self.leagues, mods)[1]})
+        run(choose("Standard", ["Custom/Bots", "idols"]))
+        # A listed mod named exactly as a league's folder does not load.
+        self.write(mods / "Hardcore/mod.json", {"leagues": "listed"})
+        self.assertNotIn("hardcore", data.catalogue(self.modules, self.leagues, mods)[0])
+        # A mod turned off is no longer there, and what was reviewed has changed.
+        before = data.review(self.modules, self.leagues, self.choices, mods)
+        (mods / "mod-state.txt").write_text("idols off\n", encoding="utf-8")
+        self.assertNotEqual(before, data.review(self.modules, self.leagues, self.choices, mods))
+        systems, profiles = data.catalogue(self.modules, self.leagues, mods)
+        self.assertNotIn("idols", systems)
+        self.assertNotIn("Phrecia", {p["name"] for p in profiles})
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

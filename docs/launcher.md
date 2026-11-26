@@ -1127,7 +1127,11 @@ the server's `mod-state.txt` (no backup, no client), which a stopped Gateway rea
 applies within a second (LocalExile since 2026-11-07; an older Gateway applies it at its next start). While Gateway runs,
 Windows and Linux show a restart notice when the checkout's source does not identify the live-choice hook; release installs
 also show the notice because they have no source to verify. The checkbox represents the saved choice, not proof of a live
-load. A switch holds the workspace lock and is refused while another operation holds it. A program that is no LocalExile
+load. A league's mod (`mod.json` `"leagues": "listed"`; LocalExile's mod guide, "Leagues") has the tag **League content** on its
+page, and **Adds league …** for each league in its `Leagues/` folder; Browse takes the tag from the index's `leagues`. One
+that no league lists is not a failure: its row says **No league uses it** and offers no Reinstall. The servers read a
+mod's leagues and world data, and which leagues list a mod, only when they start: after such a mod is installed, updated,
+uninstalled or switched while they run, the notice says to restart them, until they stop. A switch holds the workspace lock and is refused while another operation holds it. A program that is no LocalExile
 server holding one of the servers' ports (Steam's helper on 8080, say) does not block mod changes, nor Modules, Leagues
 or Accounts: it blocks only a start, and the message names it. **Update** and
 **Update all** appear when a repository has a newer version. The ⋮ menu holds the rarer tools: Install from folder…,
@@ -1220,6 +1224,7 @@ unsupported gameplay settings.
 
 The **Global mods** summary stays above the league workspace while switching flags or modes. It lists the checkout's
 saved enabled mod names (up to three, with the full list in its tooltip), separately from the last-checked live load count.
+It holds the mods of every league; a league's mod is in the leagues' lists (below).
 Saved choices never imply a successful live load. An unavailable/not-checked report is identified explicitly; an existing
 report is always labelled **Last checked**, even if the server has since stopped or restarted. The summary never runs a
 live inspection itself. **Manage in Mods** opens Mods without changing league choices.
@@ -1317,6 +1322,23 @@ module the league does not ship with (the Currency Exchange in an SSF or a Ruthl
   NessaDevelopmentTabs, at the time of writing), off until its user lists it in the league they want it in, which is how
   LocalExile's own guide turns PlayerBots on (`{"Standard": {"add": ["PlayerBots"]}}` in `data/league-modules.json`).
   Saving writes that same entry. An add-on is never part of a bundle, in a league made in Waypoint that lists it either.
+- **A league's mod** (an installed mod that is on and whose `mod.json` says `"leagues": "listed"`; LocalExile's mod
+  guide, "Leagues") is a row of the list like a module, with a **Mod** badge: ticked where a league lists it, in its
+  `league.json` (`"mods"`) or the user's choices, and ticked or unticked like a module. It is listed by its id, and an
+  entry that names it in another case or by the path it had as a module (`Custom/PlayerBots`) is that mod's row. It
+  follows the module rules: what it `depends` on is on, one that only isolated leagues list stays there, a league's own
+  asks first. A mod with a module's id is not shown: the module runs. The Modules section lists LocalExile's modules
+  only.
+- **A league that a mod brings** (its `Leagues/<Name>/` folder, read while the mod is on, after the checkout's own: the
+  first of a name stays) is a league like the others, and its details say which mod it is from. Its module choices are
+  edited and saved as any league's; it is not hidden or shown here and its settings are not edited here, because its
+  files are the mod's and an update of the mod replaces them. A league made from one keeps that league's mods that
+  stay ticked as its own (`league.json` `"mods"`). A league whose `league.json` names a mod that is not on, and still
+  lists it, is shown as not offered (LocalExile does not load it), with that mod's row as **{id} (mod not on)**. A mod's
+  league that cannot be read is left out, as LocalExile leaves it out; a new league is not named as an installed mod.
+  All of this needs a LocalExile that has listed mods (its catalog's `ModFolders.On`; a release above 0.6.0); with an
+  older one, or `Game_MODS=0`, Waypoint reads no mod here.
+- A league's mod may depend on a mod of every league that is on.
 - **A listed module that is not installed** (a typo in a hand edit, a module taken away since) shows as
   **{path} (not installed)**, ticked. LocalExile skips it and loads the league, so the league stays editable; unticking
   the entry takes it off the list. It is never required, and a new one that is not installed is refused. Save, discard and validation feedback stay visible below the scrolling panel. Details, the card

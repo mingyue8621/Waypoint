@@ -154,7 +154,13 @@ public sealed partial class GameSystemsTab
     {
         var row = new DockPanel { LastChildFill = true, VerticalAlignment = VerticalAlignment.Center };
         var icon = new ModuleGlyph(module.Id, 18); icon.Margin = new Thickness(0, 0, 12, 0);
-        DockPanel.SetDock(icon, Dock.Left); row.Children.Add(icon); row.Children.Add(Type(ModuleTitle(module), 13, true));
+        DockPanel.SetDock(icon, Dock.Left); row.Children.Add(icon);
+        if (module.Mod)
+        {
+            var mod = Badge(L.Text("Mod")); mod.Margin = new Thickness(12, 0, 0, 0);
+            DockPanel.SetDock(mod, Dock.Right); row.Children.Add(mod);
+        }
+        row.Children.Add(Type(ModuleTitle(module), 13, true));
         return row;
     }
     static Element ModuleTileVisual(GameSystem module)

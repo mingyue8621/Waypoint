@@ -37,8 +37,8 @@ public class VersionsTests
     }
 
     [Theory]
-    [InlineData("LocalExile/LocalExile", true)]
-    [InlineData("localexile/LOCALEXILE", true)]
+    [InlineData(Launcher.Core.LocalExileReleases.Repository, true)]
+    [InlineData("MINGYUE8621/LOCALEXILE", true)]
     [InlineData("Wrathen/LocalExile", true)]
     [InlineData("evrydayjunglist/evryPath", false)]
     [InlineData(null, false)]

@@ -82,7 +82,9 @@ public class ReleaseModCompatibilityTests
         try
         {
             Repo.IsInstall = false;
-            Repo.ClientVersion = ReleaseVersion.Parse("0.3.0");
+            // This launcher reads compatibleClientVersions as "the first build it needs", not an exact match: a mod that
+            // asks for 0.2.0-beta is incompatible only on an older build, so the copy here is one before it.
+            Repo.ClientVersion = ReleaseVersion.Parse("0.1.0-beta");
             var offer = new BrowseItem(ModSource.Official, Listing, null, null);
             Assert.True(offer.Incompatible);
             Assert.NotNull(offer.IncompatibleTip);

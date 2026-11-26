@@ -1532,6 +1532,9 @@
   <data name="Text_28c9a44bcbb7" xml:space="preserve">
     <value>不做任何更改。如果此客户端与你平时玩的游戏共用设置，你需要自行在游戏中设置“连线模式”（Networking Mode）。</value>
   </data>
+  <data name="Text_28f8132472d1" xml:space="preserve">
+    <value>请重启服务器，以应用对联盟模组的更改。</value>
+  </data>
   <data name="Text_28fd171b0b6b" xml:space="preserve">
     <value>下次再询问</value>
   </data>
@@ -2105,6 +2108,9 @@
   </data>
   <data name="Text_378c3757374c" xml:space="preserve">
     <value>不限制装备类别</value>
+  </data>
+  <data name="Text_37a50d180bfc" xml:space="preserve">
+    <value>来自模组：{0}</value>
   </data>
   <data name="Text_37a8eec1ce19" xml:space="preserve">
     <value>默认</value>
@@ -2691,6 +2697,9 @@
   </data>
   <data name="Text_480d4be7d61f" xml:space="preserve">
     <value>盾牌</value>
+  </data>
+  <data name="Text_481ebcccf62c" xml:space="preserve">
+    <value>没有联盟使用它</value>
   </data>
   <data name="Text_4850b174b713" xml:space="preserve">
     <value>必需</value>
@@ -3804,6 +3813,9 @@
   <data name="Text_6707ce0b6be2" xml:space="preserve">
     <value>该角色名称已被占用</value>
   </data>
+  <data name="Text_6712fcd28cdc" xml:space="preserve">
+    <value>{0}（模组未启用）</value>
+  </data>
   <data name="Text_67181a386da0" xml:space="preserve">
     <value>该文件夹是 LocalExile 发行版</value>
   </data>
@@ -4674,6 +4686,9 @@
   <data name="Text_808fc010f815" xml:space="preserve">
     <value>{0}：{1}（备份时）</value>
   </data>
+  <data name="Text_809765cacb05" xml:space="preserve">
+    <value>此联赛需要该模组。在该模组未安装或已停用时，LocalExile 不会加载此联赛。取消勾选即可将其从列表中移除。</value>
+  </data>
   <data name="Text_80d16534322e" xml:space="preserve">
     <value>模组已构建。</value>
   </data>
@@ -5018,6 +5033,9 @@
   </data>
   <data name="Text_8ad920a3b55b" xml:space="preserve">
     <value>塑界者</value>
+  </data>
+  <data name="Text_8b10a3945dee" xml:space="preserve">
+    <value>联盟内容</value>
   </data>
   <data name="Text_8b18eaba7be1" xml:space="preserve">
     <value>3.  复制客户端并进行准备</value>
@@ -7014,6 +7032,9 @@
   <data name="Text_c1949802a579" xml:space="preserve">
     <value>附魔</value>
   </data>
+  <data name="Text_c19cd7719e80" xml:space="preserve">
+    <value>新增联盟 {0}</value>
+  </data>
   <data name="Text_c1a0441de50c" xml:space="preserve">
     <value>返回我的模组</value>
   </data>
@@ -7236,6 +7257,9 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
   </data>
   <data name="Text_c83931177471" xml:space="preserve">
     <value>这不是物品：请在 Path of Building 或游戏中用 Ctrl+C 复制一件物品。</value>
+  </data>
+  <data name="Text_c86ca7b723e9" xml:space="preserve">
+    <value>在所有联赛中运行的模组。取消勾选即可将其从列表中移除。</value>
   </data>
   <data name="Text_c87d285421d0" xml:space="preserve">
     <value>无法选择经过测试的版本（git 退出代码 {0}）。</value>
@@ -8700,6 +8724,9 @@ Gateway 最近报告的事件。打开 Gateway 输出查看详情。</value>
   </data>
   <data name="Text_f18e2bb0aa10" xml:space="preserve">
     <value>使用独立的游戏设置</value>
+  </data>
+  <data name="Text_f1959987d67e" xml:space="preserve">
+    <value>模组带来的联赛无法在这里隐藏或显示：更新该模组会撤销该更改。</value>
   </data>
   <data name="Text_f1b7505afa5c" xml:space="preserve">
     <value>社交</value>
